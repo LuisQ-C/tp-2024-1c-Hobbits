@@ -16,7 +16,7 @@ int iniciar_servidor(t_log* logger)
     hints.ai_flags = AI_PASSIVE;
 
     //LEER PUERTO DESDE CONFIG, LA IP ESTA BIEN PORQUE SE EJECUTA EN LA IP DE LA MAQUINA DONDE VA CORRER
-    getaddrinfo(NULL,"4444",&hints,&servinfo);
+    getaddrinfo(NULL,"35892",&hints,&servinfo);
 
     //Creamos el socket de escucha del servidor
     socket_servidor = socket(servinfo->ai_family,servinfo->ai_socktype,servinfo->ai_protocol);
