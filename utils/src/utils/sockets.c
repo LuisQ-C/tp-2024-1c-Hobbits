@@ -1,10 +1,10 @@
-#include <utils/sockets.h>
+#include "../include/sockets.h"
 
 void decir_hola(char* quien) {
     printf("Hola desde %s!!\n", quien);
 }
 
-int iniciar_servidor(t_log* logger)
+int iniciar_servidor(t_log* logger,char* ip,char* puerto)
 {
     //NO HACE FALTA ENTENDER EN PROFUNDIDAD LO SIGUIENTE:
     int socket_servidor;
@@ -16,7 +16,7 @@ int iniciar_servidor(t_log* logger)
     hints.ai_flags = AI_PASSIVE;
 
     //LEER PUERTO DESDE CONFIG, LA IP ESTA BIEN PORQUE SE EJECUTA EN LA IP DE LA MAQUINA DONDE VA CORRER
-    getaddrinfo(NULL,"35892",&hints,&servinfo);
+    getaddrinfo(ip,puerto,&hints,&servinfo);
 
     //Creamos el socket de escucha del servidor
     socket_servidor = socket(servinfo->ai_family,servinfo->ai_socktype,servinfo->ai_protocol);
