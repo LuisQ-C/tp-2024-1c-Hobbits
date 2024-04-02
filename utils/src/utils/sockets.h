@@ -1,5 +1,5 @@
-#ifndef UTILS_HELLO_H_
-#define UTILS_HELLO_H_
+#ifndef UTILS_SOCKETS_H_
+#define UTILS_SOCKETS_H_
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,7 +11,7 @@
 #include<string.h>
 #include<assert.h>
 
-//#include <signal.h>
+#include <signal.h>
 
 //t_log* logger;
 /**
