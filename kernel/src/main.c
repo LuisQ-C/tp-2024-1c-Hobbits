@@ -37,7 +37,7 @@ t_log* iniciar_logger(void)
 t_config* iniciar_config(t_log* logger)
 {
 	t_config* nuevo_config;
-	nuevo_config = config_create("/home/utnso/tp-2024-1c-Hobbits/kernel/kernel.config");
+	nuevo_config = config_create("kernel.config"); // PARA EJECUTAR EN CONSOLA: DESDE KERNEL -> ./BIN/KERNEL
 	if(nuevo_config == NULL){
 		log_error(logger,"No se pudo crear el config!");
 		abort();
