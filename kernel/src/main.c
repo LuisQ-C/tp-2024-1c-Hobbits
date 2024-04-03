@@ -14,6 +14,7 @@ int main(int argc, char* argv[]) {
     if(!generar_conexiones(logger,&fd_memoria,&fd_cpu,config)){
         exit(1);
     }
+    
     liberar_conexion(fd_memoria);
     liberar_conexion(fd_cpu);
 

@@ -59,7 +59,7 @@ int esperar_cliente(int fd_escucha,t_log* logger)
         exit(1);
     }
 	log_info(logger,"Se conecto un cliente!");
-
+    
 	return fd_conexion;
 }
 int crear_conexion(char *ip, char* puerto,t_log* logger,char* nombre_servidor)
