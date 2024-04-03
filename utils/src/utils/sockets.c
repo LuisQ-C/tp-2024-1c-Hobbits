@@ -7,7 +7,8 @@ void decir_hola(char* quien) {
 int iniciar_servidor(t_log* logger,char* ip,char* puerto)
 {
     //NO HACE FALTA ENTENDER EN PROFUNDIDAD LO SIGUIENTE:
-    int socket_servidor;
+    int err;
+    int fd_escucha;
     struct addrinfo hints, *servinfo, *p;
 
     memset(&hints, 0, sizeof(hints));
@@ -16,46 +17,54 @@ int iniciar_servidor(t_log* logger,char* ip,char* puerto)
     hints.ai_flags = AI_PASSIVE;
 
     //LEER PUERTO DESDE CONFIG, LA IP ESTA BIEN PORQUE SE EJECUTA EN LA IP DE LA MAQUINA DONDE VA CORRER
-    getaddrinfo(ip,puerto,&hints,&servinfo);
-
+    err = getaddrinfo(ip,puerto,&hints,&servinfo);
+    if(err != 0){
+        log_error(logger,"Error al obtener informacion de la ip y puerto del servidor");
+        exit(1);
+    }
     //Creamos el socket de escucha del servidor
-    socket_servidor = socket(servinfo->ai_family,servinfo->ai_socktype,servinfo->ai_protocol);
-    //ERROA AL CREAR SOCKET
-    if(socket_servidor == -1)
+    fd_escucha = socket(servinfo->ai_family,servinfo->ai_socktype,servinfo->ai_protocol);
+    if(fd_escucha == -1)
     {
         log_error(logger,"Error al crear el socket!");
-        close(socket_servidor); //NO SE SI ESTA BIEN, ELIMINA EL FD
+        exit(1); 
     }
     //Asociamos socket a un puerto
-    bind(socket_servidor,servinfo->ai_addr,servinfo->ai_addrlen);//NO DEVUELVE ERROR
+    err = bind(fd_escucha,servinfo->ai_addr,servinfo->ai_addrlen);
+    if(err != 0){
+        log_error(logger,"Error al bindear el socket al ip y puerto");
+        exit(1);
+    }
     //escuchamos conexiones entrantes, ponemos el socket creado como escucha, solo se encarga de eso
-    if(listen(socket_servidor,SOMAXCONN) == -1){
-        log_error(logger,"Error al marcar socket como escucha!");
-        close(socket_servidor); //ELIMINA EL FD,termina conexion
+    err = listen(fd_escucha,SOMAXCONN);
+    if(err == -1){
+        log_error(logger,"Error al marcar el socket como escucha");
+        exit(1);
     }
     
 
     freeaddrinfo(servinfo);
     log_trace(logger,"Listo para escuchar a mi cliente!");
 
-    return socket_servidor;
+    return fd_escucha;
 }
-int esperar_cliente(int socket_servidor,t_log* logger)
+int esperar_cliente(int fd_escucha,t_log* logger)
 {
 
 	// Aceptamos un nuevo cliente, se crea un nuevo socket, canal de comunicacion
-	int socket_cliente = accept(socket_servidor, NULL, NULL);
-    if(socket_cliente == -1)
+	int fd_conexion = accept(fd_escucha, NULL, NULL);
+    if(fd_conexion == -1)
     {
-        log_error(logger,"No se pudo aceptar la solicitud del cliente!");
-        close(socket_cliente);
+        log_error(logger,"No se pudo aceptar la conexion entrante");
+        exit(1);
     }
 	log_info(logger,"Se conecto un cliente!");
 
-	return socket_cliente;
+	return fd_conexion;
 }
-int crear_conexion(char *ip, char* puerto)
+int crear_conexion(char *ip, char* puerto,t_log* logger,char* nombre_servidor)
 {
+    int err;
 	struct addrinfo hints;
 	struct addrinfo *server_info;
 
@@ -64,19 +73,28 @@ int crear_conexion(char *ip, char* puerto)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(ip, puerto, &hints, &server_info);
-
+	err = getaddrinfo(ip, puerto, &hints, &server_info);
+    if(err != 0){
+        log_error(logger,"Error al obtener informacion de la ip y puerto del cliente"); // REVISAR DESCRIPCION DEL LOGGER
+        exit(1);
+    }
 	// Ahora vamos a crear el socket.
-	int socket_cliente = socket(server_info->ai_family,server_info->ai_socktype,server_info->ai_protocol);
+	int fd_conexion = socket(server_info->ai_family,server_info->ai_socktype,server_info->ai_protocol);
 
 	// Ahora que tenemos el socket, vamos a conectarlo
-	connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
+	err = connect(fd_conexion, server_info->ai_addr, server_info->ai_addrlen);
+    if(err == -1){
+        log_error(logger,"Error al conectar cliente-servidor");
+        exit(1);
+    }
+
+    log_info(logger,"Conectado a %s, IP:%s, PUERTO:%s",nombre_servidor,ip,puerto);
 
 	freeaddrinfo(server_info);
 
-	return socket_cliente;
+	return fd_conexion;
 }
-void liberar_conexion(int socket_cliente)
+void liberar_conexion(int fd_conexion)
 {
-	close(socket_cliente);
+	close(fd_conexion);
 }

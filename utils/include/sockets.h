@@ -20,9 +20,9 @@
 */
 void decir_hola(char* quien);
 
-int iniciar_servidor(t_log*,char* ip, char* puerto);
+int iniciar_servidor(t_log*,char*, char*);
 int esperar_cliente(int,t_log*);
-int crear_conexion(char* , char* );
+int crear_conexion(char* , char*,t_log*,char*);
 void liberar_conexion(int);
 
 #endif

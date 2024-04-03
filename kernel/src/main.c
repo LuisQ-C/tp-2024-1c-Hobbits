@@ -1,27 +1,21 @@
 #include "../include/main.h"
 
 int main(int argc, char* argv[]) {
-    int conexion;
-    char* ip;
-    char* puerto;
-    
+    int fd_memoria = 0;
+    int fd_cpu = 0;
+
 
     t_log* logger;
     t_config* config;
 
     logger = iniciar_logger();
     config = iniciar_config(logger);
-    
-    //paso datos de ip y puerto
-    ip = config_get_string_value(config,"IP_MEMORIA");
-    puerto = config_get_string_value(config,"PUERTO_MEMORIA");
-    log_info(logger,"Lei la IP %s y el puerto %s", ip, puerto);
 
-    //EL SERVIDOR YA ESTA CORRIENDO
-
-    conexion = crear_conexion(ip,puerto);
-
-    liberar_conexion(conexion);
+    if(!generar_conexiones(logger,&fd_memoria,&fd_cpu,config)){
+        exit(1);
+    }
+    liberar_conexion(fd_memoria);
+    liberar_conexion(fd_cpu);
 
 }
 t_log* iniciar_logger(void)

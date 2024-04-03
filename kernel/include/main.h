@@ -8,6 +8,7 @@
 #include<commons/string.h>
 #include<commons/config.h>
 #include<readline/readline.h>
+#include"../include/conexiones.h"
 
 t_log* iniciar_logger(void);
 t_config* iniciar_config(t_log*);

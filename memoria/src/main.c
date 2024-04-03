@@ -4,7 +4,7 @@
 int main(int argc, char* argv[]) {
     //char* puerto = "4444";
     //iniciar_memoria();
-    logger = log_create("hola.log", "Servidor", 1, LOG_LEVEL_DEBUG);
+    logger = log_create("memoria.log", "MODULO MEMORIA", 1, LOG_LEVEL_DEBUG);
     int server_fd = iniciar_servidor(logger,"0.0.0.0","8096");
     log_info(logger,"Servidor listo para recibir cliente!");
     int cliente_fd = esperar_cliente(server_fd,logger);

@@ -1,6 +1,11 @@
 #include "../include/main.h"
 
+t_log* logger;
 int main(int argc, char* argv[]) {
-    decir_hola("CPU");
+    
+    logger = log_create("cpu.log", "MODULO CPU", 1, LOG_LEVEL_DEBUG);
+    int server_fd = iniciar_servidor(logger,"0.0.0.0","8097");
+    log_info(logger,"Servidor listo para recibir cliente!");
+    int cliente_fd = esperar_cliente(server_fd,logger);
     return 0;
 }
