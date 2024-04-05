@@ -5,8 +5,8 @@
 #include <stdio.h>
 
 #include "../../utils/include/sockets.h"
+#include "../../utils/include/logsConfigs.h"
 
-#define PUERTO "4444" //HACER VARIABLE LOCAL
 
 //extern t_log* logger;
 

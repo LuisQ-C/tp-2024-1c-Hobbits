@@ -8,34 +8,17 @@ int main(int argc, char* argv[]) {
     t_log* logger;
     t_config* config;
 
-    logger = iniciar_logger();
-    config = iniciar_config(logger);
+    logger = iniciar_logger("kernel.log","Kernel",1,LOG_LEVEL_INFO);
+    config = iniciar_config("kernel.config",logger);
 
     if(!generar_conexiones(logger,&fd_memoria,&fd_cpu,config)){
         exit(1);
     }
     
+    //LIBREAMOS LOG, CONFIG Y AMBAS CONEXIONES
+    log_destroy(logger);
+    config_destroy(config);
     liberar_conexion(fd_memoria);
     liberar_conexion(fd_cpu);
 
-}
-t_log* iniciar_logger(void)
-{
-	t_log* nuevo_logger;
-	nuevo_logger = log_create("kernel.log","Kernel",1,LOG_LEVEL_INFO);
-	if(nuevo_logger == NULL){
-		perror("No se pudo crear el logger!");
-		abort();
-	}
-	return nuevo_logger;
-}
-t_config* iniciar_config(t_log* logger)
-{
-	t_config* nuevo_config;
-	nuevo_config = config_create("kernel.config"); // PARA EJECUTAR EN CONSOLA: DESDE KERNEL -> ./BIN/KERNEL
-	if(nuevo_config == NULL){
-		log_error(logger,"No se pudo crear el config!");
-		abort();
-	}
-	return nuevo_config;
 }

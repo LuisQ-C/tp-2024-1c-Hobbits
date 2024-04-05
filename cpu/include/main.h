@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../../utils/include/sockets.h"
+#include "../../utils/include/logsConfigs.h"
 
 
 #endif
