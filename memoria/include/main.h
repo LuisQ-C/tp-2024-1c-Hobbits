@@ -6,10 +6,10 @@
 
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/logsConfigs.h"
-
-
-//extern t_log* logger;
+#include <pthread.h>
 
 //extern t_log* logger;
 
+//extern t_log* logger;
+void* atender_cliente(void*);
 #endif

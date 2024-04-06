@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
     
+    
     //LIBREAMOS LOG, CONFIG Y AMBAS CONEXIONES
     log_destroy(logger);
     config_destroy(config);
