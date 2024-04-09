@@ -22,7 +22,7 @@
 void decir_hola(char* quien);
 
 int iniciar_servidor(t_log*,char*, char*);
-int esperar_cliente(int,t_log*);
+int esperar_cliente(int,t_log*,char*);
 int crear_conexion(char* , char*,t_log*,char*);
 void liberar_conexion(int);
 

@@ -12,4 +12,6 @@
 
 //extern t_log* logger;
 void* atender_cliente(void*);
+void iniciar_conexiones(t_config*,t_log*);
+void atender_interfaces(void*);
 #endif

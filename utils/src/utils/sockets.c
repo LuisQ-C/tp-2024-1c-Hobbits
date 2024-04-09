@@ -48,7 +48,7 @@ int iniciar_servidor(t_log* logger,char* ip,char* puerto)
 
     return fd_escucha;
 }
-int esperar_cliente(int fd_escucha,t_log* logger)
+int esperar_cliente(int fd_escucha,t_log* logger,char* nombre_servidor)
 {
 
 	// Aceptamos un nuevo cliente, se crea un nuevo socket, canal de comunicacion
@@ -58,7 +58,7 @@ int esperar_cliente(int fd_escucha,t_log* logger)
         log_error(logger,"No se pudo aceptar la conexion entrante");
         exit(1);
     }
-	log_info(logger,"Se conecto un cliente!");
+	log_info(logger,"Se conecto el modulo: %s",nombre_servidor);
     
 	return fd_conexion;
 }

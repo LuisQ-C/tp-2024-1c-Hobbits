@@ -15,7 +15,7 @@ t_log* iniciar_logger(char* nombreArchivo, char* nombreProceso,int mostrarPorCon
 t_config* iniciar_config(char* rutaConfig,t_log* logger)
 {
 	t_config* nuevo_config;
-	nuevo_config = config_create("kernel.config"); // PARA EJECUTAR EN CONSOLA: DESDE KERNEL -> ./BIN/KERNEL
+	nuevo_config = config_create(rutaConfig); // PARA EJECUTAR EN CONSOLA: DESDE KERNEL -> ./BIN/KERNEL
 	if(nuevo_config == NULL){
 		log_error(logger,"Error al crear el config!");
 		abort();

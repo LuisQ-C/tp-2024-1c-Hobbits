@@ -1,8 +1,8 @@
 #include "../include/main.h"
 
 int main(int argc, char* argv[]) {
-    int fd_memoria = 0;
-    int fd_cpu = 0;
+    //int fd_memoria = 0;
+    //int fd_cpu = 0;
 
 
     t_log* logger;
@@ -11,15 +11,22 @@ int main(int argc, char* argv[]) {
     logger = iniciar_logger("kernel.log","Kernel",1,LOG_LEVEL_INFO);
     config = iniciar_config("kernel.config",logger);
 
-    if(!generar_conexiones(logger,&fd_memoria,&fd_cpu,config)){
-        exit(1);
-    }
-    
-    
-    //LIBREAMOS LOG, CONFIG Y AMBAS CONEXIONES
+    iniciar_conexiones(config,logger); //falta manejo errores por si falla
+
+    //liberar_conexion(fd_memoria);
+    //liberar_conexion(fd_cpu);
     log_destroy(logger);
     config_destroy(config);
-    liberar_conexion(fd_memoria);
-    liberar_conexion(fd_cpu);
+
+    //while(1);
+    
+    /*
+    {
+        escuchar_interfaces();
+    }*/
+    
+    //LIBREAMOS LOG, CONFIG Y AMBAS CONEXIONES
+    
+    
 
 }

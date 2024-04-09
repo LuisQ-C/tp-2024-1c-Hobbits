@@ -8,4 +8,5 @@
 #include "../../utils/include/protocolo.h"
 #include <pthread.h>
 void* atender_cliente(void*);
+void iniciar_conexiones(t_config*,t_log*);
 #endif

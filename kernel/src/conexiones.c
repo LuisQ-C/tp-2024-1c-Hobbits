@@ -1,14 +1,26 @@
 #include "../include/conexiones.h"
 typedef struct
 {
-    int fd_cpu;
-    int fd_memoria;
-}datos;
+    int fd;
+} datosHiloCPU;
+typedef struct
+{
+    int fd;
+} datosHiloMemoria;
 
+typedef struct
+{
+    char* ip;
+    char* puerto;
+    t_log* logger;
+} t_datos_server_interfaces;
 
+/*
 int generar_conexiones(t_log* logger,int* fd_memoria,int* fd_cpu,t_config* config){
     char* ip;
     char* puerto;
+
+    
     
     ip = config_get_string_value(config,"IP_MEMORIA");
     puerto = config_get_string_value(config,"PUERTO_MEMORIA");
@@ -20,23 +32,93 @@ int generar_conexiones(t_log* logger,int* fd_memoria,int* fd_cpu,t_config* confi
 
     *fd_cpu = crear_conexion(ip,puerto,logger,"CPU");
     //HILOS
-    datos* args = malloc(sizeof(datos));
-    args->fd_cpu = *fd_cpu;
-    args->fd_memoria = *fd_memoria;
+    crear_hilos(fd_cpu,fd_memoria);
+    
+    return fd_memoria != 0 && fd_cpu != 0;
+}*/
+void iniciar_conexiones(t_config* config,t_log* logger)
+{
+    char* ip;
+    char* puerto;
+    pthread_t conexionesIO;
+    t_datos_server_interfaces* datosServerInterfaces = malloc(sizeof(t_datos_server_interfaces));
+    //CONECTARSE A MEMORIA
+    ip = config_get_string_value(config,"IP_MEMORIA");
+    puerto = config_get_string_value(config,"PUERTO_MEMORIA");
+    int fd_memoria = crear_conexion(ip,puerto,logger,"MEMORIA");
+    //CONECTARSE A CPU A TRAVES DE DISPATCH E INTERRUPT
+    ip = config_get_string_value(config,"IP_CPU");
+    puerto = config_get_string_value(config,"PUERTO_CPU_DISPATCH");
+    int fd_cpu_dispatch = crear_conexion(ip,puerto,logger,"CPU-DISPATCH");
+    puerto = config_get_string_value(config,"PUERTO_CPU_INTERRUPT");
+    int fd_cpu_interrupt = crear_conexion(ip,puerto,logger,"CPU-INTERRUPT");
+    //LEVANTAR SERVER PARA I/O CON UN HILO
+    datosServerInterfaces->ip = config_get_string_value(config,"IP_KERNEL");
+    datosServerInterfaces->puerto = config_get_string_value(config,"PUERTO_ESCUCHA");
+    datosServerInterfaces->logger = logger;
+    pthread_create(&conexionesIO,NULL,(void*) escucharConexionesIO,(void*) datosServerInterfaces);
+    pthread_join(conexionesIO,NULL);
+
+    log_info(logger,"Sigue ejecutando");
+}
+void escucharConexionesIO(void* datosServerInterfaces)
+{
+    t_datos_server_interfaces* auxiliarDatosServer = (t_datos_server_interfaces*) datosServerInterfaces;
+    char* ip = auxiliarDatosServer->ip;
+    char* puerto = auxiliarDatosServer->puerto;
+    t_log* logger = auxiliarDatosServer->logger;
+    free(auxiliarDatosServer);
+    int fd_escucha_interfaces = iniciar_servidor(logger,ip,puerto);
+    while(1)
+    {
+        int fd_conexion_IO = esperar_cliente(fd_escucha_interfaces,logger,"INTERFAZ I/O");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+void escuchar_interfaces()
+{
+    while(1)
+    {
+        pthread_t hiloConexionIO;
+        pthread_create(&hiloConexionIO,NULL,(void*) gestionarConexionConInterfaces,NULL);
+        pthread_detach(hiloConexionIO);
+    }
+}
+void crear_hilos(int* fd_cpu,int* fd_memoria)
+{
     pthread_t hiloMemoria, hiloCPU;
-    pthread_create(&hiloCPU,NULL,(void*) gestionarConexionCPU, (void*) args);
-    pthread_create(&hiloMemoria,NULL,(void*) gestionarConexionMemoria,(void*) args);
+    datosHiloCPU* fileDescriptorCPU = malloc(sizeof(datosHiloCPU));
+    datosHiloMemoria* fileDescriptorMemoria = malloc(sizeof(datosHiloMemoria));
+    fileDescriptorCPU->fd = *fd_cpu;
+    fileDescriptorMemoria->fd = *fd_memoria;
+    pthread_create(&hiloCPU,NULL,gestionarConexionCPU, (void*) fileDescriptorCPU);
+    pthread_create(&hiloMemoria,NULL,gestionarConexionMemoria,(void*) fileDescriptorMemoria);
     pthread_join(hiloCPU,NULL);
     pthread_join(hiloMemoria,NULL);
-    
-    //
-    //return fd_memoria != 0 && fd_cpu != 0;
-    return 1;
 }
-void* gestionarConexionCPU(void* args)
+void* gestionarConexionConInterfaces(void* args)
 {
-    datos* args2 = (datos*) args;
-    int fd_cpu = args2->fd_cpu;
+    return NULL;
+}
+void* gestionarConexionCPU(void* fileDescriptorCPU)
+{
+    datosHiloCPU* recepcionFD = (datosHiloCPU*) fileDescriptorCPU;
+    int fd_cpu = recepcionFD->fd;
+    free(recepcionFD);
     int32_t result = 3;
     int32_t handshake = 1;
     while(1)
@@ -53,12 +135,14 @@ void* gestionarConexionCPU(void* args)
         }
         break;
     }
+    close(fd_cpu);
     return NULL;
 }
-void* gestionarConexionMemoria(void* args)
+void* gestionarConexionMemoria(void* fileDescriptorMemoria)
 {
-    datos* args2 = (datos*) args;
-    int fd_memoria = args2->fd_memoria;
+    datosHiloMemoria* recepcionFD = (datosHiloMemoria*) fileDescriptorMemoria;
+    int fd_memoria = recepcionFD->fd;
+    free(recepcionFD);
     int32_t result;
     int32_t handshake = 1;
     while(1)
@@ -73,5 +157,6 @@ void* gestionarConexionMemoria(void* args)
         }
         break;
     }
+    close(fd_memoria);
     return NULL;
-}
+}*/

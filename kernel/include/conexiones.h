@@ -7,8 +7,12 @@
 #include "../../utils/include/protocolo.h"
 #include <pthread.h>
 
-int generar_conexiones(t_log*,int*,int*,t_config*);
+void iniciar_conexiones(t_config*,t_log*);
+void escucharConexionesIO(void* datosServerInterfaces);
+/*void escuchar_interfaces();
+void crear_hilos(int*,int*);
+void* gestionarConexionConInterfaces(void*);
 void* gestionarConexionMemoria(void*);
-void* gestionarConexionCPU(void* );
+void* gestionarConexionCPU(void* );*/
 
 #endif 
