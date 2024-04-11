@@ -10,7 +10,9 @@
 
 
 void iniciar_conexiones(t_log* logger,t_config* config,int* server_fd,int* fd_cpu,int* fd_kernel);
-void atender_interfaces(void* datosServerIO);
+//void atender_interfaces(void* datosServerIO);
 void terminar_programa(t_log* logger,t_config* config,int* fd_cpu,int* fd_kernel);
+void procesarConexionesIO(void* datosServerInterfaces);
+int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces);
 
 #endif

@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
     config = iniciar_config("kernel.config",logger);
 
     iniciar_conexiones(config,logger,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt,&fd_escucha_interfaces); //falta manejo errores por si falla
-    //while(1);
+    while(escucharConexionesIO(logger,fd_escucha_interfaces));
     terminar_programa();
     return 0;
 }

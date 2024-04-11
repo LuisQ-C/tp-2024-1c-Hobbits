@@ -18,8 +18,8 @@ void iniciar_conexiones(t_config* config,t_log* logger,int* fd_memoria,int* fd_c
 {
     char* ip;
     char* puerto;
-    pthread_t conexionesIO;
-    t_datos_server_interfaces* datosServerInterfaces = malloc(sizeof(t_datos_server_interfaces));
+    //pthread_t conexionesIO;
+    //t_datos_server_interfaces* datosServerInterfaces = malloc(sizeof(t_datos_server_interfaces));
     //CONECTARSE A MEMORIA
     ip = config_get_string_value(config,"IP_MEMORIA");
     puerto = config_get_string_value(config,"PUERTO_MEMORIA");
@@ -34,14 +34,38 @@ void iniciar_conexiones(t_config* config,t_log* logger,int* fd_memoria,int* fd_c
     ip = config_get_string_value(config,"IP_KERNEL");
     puerto = config_get_string_value(config,"PUERTO_ESCUCHA");
     *fd_escucha_interfaces = iniciar_servidor(logger,ip,puerto);
-    datosServerInterfaces->fd_escucha_interfaces = *fd_escucha_interfaces;
-    datosServerInterfaces->logger = logger;
-    pthread_create(&conexionesIO,NULL,(void*) escucharConexionesIO,(void*) datosServerInterfaces);
-    pthread_join(conexionesIO,NULL);
+    //datosServerInterfaces->fd_escucha_interfaces = *fd_escucha_interfaces;
+    //datosServerInterfaces->logger = logger;
+    //pthread_create(&conexionesIO,NULL,(void*) escucharConexionesIO,(void*) datosServerInterfaces);
+    //pthread_join(conexionesIO,NULL);
     //pthread_detach(conexionesIO);
     //log_info(logger,"Sigue ejecutando");
 }
-void escucharConexionesIO(void* datosServerInterfaces)
+
+int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces){
+    int fd_conexion_IO = esperar_cliente(fd_escucha_interfaces,logger,"INTERFAZ I/O");
+    pthread_t conexionesIO;
+    t_datos_server_interfaces* datosServerInterfaces = malloc(sizeof(t_datos_server_interfaces));
+    datosServerInterfaces->fd_escucha_interfaces = fd_escucha_interfaces;
+    datosServerInterfaces->logger = logger;
+    pthread_create(&conexionesIO,NULL,(void*) procesarConexionesIO,(void*) datosServerInterfaces);
+    pthread_detach(conexionesIO);
+    
+    
+    return 1;
+}
+
+void procesarConexionesIO(void* datosServerInterfaces){
+    t_datos_server_interfaces* auxiliarDatosServer = (t_datos_server_interfaces*) datosServerInterfaces;
+    int fd_escucha_interfaces = auxiliarDatosServer->fd_escucha_interfaces;
+    t_log* logger = auxiliarDatosServer->logger;
+    free(auxiliarDatosServer);
+   //int a;
+   //scanf("%d",&a);
+    //while(1);
+    log_info(logger,"CERRANDO HILO");
+}
+/*void escucharConexionesIO(void* datosServerInterfaces)
 {
     t_datos_server_interfaces* auxiliarDatosServer = (t_datos_server_interfaces*) datosServerInterfaces;
     int fd_escucha_interfaces = auxiliarDatosServer->fd_escucha_interfaces;
@@ -49,9 +73,8 @@ void escucharConexionesIO(void* datosServerInterfaces)
     free(auxiliarDatosServer);
     while(1)
     {
-        int fd_conexion_IO = esperar_cliente(fd_escucha_interfaces,logger,"INTERFAZ I/O");
     }
-}
+}*/
 
 
 
