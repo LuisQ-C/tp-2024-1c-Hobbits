@@ -7,6 +7,8 @@
 #include "../../utils/include/logsConfigs.h"
 #include "../../utils/include/protocolo.h"
 #include <pthread.h>
-void* atender_cliente(void*);
-void iniciar_conexiones(t_config*,t_log*);
+#include"../include/conexionesCPU.h"
+#include<commons/string.h>
+#include<commons/config.h>
+
 #endif
