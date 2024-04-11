@@ -1,0 +1,8 @@
+1- al hacer el while(1), terminar programa no sucede nunca (memoria y kernel).
+2- como hacer que un modulo rechaze el handshake de otro (que no le permite mandar mensajes)
+3- buscar la forma de hacer handshake con enum
+4- mejorar manejo de errores (masomenos, estamos bien igual)
+5- mandar mensajes luego del handshake
+6- pasarle valgrind antes de cualquier otra cosa!!!!
+7- 
+

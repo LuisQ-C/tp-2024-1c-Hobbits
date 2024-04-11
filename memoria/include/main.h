@@ -6,6 +6,7 @@
 
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/logsConfigs.h"
+#include "../../utils/include/protocolo.h"
 #include <pthread.h>
 #include"../include/conexionesMemoria.h"
 

@@ -11,8 +11,8 @@ int main(int argc, char* argv[]) {
     logger = iniciar_logger("memoria.log", "MODULO MEMORIA", 1, LOG_LEVEL_DEBUG);
     config = iniciar_config("memoria.config",logger);
     iniciar_conexiones(logger,config,&server_fd,&fd_cpu,&fd_kernel);
-     while(escucharConexionesIO(logger,server_fd));
-    
+    recibirHandshake(logger,fd_cpu,"MODULO CPU",1);
+    while(escucharConexionesIO(logger,server_fd));
     terminar_programa(logger,config,&fd_cpu,&fd_kernel);
     return 0;
 }
