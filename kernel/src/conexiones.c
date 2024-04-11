@@ -10,33 +10,11 @@ typedef struct
 
 typedef struct
 {
-    char* ip;
-    char* puerto;
+    int fd_escucha_interfaces;
     t_log* logger;
 } t_datos_server_interfaces;
 
-/*
-int generar_conexiones(t_log* logger,int* fd_memoria,int* fd_cpu,t_config* config){
-    char* ip;
-    char* puerto;
-
-    
-    
-    ip = config_get_string_value(config,"IP_MEMORIA");
-    puerto = config_get_string_value(config,"PUERTO_MEMORIA");
-
-    *fd_memoria = crear_conexion(ip,puerto,logger,"MEMORIA");
-    
-    ip = config_get_string_value(config,"IP_CPU");
-    puerto = config_get_string_value(config,"PUERTO_CPU");
-
-    *fd_cpu = crear_conexion(ip,puerto,logger,"CPU");
-    //HILOS
-    crear_hilos(fd_cpu,fd_memoria);
-    
-    return fd_memoria != 0 && fd_cpu != 0;
-}*/
-void iniciar_conexiones(t_config* config,t_log* logger)
+void iniciar_conexiones(t_config* config,t_log* logger,int* fd_memoria,int* fd_cpu_dispatch, int* fd_cpu_interrupt,int* fd_escucha_interfaces)
 {
     char* ip;
     char* puerto;
@@ -45,39 +23,35 @@ void iniciar_conexiones(t_config* config,t_log* logger)
     //CONECTARSE A MEMORIA
     ip = config_get_string_value(config,"IP_MEMORIA");
     puerto = config_get_string_value(config,"PUERTO_MEMORIA");
-    int fd_memoria = crear_conexion(ip,puerto,logger,"MEMORIA");
+    *fd_memoria = crear_conexion(ip,puerto,logger,"MEMORIA");
     //CONECTARSE A CPU A TRAVES DE DISPATCH E INTERRUPT
     ip = config_get_string_value(config,"IP_CPU");
     puerto = config_get_string_value(config,"PUERTO_CPU_DISPATCH");
-    int fd_cpu_dispatch = crear_conexion(ip,puerto,logger,"CPU-DISPATCH");
+    *fd_cpu_dispatch = crear_conexion(ip,puerto,logger,"CPU-DISPATCH");
     puerto = config_get_string_value(config,"PUERTO_CPU_INTERRUPT");
-    int fd_cpu_interrupt = crear_conexion(ip,puerto,logger,"CPU-INTERRUPT");
+    *fd_cpu_interrupt = crear_conexion(ip,puerto,logger,"CPU-INTERRUPT");
     //LEVANTAR SERVER PARA I/O CON UN HILO
-    datosServerInterfaces->ip = config_get_string_value(config,"IP_KERNEL");
-    datosServerInterfaces->puerto = config_get_string_value(config,"PUERTO_ESCUCHA");
+    ip = config_get_string_value(config,"IP_KERNEL");
+    puerto = config_get_string_value(config,"PUERTO_ESCUCHA");
+    *fd_escucha_interfaces = iniciar_servidor(logger,ip,puerto);
+    datosServerInterfaces->fd_escucha_interfaces = *fd_escucha_interfaces;
     datosServerInterfaces->logger = logger;
     pthread_create(&conexionesIO,NULL,(void*) escucharConexionesIO,(void*) datosServerInterfaces);
     pthread_join(conexionesIO,NULL);
-
-    log_info(logger,"Sigue ejecutando");
+    //pthread_detach(conexionesIO);
+    //log_info(logger,"Sigue ejecutando");
 }
 void escucharConexionesIO(void* datosServerInterfaces)
 {
     t_datos_server_interfaces* auxiliarDatosServer = (t_datos_server_interfaces*) datosServerInterfaces;
-    char* ip = auxiliarDatosServer->ip;
-    char* puerto = auxiliarDatosServer->puerto;
+    int fd_escucha_interfaces = auxiliarDatosServer->fd_escucha_interfaces;
     t_log* logger = auxiliarDatosServer->logger;
     free(auxiliarDatosServer);
-    int fd_escucha_interfaces = iniciar_servidor(logger,ip,puerto);
     while(1)
     {
         int fd_conexion_IO = esperar_cliente(fd_escucha_interfaces,logger,"INTERFAZ I/O");
     }
 }
-
-
-
-
 
 
 

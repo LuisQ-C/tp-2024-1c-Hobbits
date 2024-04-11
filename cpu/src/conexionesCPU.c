@@ -5,27 +5,35 @@ typedef struct
     int fd_conexion;
 }datos;
 
-
-void iniciar_conexiones(t_config* config,t_log* logger)
+void iniciar_conexiones(t_log* logger,t_config* config,int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt)
 {
     char* ip;
     char* puerto;
+    //PRIMERO SE CONECTA A MEMORIA
     ip=config_get_string_value(config,"IP_MEMORIA");
     puerto=config_get_string_value(config,"PUERTO_MEMORIA");
-    //PRIMERO SE CONECTA A MEMORIA
-    int fd_conexion_memoria = crear_conexion(ip,puerto,logger,"MEMORIA");
+    *fd_conexion_memoria = crear_conexion(ip,puerto,logger,"MEMORIA");
     //LUEGO EMPIEZA A ESCUCHAR CONEXIONES ENTRANTES
     puerto=config_get_string_value(config,"PUERTO_ESCUCHA_DISPATCH");
-    int server_fd_escucha_dispatch = iniciar_servidor(logger,"0.0.0.0",puerto);
+    *server_fd_escucha_dispatch = iniciar_servidor(logger,"0.0.0.0",puerto);
     log_info(logger,"Servidor escuchando en puerto dispatch");
     puerto=config_get_string_value(config,"PUERTO_ESCUCHA_INTERRUPT");
-    int server_fd_escucha_interrupt = iniciar_servidor(logger,"0.0.0.0",puerto);
+    *server_fd_escucha_interrupt = iniciar_servidor(logger,"0.0.0.0",puerto);
     log_info(logger,"Servidor escuchando en puerto interrupt");
     //ESPERA A QUE SE LE CONECTE EL KERNEL
-    int cliente_fd_conexion_dispatch = esperar_cliente(server_fd_escucha_dispatch,logger,"KERNEL_DISPATCH");
-    int cliente_fd_conexion_interrupt = esperar_cliente(server_fd_escucha_interrupt,logger,"KERNEL_INTERRUPT");
+    *cliente_fd_conexion_dispatch = esperar_cliente(*server_fd_escucha_dispatch,logger,"KERNEL_DISPATCH");
+    *cliente_fd_conexion_interrupt = esperar_cliente(*server_fd_escucha_interrupt,logger,"KERNEL_INTERRUPT");
 }
 
+void terminar_programa(t_log* logger, t_config* config, int* fd_conexion_memoria,int* cliente_fd_conexion_dispatch,int*cliente_fd_conexion_interrupt)
+{
+    destruir_log_config(logger,config);
+    close(*fd_conexion_memoria);
+    close(*cliente_fd_conexion_dispatch);
+    close(*cliente_fd_conexion_interrupt);
+}
+
+/*
 void* atender_cliente(void* args)
 {
     datos* args2 = (datos*) args;
@@ -51,3 +59,4 @@ void* atender_cliente(void* args)
     close(fd_conexion);
     return NULL;
 }
+*/

@@ -6,9 +6,9 @@
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/logsConfigs.h"
 #include "../../utils/include/protocolo.h"
+#include "../include/conexionesCPU.h"
 #include <pthread.h>
-#include"../include/conexionesCPU.h"
-#include<commons/string.h>
-#include<commons/config.h>
+
+//void* atender_cliente(void*);
 
 #endif

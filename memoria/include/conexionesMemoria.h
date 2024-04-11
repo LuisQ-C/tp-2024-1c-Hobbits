@@ -5,10 +5,12 @@
 #include <stdlib.h>
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/protocolo.h"
+#include "../../utils/include/logsConfigs.h"
 #include <pthread.h>
 
 
-void iniciar_conexiones(t_config* config,t_log* logger);
+void iniciar_conexiones(t_log* logger,t_config* config,int* server_fd,int* fd_cpu,int* fd_kernel);
 void atender_interfaces(void* datosServerIO);
+void terminar_programa(t_log* logger,t_config* config,int* fd_cpu,int* fd_kernel);
 
 #endif

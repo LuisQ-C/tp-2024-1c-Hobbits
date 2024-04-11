@@ -1,30 +1,22 @@
 #include "../include/main.h"
 
+t_log* logger;
+t_config* config;
+int fd_conexion_memoria = 0;
+int server_fd_escucha_dispatch = 0;
+int server_fd_escucha_interrupt = 0;
+int cliente_fd_conexion_interrupt = 0;
+int cliente_fd_conexion_dispatch = 0;
+
 int main(int argc, char* argv[]) 
 {
-    t_log* logger;
-    t_config* config;
     logger = iniciar_logger("cpu.log", "MODULO CPU", 1, LOG_LEVEL_DEBUG);
     config = iniciar_config("cpu.config",logger);
-    iniciar_conexiones(config,logger);
-    
-    
-    /*
-    pthread_t hiloKernel;
-    datos* args = malloc(sizeof(datos));
-    args->fd_conexion = esperar_cliente(server_fd,logger);
-    pthread_create(&hiloKernel,
-                    NULL,
-                    atender_cliente,
-                    (void*) args);
-    pthread_join(hiloKernel,NULL);
-    */
-    //pthread_detach(thread);
-    //}
-    
-    log_destroy(logger);//liberamos el logger, preguntar si hay que hacer close cuando cerramos servidor
-    config_destroy(config);
-    //close(server_fd);
+    iniciar_conexiones(logger,config,&fd_conexion_memoria,&server_fd_escucha_dispatch,&server_fd_escucha_interrupt,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
+    terminar_programa(logger,config,&fd_conexion_memoria,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
+    close(server_fd_escucha_dispatch);
+    close(server_fd_escucha_interrupt);
+
     return 0;
 }
 

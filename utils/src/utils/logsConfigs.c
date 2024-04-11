@@ -22,3 +22,8 @@ t_config* iniciar_config(char* rutaConfig,t_log* logger)
 	}
 	return nuevo_config;
 }
+void destruir_log_config(t_log* logger,t_config* config)
+{
+    log_destroy(logger);
+    config_destroy(config);
+}

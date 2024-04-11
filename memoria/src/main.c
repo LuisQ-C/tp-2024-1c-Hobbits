@@ -1,23 +1,21 @@
 #include "../include/main.h"
  //el extern que va por delante es cuando queremos utilizar este logger en muchos archivos o lugares, pra no redeclarar lo mismo
+t_log* logger;
+t_config* config;
+int server_fd = 0;
+int fd_cpu = 0;
+int fd_kernel = 0;
 
 int main(int argc, char* argv[]) {
-    t_log* logger;
-    t_config* config;
+
     logger = iniciar_logger("memoria.log", "MODULO MEMORIA", 1, LOG_LEVEL_DEBUG);
     config = iniciar_config("memoria.config",logger);
-    iniciar_conexiones(config,logger);
-    //int server_fd = iniciar_servidor(logger,"0.0.0.0","8096");
+    iniciar_conexiones(logger,config,&server_fd,&fd_cpu,&fd_kernel);
     
     
-    
-    
-    log_destroy(logger);
-    config_destroy(config);
-    //close(server_fd); //liberamos el log, debemos liberar la conexion cuando se cierra server?
+    terminar_programa(logger,config,&fd_cpu,&fd_kernel);
     return 0;
 }
-
 
 
 /*
