@@ -4,7 +4,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include "../../utils/include/sockets.h"
-#include "../../utils/include/logsConfig.h"
+#include "../../utils/include/logsConfigs.h"
 
 void conectar_interfaz(t_log* logger, t_config* config);
 

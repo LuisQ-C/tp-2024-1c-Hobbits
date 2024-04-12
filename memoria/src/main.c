@@ -11,11 +11,33 @@ int main(int argc, char* argv[]) {
     logger = iniciar_logger("memoria.log", "MODULO MEMORIA", 1, LOG_LEVEL_DEBUG);
     config = iniciar_config("memoria.config",logger);
     iniciar_conexiones(logger,config,&server_fd,&fd_cpu,&fd_kernel);
-    recibirHandshake(logger,fd_cpu,"MODULO CPU",1);
+    //recibirHandshake(logger,fd_cpu,"MODULO CPU",1);
+    manejarConexionCPU();
     while(escucharConexionesIO(logger,server_fd));
     terminar_programa(logger,config,&fd_cpu,&fd_kernel);
-    return 0;
+    return 0; //puede ir exit_sucess
 }
+void manejarConexionCPU()
+{
+    int cod_op;
+    while(1)
+    {
+        recv(fd_cpu, &cod_op, sizeof(cod_op), MSG_WAITALL);
+		switch (cod_op) {
+		case HANDSHAKE:
+			recibir_handshake(logger,fd_cpu,"MODULO CPU");
+			break;
+		case -1:
+			log_error(logger, "el cliente se desconecto. Terminando servidor");
+			return EXIT_FAILURE;
+		default:
+			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+			break;
+		}
+        break;
+    }
+}
+
 
 
 /*

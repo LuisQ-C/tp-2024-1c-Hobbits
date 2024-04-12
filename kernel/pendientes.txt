@@ -4,5 +4,6 @@
 4- mejorar manejo de errores (masomenos, estamos bien igual)
 5- mandar mensajes luego del handshake
 6- pasarle valgrind antes de cualquier otra cosa!!!!
-7- 
+7- preguntar sobre el extern, logs locales o globales tp0 hecho de ambas formas
+8- vamos bien, como nos ven para el checkpoint 1? recomendaciones
 

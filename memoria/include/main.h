@@ -14,4 +14,5 @@
 
 //extern t_log* logger;
 //void* atender_cliente(void*);
+void manejarConexionCPU();
 #endif
