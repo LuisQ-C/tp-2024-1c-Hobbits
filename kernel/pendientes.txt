@@ -6,4 +6,5 @@
 6- pasarle valgrind antes de cualquier otra cosa!!!!
 7- preguntar sobre el extern, logs locales o globales tp0 hecho de ambas formas
 8- vamos bien, como nos ven para el checkpoint 1? recomendaciones
+9- en cpu, cerrar los int socket con *
 
