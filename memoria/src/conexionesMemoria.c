@@ -51,6 +51,28 @@ void procesarConexionesIO(void* datosServerInterfaces){
     log_info(logger,"CERRANDO HILO");
 }
 
+void manejarConexionCPU(t_log* logger,int* fd_cpu)
+{
+    int cod_op;
+    while(1)
+    {
+        recv(*fd_cpu, &cod_op, sizeof(cod_op), MSG_WAITALL);
+		switch (cod_op) {
+		case HANDSHAKE:
+			recibir_handshake(logger,*fd_cpu,"MODULO CPU");
+			break;
+		case -1:
+			log_error(logger, "el cliente se desconecto. Terminando servidor");
+            break;
+			//return EXIT_FAILURE;
+		default:
+			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+			break;
+		}
+        break;
+    }
+}
+
 void terminar_programa(t_log* logger,t_config* config,int* fd_cpu,int* fd_kernel){
     destruir_log_config(logger,config);
     close(*fd_cpu);

@@ -65,6 +65,14 @@ void procesarConexionesIO(void* datosServerInterfaces){
     //while(1);
     log_info(logger,"CERRANDO HILO");
 }
+
+void terminar_programa(t_log* logger,t_config* config,int* fd_memoria,int* fd_cpu_dispatch,int* fd_cpu_interrupt)
+{
+    destruir_log_config(logger,config);
+    close(*fd_memoria);
+    close(*fd_cpu_dispatch);
+    close(*fd_cpu_interrupt);
+}
 /*void escucharConexionesIO(void* datosServerInterfaces)
 {
     t_datos_server_interfaces* auxiliarDatosServer = (t_datos_server_interfaces*) datosServerInterfaces;
