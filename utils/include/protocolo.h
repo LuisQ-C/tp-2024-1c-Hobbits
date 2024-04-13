@@ -14,8 +14,10 @@ typedef enum{
     FINALIZAR_PROCESO,
     INICIAR_PLANIFICACION,
     DETENER_PLANIFICACION,
-    LISTAR_PROCESOS_POR_ESTADO
+    LISTAR_PROCESOS_POR_ESTADO,
+    PROCESO
 }cod_op;
+
 typedef struct {
     uint32_t size; // Tamaño del payload
     uint32_t offset; // Desplazamiento dentro del payload
@@ -29,6 +31,7 @@ typedef struct {
     uint32_t nombre_length;
     char* nombre;
 } t_persona;
+
 typedef struct {
     uint8_t codigo_operacion;
     t_buffer* buffer;

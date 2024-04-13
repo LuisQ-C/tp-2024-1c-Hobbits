@@ -14,6 +14,7 @@ int main(int argc, char* argv[]) {
     iniciar_conexiones(logger,config,&server_fd,&fd_cpu,&fd_kernel);
     //recibirHandshake(logger,fd_cpu,"MODULO CPU",1);
     manejarConexionCPU(logger,&fd_cpu);
+    recibir_handshake(logger,fd_kernel,"MODULO KERNEL");
     while(escucharConexionesIO(logger,server_fd));
     terminar_programa(logger,config,&fd_cpu,&fd_kernel);
     return 0; //puede ir exit_sucess

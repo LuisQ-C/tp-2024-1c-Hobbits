@@ -129,6 +129,7 @@ uint8_t buffer_read_uint8(t_buffer *buffer){
     return dataRecibida;
 }
 // Lee un string y su longitud del buffer y avanza el offset
+/*
 char* buffer_read_string(t_buffer *buffer, uint32_t length){
     void* stream = buffer->stream;
     memcpy(&length, stream, sizeof(uint32_t));
@@ -137,4 +138,4 @@ char* buffer_read_string(t_buffer *buffer, uint32_t length){
     memcpy(stringRecibido, stream, length);
     stream += sizeof(length);
     return stringRecibido;
-}
+}*/

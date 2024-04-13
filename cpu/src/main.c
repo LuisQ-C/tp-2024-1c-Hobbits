@@ -22,13 +22,59 @@ int main(int argc, char* argv[])
     //
     iniciar_conexiones(logger,config,&fd_conexion_memoria,&server_fd_escucha_dispatch,&server_fd_escucha_interrupt,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
     mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA");
+    recibir_handshake(logger,cliente_fd_conexion_dispatch,"MODULO KERNEL-DISPATCH");
+    recibir_handshake(logger,cliente_fd_conexion_interrupt,"MODULO KERNEL-INTERRUPT");
+    manejarConexionKernel(logger,&cliente_fd_conexion_dispatch);
     //persona_serializar(persona);
     terminar_programa(logger,config,&fd_conexion_memoria,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
     //close(server_fd_escucha_dispatch);
     //close(server_fd_escucha_interrupt);
 
     return 0;
-}/*
+}
+
+void manejarConexionKernel(t_log* logger,int* cliente_fd_conexion_dispatch)
+{
+    int a;
+    while(1){
+        scanf("%d",&a);
+    } // SOLAMENTE PARA QUE SE QUEDE EJECUTANDO Y NO SE CAIGA, REPRESENTARIA EL CICLO DE INSTRUCCION
+    // QUE IMPLEMENTAREMOS EN EL SIGUIENTE CHECKPOINT
+    /*int cod_op;
+    recv(*cliente_fd_conexion_dispatch, &cod_op, sizeof(cod_op), MSG_WAITALL);
+    while(1)
+    {
+		switch (cod_op) {
+        case PROCESO:
+            log_info(logger,"proceso recibido");
+		case HANDSHAKE:
+			recibir_handshake(logger,*fd_cpu,"MODULO CPU");
+			break;
+		case -1:
+			log_error(logger, "el cliente se desconecto. Terminando servidor");
+            break;
+			//return EXIT_FAILURE;
+		default:
+			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+			break;
+		}
+        break;
+    }*/
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 void mandar_persona()
 {
     t_paquete* paquete = malloc(sizeof(t_paquete));

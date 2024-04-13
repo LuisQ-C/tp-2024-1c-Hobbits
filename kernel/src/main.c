@@ -13,6 +13,11 @@ int main(int argc, char* argv[]) {
     config = iniciar_config("kernel.config",logger);
 
     iniciar_conexiones(config,logger,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt,&fd_escucha_interfaces); //falta manejo errores por si falla
+    mandarHandshake(logger,fd_memoria,"MODULO MEMORIA");
+    mandarHandshake(logger,fd_cpu_dispatch,"MODULO CPU DISPATCH");
+    mandarHandshake(logger,fd_cpu_interrupt,"MODULO CPU INTERRUPT");
+    
+    
     while(escucharConexionesIO(logger,fd_escucha_interfaces));
     terminar_programa(logger,config,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt);
     return 0;

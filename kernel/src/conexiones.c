@@ -10,7 +10,7 @@ typedef struct
 
 typedef struct
 {
-    int fd_escucha_interfaces;
+    int fd_conexion_IO;
     t_log* logger;
 } t_datos_server_interfaces;
 
@@ -46,7 +46,7 @@ int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces){
     int fd_conexion_IO = esperar_cliente(fd_escucha_interfaces,logger,"INTERFAZ I/O");
     pthread_t conexionesIO;
     t_datos_server_interfaces* datosServerInterfaces = malloc(sizeof(t_datos_server_interfaces));
-    datosServerInterfaces->fd_escucha_interfaces = fd_escucha_interfaces;
+    datosServerInterfaces->fd_conexion_IO= fd_conexion_IO;
     datosServerInterfaces->logger = logger;
     pthread_create(&conexionesIO,NULL,(void*) procesarConexionesIO,(void*) datosServerInterfaces);
     pthread_detach(conexionesIO);
@@ -57,13 +57,14 @@ int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces){
 
 void procesarConexionesIO(void* datosServerInterfaces){
     t_datos_server_interfaces* auxiliarDatosServer = (t_datos_server_interfaces*) datosServerInterfaces;
-    int fd_escucha_interfaces = auxiliarDatosServer->fd_escucha_interfaces;
+    int fd_conexion_IO = auxiliarDatosServer->fd_conexion_IO;
     t_log* logger = auxiliarDatosServer->logger;
     free(auxiliarDatosServer);
    //int a;
    //scanf("%d",&a);
     //while(1);
-    log_info(logger,"CERRANDO HILO");
+    recibir_handshake(logger,fd_conexion_IO,"MODULO I/O");
+    //log_info(logger,"CERRANDO HILO");
 }
 
 void terminar_programa(t_log* logger,t_config* config,int* fd_memoria,int* fd_cpu_dispatch,int* fd_cpu_interrupt)
