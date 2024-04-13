@@ -27,7 +27,7 @@ int iniciar_servidor(t_log* logger,char* ip,char* puerto)
     if(fd_escucha == -1)
     {
         log_error(logger,"Error al crear el socket!");
-        exit(1); 
+        exit(1);
     }
     //Asociamos socket a un puerto
     err = bind(fd_escucha,servinfo->ai_addr,servinfo->ai_addrlen);

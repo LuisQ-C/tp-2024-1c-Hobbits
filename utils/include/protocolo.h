@@ -8,7 +8,13 @@
 
 typedef enum{
     HANDSHAKE,
-    PERSONA
+    PERSONA,
+    EJECUTAR_SCRIPT_OPERACIONES,
+    INICIAR_PROCESO,
+    FINALIZAR_PROCESO,
+    INICIAR_PLANIFICACION,
+    DETENER_PLANIFICACION,
+    LISTAR_PROCESOS_POR_ESTADO
 }cod_op;
 typedef struct {
     uint32_t size; // Tamaño del payload

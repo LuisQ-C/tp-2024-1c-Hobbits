@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/protocolo.h"
+#include "../../utils/include/logsConfigs.h"
 #include <pthread.h>
 
 //INICIAR CONEXIONES DEBE TENER UN MANEJO DE ERRORES
