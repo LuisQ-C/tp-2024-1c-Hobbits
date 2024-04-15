@@ -12,6 +12,6 @@
 //void* atender_cliente(void*);
 //t_buffer *persona_serializar(t_persona *persona);
 //void mandar_persona();
-void manejarConexionKernel(t_log* logger,int* cliente_fd_conexion_dispatch);
+//void manejarConexionKernel(t_log* logger,int* cliente_fd_conexion_dispatch,int* cliente_fd_conexion_interrupt);
 
 #endif

@@ -12,7 +12,11 @@ int main(int argc, char* argv[]) {
     logger = iniciar_logger("kernel.log","Kernel",1,LOG_LEVEL_INFO);
     config = iniciar_config("kernel.config",logger);
 
-    iniciar_conexiones(config,logger,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt,&fd_escucha_interfaces); //falta manejo errores por si falla
+    if(!iniciar_conexiones(config,logger,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt,&fd_escucha_interfaces))
+    {
+        log_error(logger,"Error al crear conexiones iniciales");
+        exit(1);
+    }; 
     mandarHandshake(logger,fd_memoria,"MODULO MEMORIA");
     mandarHandshake(logger,fd_cpu_dispatch,"MODULO CPU DISPATCH");
     mandarHandshake(logger,fd_cpu_interrupt,"MODULO CPU INTERRUPT");

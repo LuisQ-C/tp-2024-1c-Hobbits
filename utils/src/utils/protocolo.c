@@ -1,31 +1,27 @@
 #include "../include/protocolo.h"
-/*
-void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario,int32_t valorHandshake)
-{
-    int32_t result = 0;
-    while(1)
-    {   
-        send(fd_destinatario,&valorHandshake,sizeof(int32_t),0);
-        recv(fd_destinatario,&result,sizeof(int32_t),MSG_WAITALL);
-        if(result==0)
-        {
-            log_info(logger,"HANDSHAKE ACEPTADO DE: %s!",nombreDestinatario);
-        }else{
-            log_error(logger,"HANDSHAKE DENEGADO DE: %s!",nombreDestinatario);
-        }
-        break;
-    }
-    close(fd_destinatario);
-}*/
+
 void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario)
 {
+    int bytes;
     int32_t result = 0;
     cod_op handshake = HANDSHAKE;
     int valorHandshake = handshake;
     while(1)
     {   
-        send(fd_destinatario,&valorHandshake,sizeof(int32_t),0);
-        recv(fd_destinatario,&result,sizeof(int32_t),MSG_WAITALL);
+        bytes =send(fd_destinatario,&valorHandshake,sizeof(int32_t),0);
+        if(bytes == -1)
+        {
+            log_error(logger,"Error al enviar el handshake (funcion send)");
+            perror("\nError en send de mandarHandshake");
+            exit(1);
+        }
+        bytes = recv(fd_destinatario,&result,sizeof(int32_t),MSG_WAITALL);
+        if(bytes == -1)
+        {
+            log_error(logger,"Error al enviar el handshake (funcion send)");
+            perror("\nError en recv de mandarHandshake");
+            exit(1);
+        }
         if(result==0)
         {
             log_info(logger,"HANDSHAKE ACEPTADO DE: %s!",nombreDestinatario);
@@ -34,40 +30,21 @@ void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario
         }
         break;
     }
-    close(fd_destinatario);
+    
 }
-/*
-void recibirHandshake(t_log* logger,int fd_origen, char* nombreOrigen,int32_t valorHandshake)
-{
-    int32_t resultOk = 0;
-    int32_t resultError = -1;
-    while(1)
-    {
-        recv(fd_origen, &valorHandshake, sizeof(int32_t), MSG_WAITALL);
-        if (valorHandshake == 1) {
-            log_info(logger,"HANDSHAKE ACEPTADO A: %s!", nombreOrigen);
-            send(fd_origen, &resultOk, sizeof(int32_t), 0);
-        } else {
-            log_error(logger,"HANDSHAKE DENEGADO A: %s!", nombreOrigen);
-            send(fd_origen, &resultError, sizeof(int32_t), 0);
-        }
-        break;
-    }
-    close(fd_origen);
-}*/
-
 void recibir_handshake(t_log* logger,int fd_origen, char* nombreOrigen)
 {
+    int bytes;
     int32_t resultOk = 0;
-    int32_t resultError = -1;
-    //if (valorHandshake == 1) {
+    //int32_t resultError = -1;
     log_info(logger,"HANDSHAKE ACEPTADO A: %s!", nombreOrigen);
-    send(fd_origen, &resultOk, sizeof(int32_t), 0);
-    /*} else {
-        log_error(logger,"HANDSHAKE DENEGADO A: %s!", nombreOrigen);
-        send(fd_origen, &resultError, sizeof(int32_t), 0);
-    }*/
-    close(fd_origen);
+    bytes = send(fd_origen, &resultOk, sizeof(int32_t), 0);
+    if(bytes == -1)
+        {
+            log_error(logger,"Error al enviar el resultado del handshake (funcion send)");
+            perror("\nError en send de recibir_handshake");
+            exit(1);
+        }
 }
 
 //SERIALIZACION

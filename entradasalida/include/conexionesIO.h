@@ -5,8 +5,10 @@
 #include<stdlib.h>
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/logsConfigs.h"
+#include "../../utils/include/protocolo.h"
 
-void conectar_interfaz(t_log* logger, t_config* config,int* fd_conexion_kernel,int* fd_conexion_memoria);
+int iniciar_conexiones(t_log* logger, t_config* config,int* fd_conexion_kernel,int* fd_conexion_memoria);
+void manejarConexion(t_log* logger,int* fd_conexion_kernel,int* fd_conexion_memoria);
 void terminar_programa(t_log* logger, t_config* config,int* fd_conexion_kernel,int* fd_conexion_memoria);
 
 #endif

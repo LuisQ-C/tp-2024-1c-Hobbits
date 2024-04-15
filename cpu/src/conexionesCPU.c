@@ -5,7 +5,7 @@ typedef struct
     int fd_conexion;
 }datos;
 
-void iniciar_conexiones(t_log* logger,t_config* config,int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt)
+int iniciar_conexiones(t_log* logger,t_config* config,int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt)
 {
     char* ip;
     char* puerto;
@@ -23,6 +23,46 @@ void iniciar_conexiones(t_log* logger,t_config* config,int* fd_conexion_memoria,
     //ESPERA A QUE SE LE CONECTE EL KERNEL
     *cliente_fd_conexion_dispatch = esperar_cliente(*server_fd_escucha_dispatch,logger,"KERNEL_DISPATCH");
     *cliente_fd_conexion_interrupt = esperar_cliente(*server_fd_escucha_interrupt,logger,"KERNEL_INTERRUPT");
+    
+    return *fd_conexion_memoria != 0 && *server_fd_escucha_dispatch != 0 && *server_fd_escucha_interrupt != 0 && *cliente_fd_conexion_dispatch != 0 && *cliente_fd_conexion_interrupt != 0;
+}
+
+
+void manejarConexionKernel(t_log* logger,int* cliente_fd_conexion_dispatch,int* cliente_fd_conexion_interrupt)
+{
+    int cod_op, bytes;
+    while(1)
+    {
+        bytes = recv(*cliente_fd_conexion_dispatch, &cod_op, sizeof(cod_op), MSG_WAITALL);
+        //SI recv devuelve 0 significa que la conexion se cerro del otro lado, del lado del kernel
+        if(bytes==0)
+        {
+            log_error(logger, "el cliente se desconecto. Terminando servidor");
+            return;
+        }
+        //SI recv retorna -1 significa que hubo un error mas grave
+        else if(bytes==-1)
+        {
+            log_error(logger,"error de fd_conexion_dispatch en CPU");
+            return;
+        }
+		
+        switch (cod_op) {
+        case PROCESO:
+            log_info(logger,"proceso recibido");
+		case HANDSHAKE:
+			recibir_handshake(logger,*cliente_fd_conexion_dispatch,"MODULO KERNEL-DISPATCH");
+            recibir_handshake(logger,*cliente_fd_conexion_interrupt,"MODULO KERNEL-INTERRUPT");
+            break;
+		case -1:
+			log_error(logger, "el cliente se desconecto. Terminando servidor");
+            break;
+		default:
+			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+			break;
+		}
+        
+    }
 }
 
 void terminar_programa(t_log* logger, t_config* config, int* fd_conexion_memoria,int* cliente_fd_conexion_dispatch,int*cliente_fd_conexion_interrupt)
@@ -32,31 +72,3 @@ void terminar_programa(t_log* logger, t_config* config, int* fd_conexion_memoria
     close(*cliente_fd_conexion_dispatch);
     close(*cliente_fd_conexion_interrupt);
 }
-
-/*
-void* atender_cliente(void* args)
-{
-    datos* args2 = (datos*) args;
-    int fd_conexion = args2->fd_conexion;
-    free(args2);
-    while(1)
-    {
-        int32_t handshake = 6;
-        int32_t resultOk = 0;
-        int32_t resultError = -1;
-        printf("\nNumero de handshake antes de recibir:%d ",handshake);
-        recv(fd_conexion, &handshake, sizeof(int32_t), MSG_WAITALL);
-        printf("\nNumero de handshake recibido:%d ",handshake);
-        if (handshake == 1) {
-            printf("\nEL result enviado es correcto");
-            send(fd_conexion, &resultOk, sizeof(int32_t), 0);
-        } else {
-            printf("\nEL result enviado es error");
-            send(fd_conexion, &resultError, sizeof(int32_t), 0);
-        }
-        break;
-    }
-    close(fd_conexion);
-    return NULL;
-}
-*/
