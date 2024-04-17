@@ -8,6 +8,10 @@
 #include "../../utils/include/protocolo.h"
 #include "../include/conexionesCPU.h"
 #include <pthread.h>
+#include "../include/cicloInstruccion.h"
+#include "../include/instrucciones.h"
+
+
 
 //void* atender_cliente(void*);
 //t_buffer *persona_serializar(t_persona *persona);
