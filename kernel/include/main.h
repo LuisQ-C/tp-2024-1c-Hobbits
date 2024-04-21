@@ -14,6 +14,7 @@
 
 #include <pthread.h>
 
+void iniciar_consola(void);
 
 
 #endif
