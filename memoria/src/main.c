@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
     FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
     //char* instruccion = leerCadenaArchivos(f);
     char** instrucciones = pasarArchivoEstructura(archivoPseudocodigo);
+    fclose(archivoPseudocodigo);
     //CUIDAD QUE ACA LEE UN \n
     printf("PRIMERA INSTRUCCION: %s",instrucciones[0]);
     printf("PRIMERA INSTRUCCION: %s",instrucciones[1]);
@@ -39,11 +40,11 @@ int main(int argc, char* argv[]) {
     recibir_handshake(logger,fd_kernel,"MODULO KERNEL");
     
     /**/
-    /*
+    
     uint32_t pc_recibido;
     recv(fd_cpu, &pc_recibido, sizeof(int32_t), MSG_WAITALL);
-    enviar_mensaje(instrucciones[pc_recibido],fd_cpu);
-    fclose(archivoPseudocodigo);*/
+    enviar_mensaje(instrucciones[pc_recibido],fd_cpu,INSTRUCCION);
+    
 
     //DESTRUIR ESTRUCTURA CON SUS STRINGS DENTRO
     //string_array_destroy(instrucciones);

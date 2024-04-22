@@ -58,7 +58,7 @@ void recibir_handshake(t_log* logger,int fd_origen, char* nombreOrigen);
 int recibir_operacion(int socket_cliente);
 void* recibir_buffer(int* size, int socket_cliente);
 char* recibir_mensaje(int socket_cliente,t_log* logger); //YA NO NECESITA EL LOGGER, POR AHORA
-void enviar_mensaje(char* mensaje, int socket_cliente);
+void enviar_mensaje(char* mensaje, int socket_cliente, cod_op operacion);
 //void enviar_mensaje(char* mensaje, int socket_cliente);
 void* serializar_paquete(t_paquete* paquete, int bytes);
 void eliminar_paquete(t_paquete* paquete);
