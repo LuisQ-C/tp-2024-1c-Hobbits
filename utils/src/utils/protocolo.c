@@ -1,15 +1,15 @@
 #include "../include/protocolo.h"
 
-void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario)
+void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario, char* nombreOrigen)
 {
-    int bytes;
+    //int bytes;
     int32_t result = 0;
-    cod_op handshake = HANDSHAKE;
-    int valorHandshake = handshake;
+    /*cod_op handshake = HANDSHAKE;
+    int valorHandshake = handshake;*/
     while(1)
     {   
-        bytes =send(fd_destinatario,&valorHandshake,sizeof(int32_t),0);
-        if(bytes == -1)
+        enviar_mensaje(nombreOrigen,fd_destinatario,HANDSHAKE);
+        /*if(bytes == -1)
         {
             log_error(logger,"Error al enviar el handshake (funcion send)");
             perror("\nError en send de mandarHandshake");
@@ -21,7 +21,7 @@ void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario
             log_error(logger,"Error al enviar el handshake (funcion send)");
             perror("\nError en recv de mandarHandshake");
             exit(1);
-        }
+        }*/
         if(result==0)
         {
             log_info(logger,"HANDSHAKE ACEPTADO DE: %s!",nombreDestinatario);

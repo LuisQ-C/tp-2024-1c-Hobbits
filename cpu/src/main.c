@@ -4,6 +4,11 @@ t_log* logger;
 t_config* config;
 t_registro_cpu registro = {0,0,0,0,0,0,0,0,0};
 
+typedef struct{
+    int fd;
+    t_log* logger;
+}info_fd_conexion;
+
 int main(int argc, char* argv[])
 {
     /*
@@ -44,17 +49,53 @@ int main(int argc, char* argv[])
         log_error(logger,"Error al crear conexiones iniciales");
         exit(1);
     }
-    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA");
+    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA","CPU");
     //
-    realizarCicloInstruccion(logger,fd_conexion_memoria);
+    //realizarCicloInstruccion(logger,fd_conexion_memoria);
     //log_info(logger,"%u",registro.BX);
     log_info(logger,"%u",registro.AX);
     log_info(logger,"%u",registro.BX);
-    //
-    manejarConexionKernel(logger,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
-    terminar_programa(logger,config,&fd_conexion_memoria,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
+    //CONEXION DISPATCH - SIN HILO POR SER SECUENCIAL
+    manejarConexionDispatch(logger,cliente_fd_conexion_dispatch);
+    //CONEXION INTERRUPT CON HILO
+    pthread_t hiloInterrupt;
+    info_fd_conexion* fd_interrupt = malloc(sizeof(info_fd_conexion));
+    fd_interrupt->fd = cliente_fd_conexion_interrupt;
+    fd_interrupt->logger = logger;
+    pthread_create(&hiloInterrupt,NULL,(void*) manejarConexionInterrupt,(void*) fd_interrupt);
+    pthread_detach(hiloInterrupt);
+    /////  
     
+    //liberar los mensajes
+    //manejarConexionKernel(logger,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
+    int cod_op;
+    recv(cliente_fd_conexion_dispatch, &cod_op, sizeof(cod_op), MSG_WAITALL);
+    terminar_programa(logger,config,&fd_conexion_memoria,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
+    //hola
     return 0;
+}
+
+void manejarConexionInterrupt(void* fd_interrupt)
+{
+    info_fd_conexion* fd_recibido = fd_interrupt;
+    int fd_kernel_interrupt = fd_recibido->fd;
+    t_log* logger = fd_recibido->logger;
+    free(fd_recibido);
+
+    recibir_operacion(fd_kernel_interrupt);
+    char* moduloConectado = recibir_mensaje(fd_kernel_interrupt,logger);
+    recibir_handshake(logger,fd_kernel_interrupt,moduloConectado);
+    free(moduloConectado);
+
+}
+
+void manejarConexionDispatch(t_log* logger,int cliente_fd_conexion_dispatch)
+{
+    recibir_operacion(cliente_fd_conexion_dispatch);
+    char* moduloConectado = recibir_mensaje(cliente_fd_conexion_dispatch,logger);
+    recibir_handshake(logger,cliente_fd_conexion_dispatch,moduloConectado);
+    free(moduloConectado);
+
 }
 
 

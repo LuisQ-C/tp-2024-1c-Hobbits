@@ -17,9 +17,9 @@ int main(int argc, char* argv[]) {
         log_error(logger,"Error al crear conexiones iniciales");
         exit(1);
     }; 
-    mandarHandshake(logger,fd_memoria,"MODULO MEMORIA");
-    mandarHandshake(logger,fd_cpu_dispatch,"MODULO CPU DISPATCH");
-    mandarHandshake(logger,fd_cpu_interrupt,"MODULO CPU INTERRUPT");
+    mandarHandshake(logger,fd_memoria,"MODULO MEMORIA","MODULO KERNEL");
+    mandarHandshake(logger,fd_cpu_dispatch,"MODULO CPU DISPATCH","MODULO KERNEL-DISPATCH");
+    mandarHandshake(logger,fd_cpu_interrupt,"MODULO CPU INTERRUPT","MODULO KERNEL-INTERRUPT");
     
     
     while(escucharConexionesIO(logger,fd_escucha_interfaces));

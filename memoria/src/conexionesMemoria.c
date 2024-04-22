@@ -47,7 +47,11 @@ void procesarConexionesIO(void* datosServerInterfaces){
     int fd_conexion_IO = auxiliarDatosServer->fd_conexion_IO;
     t_log* logger = auxiliarDatosServer->logger;
     free(auxiliarDatosServer);
-    recibir_handshake(logger,fd_conexion_IO,"MODULO I/O");
+
+    recibir_operacion(fd_conexion_IO);
+    char* interfazConectada = recibir_mensaje(fd_conexion_IO,logger);
+    recibir_handshake(logger,fd_conexion_IO,interfazConectada);
+    free(interfazConectada);
 }
 
 void manejarConexionCPU(t_log* logger,int* fd_cpu)

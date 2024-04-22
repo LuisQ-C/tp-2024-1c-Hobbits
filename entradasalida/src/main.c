@@ -12,12 +12,13 @@ int main(int argc, char* argv[]) {
         log_error(logger,"Error al crear conexiones iniciales");
         exit(1);
     }
-    mandarHandshake(logger,fd_conexion_kernel,"MODULO KERNEL");
-    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA");
-    manejarConexion(logger,&fd_conexion_kernel,&fd_conexion_memoria);
+
+    mandarHandshake(logger,fd_conexion_kernel,"MODULO KERNEL","DISCO");
+    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA","DISCO");
+    //manejarConexion(logger,&fd_conexion_kernel,&fd_conexion_memoria);
     terminar_programa(logger,config,&fd_conexion_kernel,&fd_conexion_memoria);
     
-   return 0;
+    return 0;
 }
 
 

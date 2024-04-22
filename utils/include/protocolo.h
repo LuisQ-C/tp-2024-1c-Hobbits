@@ -50,7 +50,7 @@ typedef struct {
 
 //void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario,int32_t valorHandshake);
 //void recibirHandshake(t_log* logger,int fd_origen, char* nombreOrigen,int32_t valorHandshake);
-void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario);
+void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario, char* nombreOrigen);
 void recibir_handshake(t_log* logger,int fd_origen, char* nombreOrigen);
 
 
