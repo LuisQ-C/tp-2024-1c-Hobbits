@@ -1,0 +1,1 @@
+1- Preguntar si se puede sumar un registro de 8bits a uno de 32bits

@@ -15,13 +15,24 @@ typedef enum{
     INICIAR_PLANIFICACION,
     DETENER_PLANIFICACION,
     LISTAR_PROCESOS_POR_ESTADO,
-    PROCESO
+    PROCESO,
+    INSTRUCCION,
+    SET,
+    SUM,
+    SUB,
+    JNZ,
+    IO_GEN_SLEEP
 }cod_op;
-
+/*
 typedef struct {
     uint32_t size; // Tamaño del payload
     uint32_t offset; // Desplazamiento dentro del payload
     void* stream; // Payload
+} t_buffer;*/
+typedef struct
+{
+	int size;
+	void* stream;
 } t_buffer;
 
 typedef struct {
@@ -33,7 +44,7 @@ typedef struct {
 } t_persona;
 
 typedef struct {
-    uint8_t codigo_operacion;
+    int codigo_operacion;
     t_buffer* buffer;
 } t_paquete;
 
@@ -41,6 +52,16 @@ typedef struct {
 //void recibirHandshake(t_log* logger,int fd_origen, char* nombreOrigen,int32_t valorHandshake);
 void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario);
 void recibir_handshake(t_log* logger,int fd_origen, char* nombreOrigen);
+
+
+//SERIALIZACION TP0
+int recibir_operacion(int socket_cliente);
+void* recibir_buffer(int* size, int socket_cliente);
+char* recibir_mensaje(int socket_cliente,t_log* logger); //YA NO NECESITA EL LOGGER, POR AHORA
+void enviar_mensaje(char* mensaje, int socket_cliente);
+//void enviar_mensaje(char* mensaje, int socket_cliente);
+void* serializar_paquete(t_paquete* paquete, int bytes);
+void eliminar_paquete(t_paquete* paquete);
 
 //BUFFER, SERIALIZACION
 t_buffer *buffer_create(uint32_t size);

@@ -9,7 +9,7 @@
 #include "../../utils/include/protocolo.h"
 #include <pthread.h>
 #include"../include/conexionesMemoria.h"
-
+#include"../include/archivos.h"
 //extern t_log* logger;
 
 //extern t_log* logger;

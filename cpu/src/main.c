@@ -2,14 +2,16 @@
 
 t_log* logger;
 t_config* config;
-t_registro_cpu registro = {0,0,0,0,0,0};
+t_registro_cpu registro = {0,0,0,0,0,0,0,0,0};
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
-    
+    /*
+    int AX = 12;
     set_8(&registro.ax,0);
     //set_8(&registro.bx,4);
     //set_32(&registro.eax,32);
+    printf("%d\n",AX);
     printf("%d\n",registro.ax);
     printf("%d\n",registro.pc);
     //printf("%d\n",registro.bx);
@@ -23,12 +25,12 @@ int main(int argc, char* argv[])
     //printf("%d\n",registro.ax);
     //printf("%d\n",registro.eax);
 
-    
+    */
 
 
 
-
-    /* NO TOCAR ANDA PERFECTO
+    //char* instruccion= string_new();
+    //NO TOCAR ANDA PERFECTO
     int fd_conexion_memoria = 0;
     int server_fd_escucha_dispatch = 0;
     int server_fd_escucha_interrupt = 0;
@@ -43,9 +45,15 @@ int main(int argc, char* argv[])
         exit(1);
     }
     mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA");
+    //
+    realizarCicloInstruccion(logger,fd_conexion_memoria);
+    //log_info(logger,"%u",registro.BX);
+    log_info(logger,"%u",registro.AX);
+    log_info(logger,"%u",registro.BX);
+    //
     manejarConexionKernel(logger,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
     terminar_programa(logger,config,&fd_conexion_memoria,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
-    */
+    
     return 0;
 }
 
