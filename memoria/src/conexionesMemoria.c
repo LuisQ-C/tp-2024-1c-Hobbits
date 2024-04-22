@@ -72,7 +72,14 @@ void procesarConexionesIO(void* datosServerInterfaces){
     t_log* logger = auxiliarDatosServer->logger;
     free(auxiliarDatosServer);
 
-    recibir_operacion(fd_conexion_IO);
+    int codigoOperacion = recibir_operacion(fd_conexion_IO);
+
+    if(codigoOperacion == -1)
+    {
+        log_error(logger,"Error al recibirOperacion");
+        //return;
+    }
+
     char* interfazConectada = recibir_mensaje(fd_conexion_IO,logger);
     recibir_handshake(logger,fd_conexion_IO,interfazConectada);
     free(interfazConectada);
@@ -89,24 +96,13 @@ void conexionCPU(void* info_fd_cpu)
     while(1)
     {
         codigoOperacion = recibir_operacion(fd_cpu);
-        //manejar_error_desconexion();
-        //SI recv devuelve 0 significa que la conexion se cerro del otro lado, del lado del kernel
-        /*if(bytes==0)
-        {
-            log_error(logger, "el cliente se desconecto. Terminando servidor");
-            return;
-        }
-        //SI recv retorna -1 significa que hubo un error mas grave
-        else if(bytes==-1)
-        {
-            log_error(logger,"error de fd_conexion_dispatch en CPU");
-            return;
-        }*/
+
         if(codigoOperacion == -1)
         {
-            log_error(logger,"Error de fd_conexion_dispatch en CPU");
+            log_error(logger,"Error al recibirOperacion");
             return;
         }
+
 		switch (codigoOperacion) {
 		case HANDSHAKE:
             char* moduloConectado = recibir_mensaje(fd_cpu,logger);
@@ -115,11 +111,11 @@ void conexionCPU(void* info_fd_cpu)
 			break;
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
-            break;
+            return;
 			//return EXIT_FAILURE;
 		default:
 			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-			break;
+			return;
 		}
     }
 }
@@ -134,23 +130,13 @@ void conexionKernel(void* info_fd_kernel)
     while(1)
     {
         codigoOperacion = recibir_operacion(fd_kernel);
-        //SI recv devuelve 0 significa que la conexion se cerro del otro lado, del lado del kernel
-        /*if(bytes==0)
-        {
-            log_error(logger, "el cliente se desconecto. Terminando servidor");
-            return;
-        }
-        //SI recv retorna -1 significa que hubo un error mas grave
-        else if(bytes==-1)
-        {
-            log_error(logger,"error de fd_conexion_dispatch en CPU");
-            return;
-        }*/
+
         if(codigoOperacion == -1)
         {
-            log_error(logger,"Error de fd_conexion_memoria en KERNEL");
+            log_error(logger,"Error al recibirOperacion");
             return;
         }
+
 		switch (codigoOperacion) {
 		case HANDSHAKE:
             char* moduloConectado = recibir_mensaje(fd_kernel,logger);
@@ -159,11 +145,11 @@ void conexionKernel(void* info_fd_kernel)
 			break;
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
-            break;
+            return;
 			//return EXIT_FAILURE;
 		default:
 			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-			break;
+			return;
 		}
     }
 }
