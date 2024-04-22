@@ -4,10 +4,7 @@ t_log* logger;
 t_config* config;
 t_registro_cpu registro = {0,0,0,0,0,0,0,0,0};
 
-typedef struct{
-    int fd;
-    t_log* logger;
-}info_fd_conexion;
+
 
 int main(int argc, char* argv[])
 {
@@ -53,17 +50,13 @@ int main(int argc, char* argv[])
     //
     //realizarCicloInstruccion(logger,fd_conexion_memoria);
     //log_info(logger,"%u",registro.BX);
-    log_info(logger,"%u",registro.AX);
-    log_info(logger,"%u",registro.BX);
+    //log_info(logger,"%u",registro.AX);
+    //log_info(logger,"%u",registro.BX);
     //CONEXION DISPATCH - SIN HILO POR SER SECUENCIAL
     manejarConexionDispatch(logger,cliente_fd_conexion_dispatch);
-    //CONEXION INTERRUPT CON HILO
-    pthread_t hiloInterrupt;
-    info_fd_conexion* fd_interrupt = malloc(sizeof(info_fd_conexion));
-    fd_interrupt->fd = cliente_fd_conexion_interrupt;
-    fd_interrupt->logger = logger;
-    pthread_create(&hiloInterrupt,NULL,(void*) manejarConexionInterrupt,(void*) fd_interrupt);
-    pthread_detach(hiloInterrupt);
+    //INICIALIZAR HILO INTERRUPT
+    inicializar_hilo_interrupt(logger,cliente_fd_conexion_interrupt);
+    
     /////  
     
     //liberar los mensajes
@@ -74,85 +67,3 @@ int main(int argc, char* argv[])
     //hola
     return 0;
 }
-
-void manejarConexionInterrupt(void* fd_interrupt)
-{
-    info_fd_conexion* fd_recibido = fd_interrupt;
-    int fd_kernel_interrupt = fd_recibido->fd;
-    t_log* logger = fd_recibido->logger;
-    free(fd_recibido);
-
-    recibir_operacion(fd_kernel_interrupt);
-    char* moduloConectado = recibir_mensaje(fd_kernel_interrupt,logger);
-    recibir_handshake(logger,fd_kernel_interrupt,moduloConectado);
-    free(moduloConectado);
-
-}
-
-void manejarConexionDispatch(t_log* logger,int cliente_fd_conexion_dispatch)
-{
-    recibir_operacion(cliente_fd_conexion_dispatch);
-    char* moduloConectado = recibir_mensaje(cliente_fd_conexion_dispatch,logger);
-    recibir_handshake(logger,cliente_fd_conexion_dispatch,moduloConectado);
-    free(moduloConectado);
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-void mandar_persona()
-{
-    t_paquete* paquete = malloc(sizeof(t_paquete));
-
-    paquete->codigo_operacion = PERSONA; // Podemos usar una constante por operación
-    paquete->buffer = buffer; // Nuestro buffer de antes.
-
-    // Armamos el stream a enviar
-    void* a_enviar = malloc(buffer->size + sizeof(uint8_t) + sizeof(uint32_t));
-    int offset = 0;
-
-    memcpy(a_enviar + offset, &(paquete->codigo_operacion), sizeof(uint8_t));
-
-    offset += sizeof(uint8_t);
-    memcpy(a_enviar + offset, &(paquete->buffer->size), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
-    memcpy(a_enviar + offset, paquete->buffer->stream, paquete->buffer->size);
-
-    // Por último enviamos
-    send(unSocket, a_enviar, buffer->size + sizeof(uint8_t) + sizeof(uint32_t), 0);
-
-    // No nos olvidamos de liberar la memoria que ya no usaremos
-    free(a_enviar);
-    free(paquete->buffer->stream);
-    free(paquete->buffer);
-    free(paquete);
-}
-
-t_buffer *persona_serializar(t_persona *persona) {
-    t_buffer *buffer = buffer_create(
-      sizeof(uint32_t) * 2 +                    // DNI y Pasaporte
-      sizeof(uint8_t) +                         // Edad
-      sizeof(uint32_t) + persona->nombre_length // Longitud del nombre, y el propio nombre
-    );
-
-    buffer_add_uint32(buffer, persona->dni);
-    buffer_add_uint8(buffer, persona->edad);
-    buffer_add_uint32(buffer, persona->pasaporte);
-    buffer_add_string(buffer, persona->nombre_length, persona->nombre);
-
-    free(persona);
-
-    return buffer;
-}*/

@@ -4,7 +4,10 @@ typedef struct
 {
     int fd_conexion;
 }datos;
-
+typedef struct{
+    int fd;
+    t_log* logger;
+}info_fd_conexion;
 int iniciar_conexiones(t_log* logger,t_config* config,int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt)
 {
     char* ip;
@@ -25,6 +28,40 @@ int iniciar_conexiones(t_log* logger,t_config* config,int* fd_conexion_memoria,i
     *cliente_fd_conexion_interrupt = esperar_cliente(*server_fd_escucha_interrupt,logger,"KERNEL_INTERRUPT");
     
     return *fd_conexion_memoria != 0 && *server_fd_escucha_dispatch != 0 && *server_fd_escucha_interrupt != 0 && *cliente_fd_conexion_dispatch != 0 && *cliente_fd_conexion_interrupt != 0;
+}
+
+void inicializar_hilo_interrupt(t_log* logger, int cliente_fd_conexion_interrupt)
+{
+    //CONEXION INTERRUPT CON HILO
+    pthread_t hiloInterrupt;
+    info_fd_conexion* fd_interrupt = malloc(sizeof(info_fd_conexion));
+    fd_interrupt->fd = cliente_fd_conexion_interrupt;
+    fd_interrupt->logger = logger;
+    pthread_create(&hiloInterrupt,NULL,(void*) manejarConexionInterrupt,(void*) fd_interrupt);
+    pthread_detach(hiloInterrupt);
+}
+
+void manejarConexionInterrupt(void* fd_interrupt)
+{
+    info_fd_conexion* fd_recibido = fd_interrupt;
+    int fd_kernel_interrupt = fd_recibido->fd;
+    t_log* logger = fd_recibido->logger;
+    free(fd_recibido);
+
+    recibir_operacion(fd_kernel_interrupt);
+    char* moduloConectado = recibir_mensaje(fd_kernel_interrupt,logger);
+    recibir_handshake(logger,fd_kernel_interrupt,moduloConectado);
+    free(moduloConectado);
+
+}
+
+void manejarConexionDispatch(t_log* logger,int cliente_fd_conexion_dispatch)
+{
+    recibir_operacion(cliente_fd_conexion_dispatch);
+    char* moduloConectado = recibir_mensaje(cliente_fd_conexion_dispatch,logger);
+    recibir_handshake(logger,cliente_fd_conexion_dispatch,moduloConectado);
+    free(moduloConectado);
+
 }
 
 
