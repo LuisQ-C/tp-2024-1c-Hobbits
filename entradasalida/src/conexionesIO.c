@@ -7,6 +7,25 @@ int iniciar_conexiones(t_log* logger, t_config* config,int* fd_conexion_kernel,i
     ip = config_get_string_value(config,"IP_KERNEL");
     puerto = config_get_string_value(config,"PUERTO_KERNEL");
     *fd_conexion_kernel = crear_conexion(ip,puerto,logger,"KERNEL");
+//AGREGADO conviene que este debajo de conexion a memoria
+//////////Aca leo todo junto???
+char* tipoDeInterfaz;
+char* tiempoDeUnidadDeTrabajo;
+
+tipoDeInterfaz = config_get_string_value(config, "TIPO_INTERFAZ");
+tiempoDeUnidadDeTrabajo = config_get_string_value(config, "TIEMPO_UNIDAD_TRABAJO");
+
+if (!(strcmp(tipoDeInterfaz, GENERICO)))
+{
+    log_info(logger,"La interfaz recibida es: GENERICA");
+    realizarDemora(tiempoDeUnidadDeTrabajo)   //IO_GEN_SLEEP???? creo la funcion?
+
+}
+
+
+//////////
+//////////
+
     //CONEXION A MEMORIA
     ip = config_get_string_value(config,"IP_MEMORIA");
     puerto = config_get_string_value(config,"PUERTO_MEMORIA");
