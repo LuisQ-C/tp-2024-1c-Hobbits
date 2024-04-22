@@ -14,7 +14,6 @@
 
 //extern t_log* logger;
 //void* atender_cliente(void*);
-void conexionCPU(void* fds);
-void conexionKernel(void* fds2);
+
 
 #endif
