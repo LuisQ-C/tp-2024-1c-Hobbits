@@ -37,7 +37,7 @@ char* custom_completion_generator(const char* text, int state){
     while ((name = opciones[list_index])) {
         list_index++;
 
-        if (strncmp(name, text, len) == 0) {
+        if (strncasecmp(name, text, len) == 0) {
             return strdup(name);
         }
     }
@@ -83,7 +83,7 @@ bool validar_instrucciones_leidas(char* leido){
 
     if(strcmp(instruccion_leida[0], "EJECUTAR_SCRIPT") == 0)
         valido = true;
-    else if (strcmp(instruccion_leida[0], "INCIAR_PROCESO") == 0)
+    else if (strcmp(instruccion_leida[0], "INICIAR_PROCESO") == 0)
         valido = true;
     else if (strcmp(instruccion_leida[0], "FINALIZAR_PROCESO") == 0)
         valido = true;
@@ -108,7 +108,7 @@ void instrucciones_consola(char* leido){
 
     if(strcmp(instruccion_leida[0], "EJECUTAR_SCRIPT") == 0)
         ejecutar_script(instruccion_leida[1]);
-    else if (strcmp(instruccion_leida[0], "INCIAR_PROCESO") == 0)
+    else if (strcmp(instruccion_leida[0], "INICIAR_PROCESO") == 0)
         iniciar_proceso(instruccion_leida[1]);
     else if (strcmp(instruccion_leida[0], "FINALIZAR_PROCESO") == 0)
         finalizar_proceso(atoi(instruccion_leida[1]));

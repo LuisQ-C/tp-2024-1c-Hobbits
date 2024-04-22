@@ -21,16 +21,13 @@ int main(int argc, char* argv[]) {
     mandarHandshake(logger,fd_cpu_dispatch,"MODULO CPU DISPATCH");
     mandarHandshake(logger,fd_cpu_interrupt,"MODULO CPU INTERRUPT");
 
+    //Llamamos la inicialización de la consola
     
     pthread_t hilo_consola;
     pthread_create(&hilo_consola, NULL, (void*) iniciar_consola, NULL);
     pthread_detach(hilo_consola);
     
     while(escucharConexionesIO(logger,fd_escucha_interfaces));
-
-    //Llamamos la inicialización de la consola
-    
-
 
     terminar_programa(logger,config,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt);
     return 0;
