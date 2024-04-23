@@ -2,8 +2,8 @@
 
 void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario, char* nombreOrigen)
 {
-    //int bytes;
-    int32_t result = 0;
+    int bytes;
+    int32_t result = 3;
     /*cod_op handshake = HANDSHAKE;
     int valorHandshake = handshake;*/
     while(1)
@@ -14,14 +14,14 @@ void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario
             log_error(logger,"Error al enviar el handshake (funcion send)");
             perror("\nError en send de mandarHandshake");
             exit(1);
-        }
+        }*/
         bytes = recv(fd_destinatario,&result,sizeof(int32_t),MSG_WAITALL);
         if(bytes == -1)
         {
-            log_error(logger,"Error al enviar el handshake (funcion send)");
+            log_error(logger,"Error al enviar el handshake (funcion recv)");
             perror("\nError en recv de mandarHandshake");
             exit(1);
-        }*/
+        }
         if(result==0)
         {
             log_info(logger,"HANDSHAKE ACEPTADO DE: %s!",nombreDestinatario);
