@@ -54,7 +54,7 @@ void procesarConexionesIO(void* datosServerInterfaces){
     
     recibir_operacion(fd_conexion_IO);
     char* interfazConectada = recibir_mensaje(fd_conexion_IO,logger);
-    recibir_handshake(logger,fd_conexion_IO,interfazConectada);
+    enviar_handshake_ok(logger,fd_conexion_IO,interfazConectada);
     free(interfazConectada);
 }
 

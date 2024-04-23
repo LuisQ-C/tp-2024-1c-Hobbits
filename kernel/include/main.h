@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/logsConfigs.h"
 #include "../../utils/include/protocolo.h"
@@ -15,6 +16,7 @@
 #include <pthread.h>
 
 void iniciar_consola(void);
+void conexion_dispatch(void* dispatch);
 
 
 #endif

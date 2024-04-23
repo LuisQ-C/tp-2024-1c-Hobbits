@@ -32,7 +32,7 @@ void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario
     }
     
 }
-void recibir_handshake(t_log* logger,int fd_origen, char* nombreOrigen)
+void enviar_handshake_ok(t_log* logger,int fd_origen, char* nombreOrigen)
 {
     int bytes;
     int32_t resultOk = 0;
@@ -117,6 +117,68 @@ void* serializar_paquete(t_paquete* paquete, int bytes)
 
 	return magic;
 }
+
+//FUNCIONES NUEVAS TP0, ARMAR PAQUETE
+t_list* recibir_paquete(int socket_cliente)
+{
+	int size;
+	int desplazamiento = 0;
+	void * buffer;
+	t_list* valores = list_create();
+	int tamanio;
+
+	buffer = recibir_buffer(&size, socket_cliente);
+	while(desplazamiento < size)
+	{
+		memcpy(&tamanio, buffer + desplazamiento, sizeof(int));
+		desplazamiento+=sizeof(int);
+		char* valor = malloc(tamanio);
+		memcpy(valor, buffer+desplazamiento, tamanio);
+		desplazamiento+=tamanio;
+		list_add(valores, valor);
+	}
+	free(buffer);
+	return valores;
+}
+
+t_paquete* crear_paquete(cod_op codigo_op)
+{
+	t_paquete* paquete = malloc(sizeof(t_paquete));
+	paquete->codigo_operacion = codigo_op;
+	crear_buffer(paquete);
+	return paquete;
+}
+
+void crear_buffer(t_paquete* paquete)
+{
+	paquete->buffer = malloc(sizeof(t_buffer));
+	paquete->buffer->size = 0;
+	paquete->buffer->stream = NULL;
+}
+
+
+void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio)
+{
+	paquete->buffer->stream = realloc(paquete->buffer->stream, paquete->buffer->size + tamanio + sizeof(int));
+
+	memcpy(paquete->buffer->stream + paquete->buffer->size, &tamanio, sizeof(int));
+	memcpy(paquete->buffer->stream + paquete->buffer->size + sizeof(int), valor, tamanio);
+
+	paquete->buffer->size += tamanio + sizeof(int);
+}
+
+/*Eliminar el paquete creado luego de enviarlo*/
+void enviar_paquete(t_paquete* paquete, int socket_cliente)
+{
+	int bytes = paquete->buffer->size + 2*sizeof(int);
+	void* a_enviar = serializar_paquete(paquete, bytes);
+
+	send(socket_cliente, a_enviar, bytes, 0);
+
+	free(a_enviar);
+}
+
+/*Eliminar paquete del lado del cliente*/
 void eliminar_paquete(t_paquete* paquete)
 {
 	free(paquete->buffer->stream);

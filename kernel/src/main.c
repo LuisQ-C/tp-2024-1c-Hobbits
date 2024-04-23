@@ -3,6 +3,33 @@
 t_log* logger;
 t_config* config;
 
+typedef struct
+{
+    uint8_t AX;
+    uint8_t BX;
+    uint8_t CX;
+    uint8_t DX;
+    uint32_t EAX;
+    uint32_t EBX;
+    uint32_t ECX;
+    uint32_t EDX;
+}registrosGenerales;
+typedef struct
+{
+   int pid;
+   uint32_t pc;
+   int quantum;
+   char* estado;
+   registrosGenerales* registrosCPU;
+} pcb;
+
+
+typedef struct
+{
+    int fd;
+}info_dispatch;
+
+
 int main(int argc, char* argv[]) {
     int fd_memoria = 0;
     int fd_cpu_dispatch = 0;
@@ -22,15 +49,57 @@ int main(int argc, char* argv[]) {
     mandarHandshake(logger,fd_cpu_interrupt,"MODULO CPU INTERRUPT","MODULO KERNEL-INTERRUPT");
 
     //Llamamos la inicialización de la consola
-    
+
     pthread_t hilo_consola;
     pthread_create(&hilo_consola, NULL, (void*) iniciar_consola, NULL);
     pthread_detach(hilo_consola);
+    //Hilo Dispatch
+    pthread_t hilo_dispatch;
+    info_dispatch* dispatch = malloc(sizeof(info_dispatch));
+    dispatch->fd = fd_cpu_dispatch;
+    pthread_create(&hilo_dispatch,NULL,(void*) conexion_dispatch,(void*) dispatch);
+    pthread_detach(hilo_dispatch);
+
     
     while(escucharConexionesIO(logger,fd_escucha_interfaces));
 
     terminar_programa(logger,config,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt);
     return 0;
+}
+
+void conexion_dispatch(void* dispatch)
+{
+    /*info_dispatch* auxiliar = dispatch;
+    int fd_dispatch = auxiliar->fd;
+    //
+    pcb* nuevoPCB = malloc(sizeof(pcb));
+    nuevoPCB->pc=0;
+    nuevoPCB->pid=14;
+    nuevoPCB->estado="new";
+    nuevoPCB->quantum=3;
+    nuevoPCB->registrosCPU = malloc(sizeof(registrosGenerales));
+    nuevoPCB->registrosCPU->AX=5;
+    nuevoPCB->registrosCPU->BX=6;
+    nuevoPCB->registrosCPU->CX=7;
+    nuevoPCB->registrosCPU->DX=5;
+    nuevoPCB->registrosCPU->EAX=8;
+    nuevoPCB->registrosCPU->EBX=10;
+    nuevoPCB->registrosCPU->ECX=20;
+    nuevoPCB->registrosCPU->EDX=50;
+    //hola
+    t_paquete* paquete = crear_paquete(PCB);
+    agregar_a_paquete(paquete,&nuevoPCB->pc,sizeof(uint32_t));
+    agregar_a_paquete(paquete,&nuevoPCB->pid,sizeof(int));
+    agregar_a_paquete(paquete,nuevoPCB->estado,sizeof(strlen(nuevoPCB->estado)+1));
+    agregar_a_paquete(paquete,&nuevoPCB->quantum,sizeof(int));
+    agregar_a_paquete(paquete, nuevoPCB->registrosCPU,sizeof(registrosGenerales));
+
+    enviar_paquete(paquete,fd_dispatch);
+
+    free(nuevoPCB->registrosCPU);
+    free(nuevoPCB);
+    eliminar_paquete(paquete);*/
+
 }
 
 

@@ -4,6 +4,18 @@ typedef struct
 {
     int fd_conexion;
 }datos;
+/*
+typedef struct
+{
+    uint8_t AX;
+    uint8_t BX;
+    uint8_t CX;
+    uint8_t DX;
+    uint32_t EAX;
+    uint32_t EBX;
+    uint32_t ECX;
+    uint32_t EDX;
+}registrosGenerales;*/
 typedef struct{
     int fd;
     t_log* logger;
@@ -50,8 +62,10 @@ void manejarConexionInterrupt(void* fd_interrupt)
 
     recibir_operacion(fd_kernel_interrupt);
     char* moduloConectado = recibir_mensaje(fd_kernel_interrupt,logger);
-    recibir_handshake(logger,fd_kernel_interrupt,moduloConectado);
+    enviar_handshake_ok(logger,fd_kernel_interrupt,moduloConectado);
     free(moduloConectado);
+
+    
 
 }
 
@@ -59,8 +73,32 @@ void manejarConexionDispatch(t_log* logger,int cliente_fd_conexion_dispatch)
 {
     recibir_operacion(cliente_fd_conexion_dispatch);
     char* moduloConectado = recibir_mensaje(cliente_fd_conexion_dispatch,logger);
-    recibir_handshake(logger,cliente_fd_conexion_dispatch,moduloConectado);
+    enviar_handshake_ok(logger,cliente_fd_conexion_dispatch,moduloConectado);
     free(moduloConectado);
+/*
+    t_list* lista;
+    if(recibir_operacion(cliente_fd_conexion_dispatch) == PCB)
+    {
+        lista = recibir_paquete(cliente_fd_conexion_dispatch);
+        uint32_t* pc = list_get(lista,0);
+        int* pid = list_get(lista,1);
+        char* estado = list_get(lista,2);
+        int* quantum = list_get(lista,3);
+        registrosGenerales* registrosRecibidos = list_get(lista,4);
+        log_info(logger,"VALOR BX: %u",registrosRecibidos->BX);
+        log_info(logger,"PC: %u",*pc);
+        log_info(logger,"PID: %d",*pid);
+        log_info(logger,"ESTADO: %s",estado);
+        log_info(logger,"QUANTUM: %d",*quantum);
+        free(pc);
+        free(pid);
+        free(estado);
+        free(quantum);
+        free(registrosRecibidos);
+        list_destroy(lista);
+        
+        
+    }*/
 
 }
 
@@ -88,8 +126,8 @@ void manejarConexionKernel(t_log* logger,int* cliente_fd_conexion_dispatch,int* 
         case PROCESO:
             log_info(logger,"proceso recibido");
 		case HANDSHAKE:
-			recibir_handshake(logger,*cliente_fd_conexion_dispatch,"MODULO KERNEL-DISPATCH");
-            recibir_handshake(logger,*cliente_fd_conexion_interrupt,"MODULO KERNEL-INTERRUPT");
+			enviar_handshake_ok(logger,*cliente_fd_conexion_dispatch,"MODULO KERNEL-DISPATCH");
+            enviar_handshake_ok(logger,*cliente_fd_conexion_interrupt,"MODULO KERNEL-INTERRUPT");
             break;
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");

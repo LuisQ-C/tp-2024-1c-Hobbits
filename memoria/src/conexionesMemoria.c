@@ -81,7 +81,7 @@ void procesarConexionesIO(void* datosServerInterfaces){
     }
 
     char* interfazConectada = recibir_mensaje(fd_conexion_IO,logger);
-    recibir_handshake(logger,fd_conexion_IO,interfazConectada);
+    enviar_handshake_ok(logger,fd_conexion_IO,interfazConectada);
     free(interfazConectada);
 }
 
@@ -106,7 +106,7 @@ void conexionCPU(void* info_fd_cpu)
 		switch (codigoOperacion) {
 		case HANDSHAKE:
             char* moduloConectado = recibir_mensaje(fd_cpu,logger);
-			recibir_handshake(logger,fd_cpu, moduloConectado);
+			enviar_handshake_ok(logger,fd_cpu, moduloConectado);
             free(moduloConectado);
 			break;
         case INSTRUCCION:
@@ -121,7 +121,7 @@ void conexionCPU(void* info_fd_cpu)
 			//return EXIT_FAILURE;
 		default:
 			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-			return;
+			break;
 		}
     }
 }
@@ -146,7 +146,7 @@ void conexionKernel(void* info_fd_kernel)
 		switch (codigoOperacion) {
 		case HANDSHAKE:
             char* moduloConectado = recibir_mensaje(fd_kernel,logger);
-			recibir_handshake(logger,fd_kernel, moduloConectado);
+			enviar_handshake_ok(logger,fd_kernel, moduloConectado);
             free(moduloConectado);
 			break;
         case INICIAR_PROCESO:
@@ -166,7 +166,7 @@ void conexionKernel(void* info_fd_kernel)
 			//return EXIT_FAILURE;
 		default:
 			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-			return;
+			break;
 		}
     }
 }

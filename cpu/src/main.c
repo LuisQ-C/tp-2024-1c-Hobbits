@@ -54,9 +54,11 @@ int main(int argc, char* argv[])
     //log_info(logger,"%u",registro.AX);
     //log_info(logger,"%u",registro.BX);
     //CONEXION DISPATCH - SIN HILO POR SER SECUENCIAL
-    manejarConexionDispatch(logger,cliente_fd_conexion_dispatch);
+    
     //INICIALIZAR HILO INTERRUPT
     inicializar_hilo_interrupt(logger,cliente_fd_conexion_interrupt);
+
+    manejarConexionDispatch(logger,cliente_fd_conexion_dispatch);
     
     
     //deshabilitar esto para tomas y luis-roger

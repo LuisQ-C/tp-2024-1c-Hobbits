@@ -13,8 +13,35 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    mandarHandshake(logger,fd_conexion_kernel,"MODULO KERNEL","DISCO");
-    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA","DISCO");
+    mandarHandshake(logger,fd_conexion_kernel,"MODULO KERNEL","INTERFAZ GENERICA");
+    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA","INTERFAZ GENERICA");
+
+    /*
+    INGRESE TIPO DE INTERFAZ A CREAR:
+    GENERICA
+    STDIN
+
+    INGRESE NOMBRE: 
+    */
+    /*
+    STRING TIPO = "GENERICA"
+    
+    */
+    /*
+    interfazGenerica()
+    {
+        int unidadesTrabajo;
+        recv(fd_conexion_kernel,&unidadesTrabajo,sizeof(int),MSG_WAITALL);
+        int resultado = tiempo_unidad_trabajo del config * unidadesTrabajo;
+        usleep(resultado);
+        int finalizado = INTERFAZ_LISTA;
+        send(fd_conexion_kernel,&finalizado,sizeof(int),0);
+    }
+    interfaz stdin()
+    {
+
+    }
+    */
     //manejarConexion(logger,&fd_conexion_kernel,&fd_conexion_memoria);
     terminar_programa(logger,config,&fd_conexion_kernel,&fd_conexion_memoria);
     

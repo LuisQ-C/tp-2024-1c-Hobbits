@@ -17,6 +17,7 @@ typedef enum{
     LISTAR_PROCESOS_POR_ESTADO,
     PROCESO,
     INSTRUCCION,
+    PCB,
     SET,
     SUM,
     SUB,
@@ -51,7 +52,7 @@ typedef struct {
 //void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario,int32_t valorHandshake);
 //void recibirHandshake(t_log* logger,int fd_origen, char* nombreOrigen,int32_t valorHandshake);
 void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario, char* nombreOrigen);
-void recibir_handshake(t_log* logger,int fd_origen, char* nombreOrigen);
+void enviar_handshake_ok(t_log* logger,int fd_origen, char* nombreOrigen);
 
 
 //SERIALIZACION TP0
@@ -61,6 +62,11 @@ char* recibir_mensaje(int socket_cliente,t_log* logger); //YA NO NECESITA EL LOG
 void enviar_mensaje(char* mensaje, int socket_cliente, cod_op operacion);
 //void enviar_mensaje(char* mensaje, int socket_cliente);
 void* serializar_paquete(t_paquete* paquete, int bytes);
+t_list* recibir_paquete(int socket_cliente);
+t_paquete* crear_paquete(cod_op codigo_op);
+void crear_buffer(t_paquete* paquete);
+void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio);
+void enviar_paquete(t_paquete* paquete, int socket_cliente);
 void eliminar_paquete(t_paquete* paquete);
 
 //BUFFER, SERIALIZACION
