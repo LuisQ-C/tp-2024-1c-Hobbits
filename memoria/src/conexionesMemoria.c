@@ -109,6 +109,12 @@ void conexionCPU(void* info_fd_cpu)
 			recibir_handshake(logger,fd_cpu, moduloConectado);
             free(moduloConectado);
 			break;
+        case INSTRUCCION:
+            char* valor_pc = recibir_mensaje(fd_cpu,logger);
+            uint32_t pc_recibido = atoi(valor_pc);
+            enviar_mensaje("SET AX 8",fd_cpu,INSTRUCCION);
+            free(valor_pc);
+            break;
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
             return;
@@ -143,6 +149,17 @@ void conexionKernel(void* info_fd_kernel)
 			recibir_handshake(logger,fd_kernel, moduloConectado);
             free(moduloConectado);
 			break;
+        case INICIAR_PROCESO:
+            /*
+            char* pathPseudocodigo = recibir_mensaje(fd_kernel,logger);
+            //se recibe el path del kernel
+            char* pathPseudocodigo = "codigoPrueba.txt";
+            FILE* archivoPseudocodigo = fopen(pathPseudocodigo,"r+");
+            char** instrucciones = pasarArchivoEstructura(archivoPseudocodigo);
+            fclose(archivoPseudocodigo);
+            string_array_destroy(instrucciones);
+            */
+            break;
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
             return;
@@ -151,40 +168,6 @@ void conexionKernel(void* info_fd_kernel)
 			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
 			return;
 		}
-    }
-}
-
-void manejarConexionCPU(t_log* logger,int* fd_cpu)
-{
-    int cod_op, bytes;
-    while(1)
-    {
-        bytes = recv(*fd_cpu, &cod_op, sizeof(cod_op), MSG_WAITALL);
-        //SI recv devuelve 0 significa que la conexion se cerro del otro lado, del lado del kernel
-        if(bytes==0)
-        {
-            log_error(logger, "el cliente se desconecto. Terminando servidor");
-            return;
-        }
-        //SI recv retorna -1 significa que hubo un error mas grave
-        else if(bytes==-1)
-        {
-            log_error(logger,"error de fd_conexion_dispatch en CPU");
-            return;
-        }
-		switch (cod_op) {
-		case HANDSHAKE:
-			recibir_handshake(logger,*fd_cpu,"MODULO CPU");
-			break;
-		case -1:
-			log_error(logger, "el cliente se desconecto. Terminando servidor");
-            break;
-			//return EXIT_FAILURE;
-		default:
-			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-			break;
-		}
-        break; //NO SE DEBERIA ROMPER EL WHILE, ESTO VA EN UN HILO APARTE
     }
 }
 

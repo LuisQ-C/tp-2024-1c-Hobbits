@@ -6,6 +6,7 @@
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/protocolo.h"
 #include "../../utils/include/logsConfigs.h"
+#include"../include/archivos.h"
 #include <pthread.h>
 
 
@@ -18,6 +19,5 @@ void conexionCPU(void* fds);
 void conexionKernel(void* fds2);
 //void conexionCPU(void* fds);
 //void conexionKernel(void* fds2);
-void manejarConexionCPU(t_log* logger,int* fd_cpu);
 
 #endif

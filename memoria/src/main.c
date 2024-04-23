@@ -12,6 +12,7 @@ int main(int argc, char* argv[]) {
     fclose(archivoPseudocodigo);
 
     string_array_destroy(instrucciones);
+    
     //ESTO ANDA NO BORRARLO
     int server_fd = 0;
     int fd_cpu = 0;

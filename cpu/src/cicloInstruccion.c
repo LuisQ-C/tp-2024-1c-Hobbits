@@ -16,10 +16,9 @@ void realizarCicloInstruccion(t_log* logger, int fd_conexion_memoria)
 {
     //while(1){
     //FALTA SOLICITAR INSTRUCCION
-    send(fd_conexion_memoria,&registro.PC,sizeof(uint32_t),0);
+    enviar_mensaje("3",fd_conexion_memoria,INSTRUCCION);
     //RECIBE LA INSTRUCCION SOLICITADA
-    t_instruccion instruccion = string_new();
-    instruccion = recibirInstruccion(logger,fd_conexion_memoria);
+    t_instruccion instruccion = recibirInstruccion(logger,fd_conexion_memoria);
     //DECODIFICA LA INSTRUCCION Y EJECUTA "SET AX 3"
     char** instruccionDesarmada = string_split(instruccion," ");
     int op_code = string_to_opcode(instruccionDesarmada[0]);
@@ -99,7 +98,10 @@ t_instruccion recibirInstruccion(t_log* logger, int fd_conexion_memoria)
         log_error(logger,"Error al recibir la instruccion");
     }
     log_info(logger,"Valor de CODOP: %d",cod_op);
-    instruccion = recibir_mensaje(fd_conexion_memoria,logger);
+    char* instruccionRecibida = recibir_mensaje(fd_conexion_memoria,logger);
+    string_append(&instruccion,instruccionRecibida);
+    free(instruccionRecibida);
+    //instruccion = recibir_mensaje(fd_conexion_memoria,logger);
     return instruccion;
 }
 

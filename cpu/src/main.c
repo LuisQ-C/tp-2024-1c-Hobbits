@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
 
 
     //char* instruccion= string_new();
+
     //NO TOCAR ANDA PERFECTO
     int fd_conexion_memoria = 0;
     int server_fd_escucha_dispatch = 0;
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
     }
     mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA","CPU");
     //
-    //realizarCicloInstruccion(logger,fd_conexion_memoria);
+    
     //log_info(logger,"%u",registro.BX);
     //log_info(logger,"%u",registro.AX);
     //log_info(logger,"%u",registro.BX);
@@ -57,7 +58,13 @@ int main(int argc, char* argv[])
     //INICIALIZAR HILO INTERRUPT
     inicializar_hilo_interrupt(logger,cliente_fd_conexion_interrupt);
     
-    /////  
+    
+    //deshabilitar esto para tomas y luis-roger
+
+    //realizarCicloInstruccion(logger,fd_conexion_memoria);
+    //log_info(logger,"VALOR REGISTRO AX: %u",registro.AX);
+    
+    ///// 
     
     //liberar los mensajes
     //manejarConexionKernel(logger,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
