@@ -71,12 +71,13 @@ void manejarConexionInterrupt(void* fd_interrupt)
 
 void manejarConexionDispatch(t_log* logger,int cliente_fd_conexion_dispatch)
 {
-    recibir_operacion(cliente_fd_conexion_dispatch);
+    recibir_operacion(cliente_fd_conexion_dispatch); //HAY Q MANEJARLE LOS ERRORES, HACERLO EN RECIBIR_OPERACION
     char* moduloConectado = recibir_mensaje(cliente_fd_conexion_dispatch,logger);
     enviar_handshake_ok(logger,cliente_fd_conexion_dispatch,moduloConectado);
     free(moduloConectado);
-/*
-    t_list* lista;
+
+    
+    /*t_list* lista;
     if(recibir_operacion(cliente_fd_conexion_dispatch) == PCB)
     {
         lista = recibir_paquete(cliente_fd_conexion_dispatch);
@@ -97,7 +98,8 @@ void manejarConexionDispatch(t_log* logger,int cliente_fd_conexion_dispatch)
         free(registrosRecibidos);
         list_destroy(lista);
         
-        
+        // QUIZAS Y SOLO QUIZAS ACA VA EL REALIZARCICLO
+
     }*/
 
 }

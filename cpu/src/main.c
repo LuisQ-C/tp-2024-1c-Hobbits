@@ -63,9 +63,11 @@ int main(int argc, char* argv[])
     
     //deshabilitar esto para tomas y luis-roger
 
-    //realizarCicloInstruccion(logger,fd_conexion_memoria);
-    //log_info(logger,"VALOR REGISTRO AX: %u",registro.AX);
-    
+    realizarCicloInstruccion(fd_conexion_memoria);
+    log_info(logger,"VALOR REGISTRO AX: %u",registro.AX);
+    log_info(logger,"VALOR REGISTRO BX: %u",registro.BX);
+    log_info(logger,"VALOR REGISTRO CX: %u",registro.CX);
+    log_info(logger,"VALOR PC: %u",registro.PC);
     ///// 
     
     //liberar los mensajes

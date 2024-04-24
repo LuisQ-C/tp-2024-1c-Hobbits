@@ -10,6 +10,8 @@ typedef struct main
 {
     int fd;
     t_log* logger;
+    t_config* config;
+    char** instrucciones;
 }info_fd_hilos;
 
 int iniciar_conexiones(t_log* logger,t_config* config,int* server_fd,int* fd_cpu,int* fd_kernel)
@@ -31,10 +33,12 @@ int iniciar_conexiones(t_log* logger,t_config* config,int* server_fd,int* fd_cpu
 void inicializar_hilos(t_log* logger, int fd_cpu, int fd_kernel)
 {
     //HILO PARA COMUNICACION CON CPU
+    char** instrucciones;
     pthread_t hiloCPU;
     info_fd_hilos* info_fd_cpu = malloc(sizeof(info_fd_hilos));
     info_fd_cpu->fd = fd_cpu;
     info_fd_cpu->logger = logger;
+    info_fd_cpu->instrucciones = instrucciones;
     pthread_create(&hiloCPU,NULL,(void*) conexionCPU,(void*) info_fd_cpu);
     pthread_detach(hiloCPU);
     //HILO PARA COMUNICACION CON KERNEL
@@ -42,6 +46,7 @@ void inicializar_hilos(t_log* logger, int fd_cpu, int fd_kernel)
     info_fd_hilos* info_fd_kernel = malloc(sizeof(info_fd_hilos));
     info_fd_kernel->fd = fd_kernel;
     info_fd_kernel->logger = logger;
+    info_fd_kernel->instrucciones = instrucciones;
     pthread_create(&hiloKernel,NULL,(void*) conexionKernel,(void*) info_fd_kernel);
     pthread_detach(hiloKernel);
 }
@@ -90,7 +95,17 @@ void conexionCPU(void* info_fd_cpu)
     info_fd_hilos* fd_recibido = info_fd_cpu;
     int fd_cpu = fd_recibido->fd;
     t_log* logger = fd_recibido->logger;
+    char** instrucciones = fd_recibido->instrucciones;
     free(fd_recibido);
+
+    FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
+    char** instruccionesPrueba = pasarArchivoEstructura(archivoPseudocodigo);
+    fclose(archivoPseudocodigo);
+
+    //string_array_destroy(instrucciones);
+
+
+
 
     int codigoOperacion;
     while(1)
@@ -112,7 +127,8 @@ void conexionCPU(void* info_fd_cpu)
         case INSTRUCCION:
             char* valor_pc = recibir_mensaje(fd_cpu,logger);
             uint32_t pc_recibido = atoi(valor_pc);
-            enviar_mensaje("SET AX 8",fd_cpu,INSTRUCCION);
+            enviar_mensaje(instruccionesPrueba[pc_recibido],fd_cpu,INSTRUCCION);
+            //enviar_mensaje("SET AX 3",fd_cpu,INSTRUCCION);
             free(valor_pc);
             break;
 		case -1:
@@ -130,7 +146,9 @@ void conexionKernel(void* info_fd_kernel)
     info_fd_hilos* fd_recibido = info_fd_kernel;
     int fd_kernel = fd_recibido->fd;
     t_log* logger = fd_recibido->logger;
+    char** instrucciones = fd_recibido->instrucciones;
     free(fd_recibido);
+   
 
     int codigoOperacion;
     while(1)
@@ -155,7 +173,7 @@ void conexionKernel(void* info_fd_kernel)
             //se recibe el path del kernel
             char* pathPseudocodigo = "codigoPrueba.txt";
             FILE* archivoPseudocodigo = fopen(pathPseudocodigo,"r+");
-            char** instrucciones = pasarArchivoEstructura(archivoPseudocodigo);
+            instrucciones = pasarArchivoEstructura(archivoPseudocodigo);
             fclose(archivoPseudocodigo);
             string_array_destroy(instrucciones);
             */

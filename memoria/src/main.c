@@ -6,13 +6,13 @@ t_config* config;
 
 
 int main(int argc, char* argv[]) {
-    FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
+    /*FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
     //char* instruccion = leerCadenaArchivos(f);
     char** instrucciones = pasarArchivoEstructura(archivoPseudocodigo);
     fclose(archivoPseudocodigo);
 
     string_array_destroy(instrucciones);
-    
+    */
     //ESTO ANDA NO BORRARLO
     int server_fd = 0;
     int fd_cpu = 0;

@@ -37,8 +37,14 @@ void sub_32(uint32_t* registroDestino,uint32_t* registroOrigen)
 }
 
 // JNZ REGISTRO INSTRUCCION (aprobado?)
-void jnz(int reg,uint32_t instruccion_proxima){
-    if(reg == 0)
+
+void jnz_8(uint8_t* reg,uint32_t instruccion_proxima){
+    if(*reg != 0)
+        registro.PC = instruccion_proxima;
+}
+
+void jnz_32(uint32_t* reg,uint32_t instruccion_proxima){
+    if(*reg != 0)
         registro.PC = instruccion_proxima;
 }
 

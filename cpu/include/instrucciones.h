@@ -25,7 +25,8 @@ void sum_8(uint8_t* registroDestino,uint8_t* registroOrigen);
 void sum_32(uint32_t* registroDestino,uint32_t* registroOrigen);
 void sub_8(uint8_t* registroDestino,uint8_t* registroOrigen);
 void sub_32(uint32_t* registroDestino,uint32_t* registroOrigen);
-void jnz(int reg,uint32_t instruccion_proxima);
+void jnz_8(uint8_t* reg,uint32_t instruccion_proxima);
+void jnz_32(uint32_t* reg,uint32_t instruccion_proxima);
 void io_gen_sleep(int interfaz,int tiempoEspera); //FALTA TODO DE ESTA
 
 #endif
