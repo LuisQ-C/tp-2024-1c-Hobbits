@@ -1,20 +1,17 @@
 #include "../include/conexionesMemoria.h"
-//extern t_log* logger;
+extern t_log* logger;
+extern t_config* config;
 typedef struct
 {
     int fd_conexion_IO;
-    t_log* logger;
 } t_datos_server_interfaces;
 
 typedef struct main
 {
     int fd;
-    t_log* logger;
-    t_config* config;
-    char** instrucciones;
 }info_fd_hilos;
 
-int iniciar_conexiones(t_log* logger,t_config* config,int* server_fd,int* fd_cpu,int* fd_kernel)
+int iniciar_conexiones(int* server_fd,int* fd_cpu,int* fd_kernel)
 {
     //FALTA IP, esta hardcodadeado
     char* puerto;
@@ -30,34 +27,28 @@ int iniciar_conexiones(t_log* logger,t_config* config,int* server_fd,int* fd_cpu
     return *server_fd != 0 && *fd_cpu != 0 && *fd_kernel != 0;
 }
 
-void inicializar_hilos(t_log* logger, int fd_cpu, int fd_kernel)
+void inicializar_hilos(int fd_cpu, int fd_kernel)
 {
     //HILO PARA COMUNICACION CON CPU
-    char** instrucciones;
     pthread_t hiloCPU;
     info_fd_hilos* info_fd_cpu = malloc(sizeof(info_fd_hilos));
     info_fd_cpu->fd = fd_cpu;
-    info_fd_cpu->logger = logger;
-    info_fd_cpu->instrucciones = instrucciones;
     pthread_create(&hiloCPU,NULL,(void*) conexionCPU,(void*) info_fd_cpu);
     pthread_detach(hiloCPU);
     //HILO PARA COMUNICACION CON KERNEL
     pthread_t hiloKernel;
     info_fd_hilos* info_fd_kernel = malloc(sizeof(info_fd_hilos));
     info_fd_kernel->fd = fd_kernel;
-    info_fd_kernel->logger = logger;
-    info_fd_kernel->instrucciones = instrucciones;
     pthread_create(&hiloKernel,NULL,(void*) conexionKernel,(void*) info_fd_kernel);
     pthread_detach(hiloKernel);
 }
 
-int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces){
+int escucharConexionesIO(int fd_escucha_interfaces){
     int fd_conexion_IO = esperar_cliente(fd_escucha_interfaces,logger,"INTERFAZ I/O");
     int err;
     pthread_t conexionesIO;
     t_datos_server_interfaces* datosServerInterfaces = malloc(sizeof(t_datos_server_interfaces));
     datosServerInterfaces->fd_conexion_IO = fd_conexion_IO;
-    datosServerInterfaces->logger = logger;
     err = pthread_create(&conexionesIO,NULL,(void*) procesarConexionesIO,(void*) datosServerInterfaces);
     if(err != 0)
     {
@@ -74,7 +65,6 @@ int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces){
 void procesarConexionesIO(void* datosServerInterfaces){
     t_datos_server_interfaces* auxiliarDatosServer = (t_datos_server_interfaces*) datosServerInterfaces;
     int fd_conexion_IO = auxiliarDatosServer->fd_conexion_IO;
-    t_log* logger = auxiliarDatosServer->logger;
     free(auxiliarDatosServer);
 
     int codigoOperacion = recibir_operacion(fd_conexion_IO);
@@ -94,8 +84,6 @@ void conexionCPU(void* info_fd_cpu)
 {
     info_fd_hilos* fd_recibido = info_fd_cpu;
     int fd_cpu = fd_recibido->fd;
-    t_log* logger = fd_recibido->logger;
-    char** instrucciones = fd_recibido->instrucciones;
     free(fd_recibido);
 
     FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
@@ -103,9 +91,6 @@ void conexionCPU(void* info_fd_cpu)
     fclose(archivoPseudocodigo);
 
     //string_array_destroy(instrucciones);
-
-
-
 
     int codigoOperacion;
     while(1)
@@ -145,8 +130,6 @@ void conexionKernel(void* info_fd_kernel)
 {
     info_fd_hilos* fd_recibido = info_fd_kernel;
     int fd_kernel = fd_recibido->fd;
-    t_log* logger = fd_recibido->logger;
-    char** instrucciones = fd_recibido->instrucciones;
     free(fd_recibido);
    
 
@@ -189,7 +172,7 @@ void conexionKernel(void* info_fd_kernel)
     }
 }
 
-void terminar_programa(t_log* logger,t_config* config,int* fd_cpu,int* fd_kernel){
+void terminar_programa(int* fd_cpu,int* fd_kernel){
     destruir_log_config(logger,config);
     close(*fd_cpu);
     close(*fd_kernel);

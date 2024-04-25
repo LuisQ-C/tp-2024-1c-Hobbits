@@ -2,7 +2,7 @@
 
 t_log* logger;
 t_config* config;
-t_registro_cpu registro = {0,0,0,0,0,0,0,0,0};
+t_registro_cpu registro = {0,0,0,0,0,0,0,0,0,0,0};
 
 
 
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     logger = iniciar_logger("cpu.log", "MODULO CPU", 1, LOG_LEVEL_DEBUG); //QUEDA PARA SIEMPRE 
     config = iniciar_config("cpu.config",logger); //DESTRUIRLO CUANDO TERMINEMOS DE LEER LOS DATOS
    
-    if(!iniciar_conexiones(logger,config,&fd_conexion_memoria,&server_fd_escucha_dispatch,&server_fd_escucha_interrupt,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt))
+    if(!iniciar_conexiones(&fd_conexion_memoria,&server_fd_escucha_dispatch,&server_fd_escucha_interrupt,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt))
     {
         log_error(logger,"Error al crear conexiones iniciales");
         exit(1);
@@ -56,9 +56,9 @@ int main(int argc, char* argv[])
     //CONEXION DISPATCH - SIN HILO POR SER SECUENCIAL
     
     //INICIALIZAR HILO INTERRUPT
-    inicializar_hilo_interrupt(logger,cliente_fd_conexion_interrupt);
+    inicializar_hilo_interrupt(cliente_fd_conexion_interrupt);
 
-    manejarConexionDispatch(logger,cliente_fd_conexion_dispatch);
+    manejarConexionDispatch(cliente_fd_conexion_dispatch);
     
     
     //deshabilitar esto para tomas y luis-roger
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
     //manejarConexionKernel(logger,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
     int cod_op;
     recv(cliente_fd_conexion_dispatch, &cod_op, sizeof(cod_op), MSG_WAITALL);
-    terminar_programa(logger,config,&fd_conexion_memoria,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
+    terminar_programa(&fd_conexion_memoria,&cliente_fd_conexion_dispatch,&cliente_fd_conexion_interrupt);
     //hola
     return 0;
 }

@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <commons/log.h>
+#include <commons/config.h>
 
 //FALTAN CAMPOS EN EL REGISTRO QUE PIDE LA CONSIGNA
 typedef struct 
@@ -17,6 +19,8 @@ typedef struct
     uint32_t EBX;
     uint32_t ECX;
     uint32_t EDX;
+    uint32_t SI;
+    uint32_t DI;
 } t_registro_cpu;
 
 void set_8(uint8_t* reg,uint8_t valor);

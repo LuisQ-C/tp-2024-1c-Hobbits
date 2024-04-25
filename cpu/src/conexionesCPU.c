@@ -1,5 +1,7 @@
 #include "../include/conexionesCPU.h"
 
+extern t_log* logger;
+extern t_config* config;
 typedef struct
 {
     int fd_conexion;
@@ -18,9 +20,9 @@ typedef struct
 }registrosGenerales;*/
 typedef struct{
     int fd;
-    t_log* logger;
 }info_fd_conexion;
-int iniciar_conexiones(t_log* logger,t_config* config,int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt)
+
+int iniciar_conexiones(int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt)
 {
     char* ip;
     char* puerto;
@@ -42,13 +44,12 @@ int iniciar_conexiones(t_log* logger,t_config* config,int* fd_conexion_memoria,i
     return *fd_conexion_memoria != 0 && *server_fd_escucha_dispatch != 0 && *server_fd_escucha_interrupt != 0 && *cliente_fd_conexion_dispatch != 0 && *cliente_fd_conexion_interrupt != 0;
 }
 
-void inicializar_hilo_interrupt(t_log* logger, int cliente_fd_conexion_interrupt)
+void inicializar_hilo_interrupt(int cliente_fd_conexion_interrupt)
 {
     //CONEXION INTERRUPT CON HILO
     pthread_t hiloInterrupt;
     info_fd_conexion* fd_interrupt = malloc(sizeof(info_fd_conexion));
     fd_interrupt->fd = cliente_fd_conexion_interrupt;
-    fd_interrupt->logger = logger;
     pthread_create(&hiloInterrupt,NULL,(void*) manejarConexionInterrupt,(void*) fd_interrupt);
     pthread_detach(hiloInterrupt);
 }
@@ -57,7 +58,6 @@ void manejarConexionInterrupt(void* fd_interrupt)
 {
     info_fd_conexion* fd_recibido = fd_interrupt;
     int fd_kernel_interrupt = fd_recibido->fd;
-    t_log* logger = fd_recibido->logger;
     free(fd_recibido);
 
     recibir_operacion(fd_kernel_interrupt);
@@ -69,7 +69,7 @@ void manejarConexionInterrupt(void* fd_interrupt)
 
 }
 
-void manejarConexionDispatch(t_log* logger,int cliente_fd_conexion_dispatch)
+void manejarConexionDispatch(int cliente_fd_conexion_dispatch)
 {
     recibir_operacion(cliente_fd_conexion_dispatch); //HAY Q MANEJARLE LOS ERRORES, HACERLO EN RECIBIR_OPERACION
     char* moduloConectado = recibir_mensaje(cliente_fd_conexion_dispatch,logger);
@@ -105,7 +105,7 @@ void manejarConexionDispatch(t_log* logger,int cliente_fd_conexion_dispatch)
 }
 
 
-void manejarConexionKernel(t_log* logger,int* cliente_fd_conexion_dispatch,int* cliente_fd_conexion_interrupt)
+void manejarConexionKernel(int* cliente_fd_conexion_dispatch,int* cliente_fd_conexion_interrupt)
 {
     int cod_op, bytes;
     while(1)
@@ -142,7 +142,7 @@ void manejarConexionKernel(t_log* logger,int* cliente_fd_conexion_dispatch,int* 
     }
 }
 
-void terminar_programa(t_log* logger, t_config* config, int* fd_conexion_memoria,int* cliente_fd_conexion_dispatch,int*cliente_fd_conexion_interrupt)
+void terminar_programa(int* fd_conexion_memoria,int* cliente_fd_conexion_dispatch,int*cliente_fd_conexion_interrupt)
 {
     destruir_log_config(logger,config);
     close(*fd_conexion_memoria);

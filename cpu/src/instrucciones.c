@@ -1,6 +1,8 @@
 #include "../include/instrucciones.h"
 
 extern t_registro_cpu registro;
+extern t_log* logger;
+extern t_config* config;
 
 // INSTRUCCIONES 
 // SET REGISTRO VALOR

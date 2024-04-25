@@ -1,6 +1,5 @@
 #include "../include/archivos.h"
 
-
 /*Pasa todo el contenido del archivo a un char**, se debe destruirlo luego de utilizar la funcion*/
 char** pasarArchivoEstructura(FILE* f)
 {   

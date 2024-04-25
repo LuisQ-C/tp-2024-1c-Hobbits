@@ -1,9 +1,7 @@
 #include "../include/main.h"
- //el extern que va por delante es cuando queremos utilizar este logger en muchos archivos o lugares, pra no redeclarar lo mismo
+
 t_log* logger;
 t_config* config;
-
-
 
 int main(int argc, char* argv[]) {
     /*FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
@@ -23,12 +21,12 @@ int main(int argc, char* argv[]) {
     //
     
     //
-    if(!iniciar_conexiones(logger,config,&server_fd,&fd_cpu,&fd_kernel))
+    if(!iniciar_conexiones(&server_fd,&fd_cpu,&fd_kernel))
     {
         log_error(logger,"Error al crear conexiones iniciales");
         exit(1);
     }
-    inicializar_hilos(logger,fd_cpu,fd_kernel);
+    inicializar_hilos(fd_cpu,fd_kernel);
 
     //////
     /*
@@ -39,8 +37,8 @@ int main(int argc, char* argv[]) {
     //DESTRUIR ESTRUCTURA CON SUS STRINGS DENTRO
     //string_array_destroy(instrucciones);
     //
-    while(escucharConexionesIO(logger,server_fd));
-    terminar_programa(logger,config,&fd_cpu,&fd_kernel);
+    while(escucharConexionesIO(server_fd));
+    terminar_programa(&fd_cpu,&fd_kernel);
     return 0; //puede ir exit_sucess
 }
 
