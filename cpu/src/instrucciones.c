@@ -17,23 +17,42 @@ void set_32(uint32_t* reg,uint32_t valor)
 }
 
 // SUM REGISTRO_DESTINO REGISTRO_ORIGEN
-void sum_8(uint8_t* registroDestino,uint8_t* registroOrigen)
+void sum_8_8(uint8_t* registroDestino,uint8_t* registroOrigen)
 {
     *registroDestino += *registroOrigen;
 }
 
-void sum_32(uint32_t* registroDestino,uint32_t* registroOrigen)
+void sum_8_32(uint8_t* registroDestino,uint32_t* registroOrigen)
+{
+    *registroDestino += *registroOrigen;
+}
+
+void sum_32_32(uint32_t* registroDestino,uint32_t* registroOrigen)
+{
+    *registroDestino += *registroOrigen;
+}
+void sum_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 {
     *registroDestino += *registroOrigen;
 }
 
 // SUB REGISTRO_DESTINO REGISTRO_ORIGEN (PREGUNTAR PROBLEMAS SOBRE RESULTADOS NEGATIVOS)
-void sub_8(uint8_t* registroDestino,uint8_t* registroOrigen) 
+void sub_8_8(uint8_t* registroDestino,uint8_t* registroOrigen) 
 {
     *registroDestino -= *registroOrigen;
 }
 
-void sub_32(uint32_t* registroDestino,uint32_t* registroOrigen)
+void sub_8_32(uint8_t* registroDestino,uint32_t* registroOrigen) 
+{
+    *registroDestino -= *registroOrigen;
+}
+
+void sub_32_32(uint32_t* registroDestino,uint32_t* registroOrigen)
+{
+    *registroDestino -= *registroOrigen;
+}
+
+void sub_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 {
     *registroDestino -= *registroOrigen;
 }

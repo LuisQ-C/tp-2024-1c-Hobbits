@@ -25,12 +25,20 @@ typedef struct
 
 void set_8(uint8_t* reg,uint8_t valor);
 void set_32(uint32_t* reg,uint32_t valor);
-void sum_8(uint8_t* registroDestino,uint8_t* registroOrigen);
-void sum_32(uint32_t* registroDestino,uint32_t* registroOrigen);
-void sub_8(uint8_t* registroDestino,uint8_t* registroOrigen);
-void sub_32(uint32_t* registroDestino,uint32_t* registroOrigen);
+
+void sum_8_32(uint8_t* registroDestino,uint32_t* registroOrigen);
+void sum_8_8(uint8_t* registroDestino,uint8_t* registroOrigen);
+void sum_32_8(uint32_t* registroDestino,uint8_t* registroOrigen);
+void sum_32_32(uint32_t* registroDestino,uint32_t* registroOrigen);
+
+void sub_8_8(uint8_t* registroDestino,uint8_t* registroOrigen);
+void sub_32_8(uint32_t* registroDestino,uint8_t* registroOrigen);
+void sub_32_32(uint32_t* registroDestino,uint32_t* registroOrigen);
+void sub_8_32(uint8_t* registroDestino,uint32_t* registroOrigen);
+
 void jnz_8(uint8_t* reg,uint32_t instruccion_proxima);
 void jnz_32(uint32_t* reg,uint32_t instruccion_proxima);
+
 void io_gen_sleep(int interfaz,int tiempoEspera); //FALTA TODO DE ESTA
 
 #endif

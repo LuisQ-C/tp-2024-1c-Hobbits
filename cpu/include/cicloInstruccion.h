@@ -23,6 +23,8 @@ uint8_t* string_to_register8(char* registroConvertir);
 uint32_t* string_to_register32(char* registroConvertir);
 
 void set(char** instruccion);
-
+void sum(char** instruccion);
+void sub(char** instruccion);
+void jnz(char** instruccion);
 
 #endif

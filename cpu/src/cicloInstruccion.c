@@ -21,7 +21,6 @@ void realizarCicloInstruccion(int fd_conexion_memoria)
     //check_interrupt(); // TIENE Q ACTUALIZAR EL PCB 
     
     //SINO LLEGO NADA, CONTINUA LA EJECUCION NORMALMENTE (IP+1 SI NO HAY JUMP)
-    registro.PC = registro.PC + 1;
      i++;
     }
 }
@@ -64,53 +63,24 @@ void decode_and_execute(t_instruccion instruccion)
         case SET:
         {
             set(instruccionDesarmada);
-            //sumar pc            
+            registro.PC = registro.PC + 1;
             break;
         }
         case SUM:
         {
-            // se podria pasar el instruccion desarmada a una funcion que haga todo esto
-            if(instruccionDesarmada[1][0] != 'E')
-            {
-                uint8_t* registroDestino = string_to_register8(instruccionDesarmada[1]);
-                uint8_t* registroOrigen = string_to_register8(instruccionDesarmada[2]);
-                sum_8(registroDestino,registroOrigen);
-            }
-            else{
-                uint32_t* registroDestino = string_to_register32(instruccionDesarmada[1]);
-                uint32_t* registroOrigen = string_to_register32(instruccionDesarmada[2]);
-                sum_32(registroDestino,registroOrigen);
-            }
+            sum(instruccionDesarmada);
+            registro.PC = registro.PC + 1;
             break;
         }
         case SUB:
         {
-            if(instruccionDesarmada[1][0] != 'E')
-            {
-                uint8_t* registroDestino = string_to_register8(instruccionDesarmada[1]);
-                uint8_t* registroOrigen = string_to_register8(instruccionDesarmada[2]);
-                sub_8(registroDestino,registroOrigen);
-            }
-            else{
-                uint32_t* registroDestino = string_to_register32(instruccionDesarmada[1]);
-                uint32_t* registroOrigen = string_to_register32(instruccionDesarmada[2]);
-                sub_32(registroDestino,registroOrigen);
-            }
+            sub(instruccionDesarmada);
+            registro.PC = registro.PC + 1;
             break;
         }
         case JNZ:
         {
-            if(instruccionDesarmada[1][0] != 'E')
-            {
-                uint8_t* registro_a_chequear = string_to_register8(instruccionDesarmada[1]);
-                uint32_t instruccion_a_saltar = atoi(instruccionDesarmada[2]);
-                jnz_8(registro_a_chequear,instruccion_a_saltar);
-            }
-            else{
-                uint32_t* registro_a_chequear = string_to_register32(instruccionDesarmada[1]);
-                uint32_t instruccion_a_saltar = atoi(instruccionDesarmada[2]);
-                jnz_32(registro_a_chequear,instruccion_a_saltar);
-            }
+            jnz(instruccionDesarmada);
             break;
         }
         case IO_GEN_SLEEP:
@@ -217,4 +187,79 @@ void set(char** instruccion)
             }
 }
 
+void sum(char** instruccion)
+{
+    if(instruccion[1][0] != 'E')
+            {
+                if(instruccion[2][0] != 'E')
+                {
+                    uint8_t* registroDestino = string_to_register8(instruccion[1]);
+                    uint8_t* registroOrigen = string_to_register8(instruccion[2]);
+                    sum_8_8(registroDestino,registroOrigen);
+                }
+                else{
+                    uint8_t* registroDestino = string_to_register8(instruccion[1]);
+                    uint32_t* registroOrigen = string_to_register32(instruccion[2]);
+                    sum_8_32(registroDestino,registroOrigen);
+                }
+            }
+            else{
+                if(instruccion[2][0] != 'E')
+                {
+                    uint32_t* registroDestino = string_to_register32(instruccion[1]);
+                    uint8_t* registroOrigen = string_to_register8(instruccion[2]);
+                    sum_32_8(registroDestino,registroOrigen);
+                }
+                else{
+                    uint32_t* registroDestino = string_to_register32(instruccion[1]);
+                    uint32_t* registroOrigen = string_to_register32(instruccion[2]);
+                    sum_32_32(registroDestino,registroOrigen);
+                }
+            }
+}
 
+void sub(char** instruccion)
+{
+    if(instruccion[1][0] != 'E')
+            {
+                if(instruccion[2][0] != 'E')
+                {
+                    uint8_t* registroDestino = string_to_register8(instruccion[1]);
+                    uint8_t* registroOrigen = string_to_register8(instruccion[2]);
+                    sub_8_8(registroDestino,registroOrigen);
+                }
+                else{
+                    uint8_t* registroDestino = string_to_register8(instruccion[1]);
+                    uint32_t* registroOrigen = string_to_register32(instruccion[2]);
+                    sub_8_32(registroDestino,registroOrigen);
+                }
+            }
+            else{
+                if(instruccion[2][0] != 'E')
+                {
+                    uint32_t* registroDestino = string_to_register32(instruccion[1]);
+                    uint8_t* registroOrigen = string_to_register8(instruccion[2]);
+                    sub_32_8(registroDestino,registroOrigen);
+                }
+                else{
+                    uint32_t* registroDestino = string_to_register32(instruccion[1]);
+                    uint32_t* registroOrigen = string_to_register32(instruccion[2]);
+                    sub_32_32(registroDestino,registroOrigen);
+                }
+            }
+}
+
+void jnz(char** instruccion)
+{
+    if(instruccion[1][0] != 'E')
+            {
+                uint8_t* registro_a_chequear = string_to_register8(instruccion[1]);
+                uint32_t instruccion_a_saltar = atoi(instruccion[2]);
+                jnz_8(registro_a_chequear,instruccion_a_saltar);
+            }
+            else{
+                uint32_t* registro_a_chequear = string_to_register32(instruccion[1]);
+                uint32_t instruccion_a_saltar = atoi(instruccion[2]);
+                jnz_32(registro_a_chequear,instruccion_a_saltar);
+            }
+}
