@@ -21,6 +21,8 @@ char* identificarInstruccion(char* instruccion);
 int string_to_opcode(char* instruccion);
 uint8_t* string_to_register8(char* registroConvertir);
 uint32_t* string_to_register32(char* registroConvertir);
-int contadorHastaPrimerEspacio(char* instruccion);
+
+void set(char** instruccion);
+
 
 #endif

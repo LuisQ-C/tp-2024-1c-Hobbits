@@ -5,7 +5,6 @@ t_config* config;
 t_registro_cpu registro = {0,0,0,0,0,0,0,0,0,0,0};
 
 
-
 int main(int argc, char* argv[])
 {
     /*

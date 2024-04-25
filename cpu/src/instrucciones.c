@@ -54,3 +54,4 @@ void jnz_32(uint32_t* reg,uint32_t instruccion_proxima){
 void io_gen_sleep(int interfaz,int tiempoEspera){
     //mandarle a kernel para que kernel le mande a la interfaz que se "duerma" n tiemposEspera
 }
+

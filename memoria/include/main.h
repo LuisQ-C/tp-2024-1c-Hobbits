@@ -3,13 +3,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
 
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/logsConfigs.h"
 #include "../../utils/include/protocolo.h"
-#include <pthread.h>
-#include"../include/conexionesMemoria.h"
-#include"../include/archivos.h"
+#include "../include/conexionesMemoria.h"
+#include "../include/archivos.h"
+#include <commons/collections/list.h>
+
 //extern t_log* logger;
 
 //extern t_log* logger;

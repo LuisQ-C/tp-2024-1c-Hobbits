@@ -86,9 +86,9 @@ void conexionCPU(void* info_fd_cpu)
     int fd_cpu = fd_recibido->fd;
     free(fd_recibido);
 
-    FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
-    char** instruccionesPrueba = pasarArchivoEstructura(archivoPseudocodigo);
-    fclose(archivoPseudocodigo);
+    //FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
+    char** instruccionesPrueba = pasarArchivoEstructura("codigoPrueba.txt");
+    //fclose(archivoPseudocodigo);
 
     //string_array_destroy(instrucciones);
 
@@ -151,11 +151,13 @@ void conexionKernel(void* info_fd_kernel)
             free(moduloConectado);
 			break;
         case INICIAR_PROCESO:
-            /*
+            /* RECIBE EL PID Y EL PATH AL PID (SUMARLO A PATH DEL CONFIG PARA HALLAR LA RUTA ABSOLUTA)
+            int pid = recibe
             char* pathPseudocodigo = recibir_mensaje(fd_kernel,logger);
             //se recibe el path del kernel
             char* pathPseudocodigo = "codigoPrueba.txt";
             FILE* archivoPseudocodigo = fopen(pathPseudocodigo,"r+");
+
             instrucciones = pasarArchivoEstructura(archivoPseudocodigo);
             fclose(archivoPseudocodigo);
             string_array_destroy(instrucciones);

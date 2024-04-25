@@ -63,15 +63,8 @@ void decode_and_execute(t_instruccion instruccion)
     {
         case SET:
         {
-            if(instruccionDesarmada[1][0] != 'E')
-            {
-                uint8_t* registroRecibido = string_to_register8(instruccionDesarmada[1]);
-                set_8(registroRecibido,atoi(instruccionDesarmada[2]));
-            }
-            else{
-                uint32_t* registroRecibido = string_to_register32(instruccionDesarmada[1]);
-                set_32(registroRecibido,atoi(instruccionDesarmada[2]));
-            }
+            set(instruccionDesarmada);
+            //sumar pc            
             break;
         }
         case SUM:
@@ -211,7 +204,17 @@ uint32_t* string_to_register32(char* registroConvertir)
     }
 }
 
-
-
+void set(char** instruccion)
+{
+    if(instruccion[1][0] != 'E')
+            {
+                uint8_t* registroRecibido = string_to_register8(instruccion[1]);
+                set_8(registroRecibido,atoi(instruccion[2]));
+            }
+            else{
+                uint32_t* registroRecibido = string_to_register32(instruccion[1]);
+                set_32(registroRecibido,atoi(instruccion[2]));
+            }
+}
 
 
