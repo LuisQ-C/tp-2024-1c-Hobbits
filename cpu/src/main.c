@@ -7,31 +7,6 @@ t_registro_cpu registro = {0,0,0,0,0,0,0,0,0,0,0};
 
 int main(int argc, char* argv[])
 {
-    /*
-    int AX = 12;
-    set_8(&registro.ax,0);
-    //set_8(&registro.bx,4);
-    //set_32(&registro.eax,32);
-    printf("%d\n",AX);
-    printf("%d\n",registro.ax);
-    printf("%d\n",registro.pc);
-    //printf("%d\n",registro.bx);
-    //printf("%d\n",registro.eax);
-
-    jnz(registro.ax,1);
-    printf("%d",registro.pc);
-    //sub_8(&registro.ax,registro.bx);
-    //sub_32(&registro.eax,registro.bx);
-
-    //printf("%d\n",registro.ax);
-    //printf("%d\n",registro.eax);
-
-    */
-
-
-
-    //char* instruccion= string_new();
-
     //NO TOCAR ANDA PERFECTO
     int fd_conexion_memoria = 0;
     int server_fd_escucha_dispatch = 0;
@@ -62,7 +37,7 @@ int main(int argc, char* argv[])
     
     //deshabilitar esto para tomas y luis-roger
 
-    realizarCicloInstruccion(fd_conexion_memoria);
+    //realizarCicloInstruccion(fd_conexion_memoria);
     log_info(logger,"VALOR REGISTRO AX: %u",registro.AX);
     log_info(logger,"VALOR REGISTRO BX: %u",registro.BX);
     log_info(logger,"VALOR REGISTRO CX: %u",registro.CX);

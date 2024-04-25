@@ -86,11 +86,8 @@ void conexionCPU(void* info_fd_cpu)
     int fd_cpu = fd_recibido->fd;
     free(fd_recibido);
 
-    //FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
-    char** instruccionesPrueba = pasarArchivoEstructura("codigoPrueba.txt");
-    //fclose(archivoPseudocodigo);
-
-    //string_array_destroy(instrucciones);
+    int retardo = config_get_int_value(config,"RETARDO_RESPUESTA");
+   // char** instruccionesPrueba = pasarArchivoEstructura("codigoPrueba.txt"); // esto debe ir en el switch
 
     int codigoOperacion;
     while(1)
@@ -112,8 +109,8 @@ void conexionCPU(void* info_fd_cpu)
         case INSTRUCCION:
             char* valor_pc = recibir_mensaje(fd_cpu,logger);
             uint32_t pc_recibido = atoi(valor_pc);
-            enviar_mensaje(instruccionesPrueba[pc_recibido],fd_cpu,INSTRUCCION);
-            //enviar_mensaje("SET AX 3",fd_cpu,INSTRUCCION);
+            usleep(retardo*1000);
+            //enviar_mensaje(instruccionesPrueba[pc_recibido],fd_cpu,INSTRUCCION);
             free(valor_pc);
             break;
 		case -1:
@@ -126,12 +123,14 @@ void conexionCPU(void* info_fd_cpu)
 		}
     }
 }
+
 void conexionKernel(void* info_fd_kernel)
 {
     info_fd_hilos* fd_recibido = info_fd_kernel;
     int fd_kernel = fd_recibido->fd;
     free(fd_recibido);
    
+    
 
     int codigoOperacion;
     while(1)

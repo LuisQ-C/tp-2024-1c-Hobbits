@@ -31,7 +31,7 @@ void agregar_proceso_lista(int pid,char* path)
     list_add(instrucciones_procesos,proceso_creado);
 }
 
-/* libera las estructuras asociadas al proceso */
+/* Libera las estructuras asociadas al proceso */
 void destruir_proceso_lista(t_proceso* proceso_a_destruir)
 {
     string_array_destroy(proceso_a_destruir->instrucciones);
@@ -41,11 +41,13 @@ void destruir_proceso_lista(t_proceso* proceso_a_destruir)
 /*
 void quitar_proceso_lista(int pid)
 {
-    t_proceso* proceso = list_find(instrucciones_procesos,buscar_proceso_pid,&pid);
+    t_proceso* proceso = malloc(sizeof(t_proceso));
+    proceso->pid = pid;
+    list_find(instrucciones_procesos,buscar_proceso_pid(proceso));
     list_remove_and_destroy_element(instrucciones_procesos,proceso->pid,destruir_proceso_lista);
 }
 
-bool buscar_proceso_pid(t_proceso* proceso,int* pid)
+bool buscar_proceso_pid(t_proceso* proceso)
 {
     if(proceso-> pid == *pid)
     {

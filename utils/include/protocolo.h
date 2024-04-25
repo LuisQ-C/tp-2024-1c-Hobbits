@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/sockets.h"
+#include "commons/string.h"
 
 
 typedef enum{
@@ -36,13 +37,26 @@ typedef struct
 	void* stream;
 } t_buffer;
 
-typedef struct {
-    uint32_t dni;
-    uint8_t edad;
-    uint32_t pasaporte;
-    uint32_t nombre_length;
-    char* nombre;
-} t_persona;
+typedef struct
+{
+    uint8_t AX;
+    uint8_t BX;
+    uint8_t CX;
+    uint8_t DX;
+    uint32_t EAX;
+    uint32_t EBX;
+    uint32_t ECX;
+    uint32_t EDX;
+}t_registros_generales;
+
+typedef struct
+{
+   int pid;
+   uint32_t pc;
+   int quantum;
+   char* estado;
+   t_registros_generales registros_CPU;
+} t_pcb;
 
 typedef struct {
     int codigo_operacion;
@@ -69,7 +83,13 @@ void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio);
 void enviar_paquete(t_paquete* paquete, int socket_cliente);
 void eliminar_paquete(t_paquete* paquete);
 
+//FUNCIONES PCB
+
+t_pcb* recibir_pcb(int fd_dispatch);
+void enviar_pcb(t_pcb* pcb_a_enviar,int fd_dispatch);
+
 //BUFFER, SERIALIZACION
+/*
 t_buffer *buffer_create(uint32_t size);
 void buffer_destroy(t_buffer *buffer);
 void buffer_add_uint32(t_buffer *buffer, uint32_t data);
@@ -78,5 +98,5 @@ void buffer_add_string(t_buffer *buffer, uint32_t length, char* string);
 uint32_t buffer_read_uint32(t_buffer *buffer);
 uint8_t buffer_read_uint8(t_buffer *buffer);
 char *buffer_read_string(t_buffer *buffer, uint32_t length);
-
+*/
 #endif

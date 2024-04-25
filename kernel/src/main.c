@@ -69,37 +69,26 @@ int main(int argc, char* argv[]) {
 
 void conexion_dispatch(void* dispatch)
 {
-    /*info_dispatch* auxiliar = dispatch;
+    info_dispatch* auxiliar = dispatch;
     int fd_dispatch = auxiliar->fd;
-    //
-    pcb* nuevoPCB = malloc(sizeof(pcb));
+    // ARMAR PCB
+    t_pcb* nuevoPCB = malloc(sizeof(t_pcb));
     nuevoPCB->pc=0;
     nuevoPCB->pid=14;
     nuevoPCB->estado="new";
     nuevoPCB->quantum=3;
-    nuevoPCB->registrosCPU = malloc(sizeof(registrosGenerales));
-    nuevoPCB->registrosCPU->AX=5;
-    nuevoPCB->registrosCPU->BX=6;
-    nuevoPCB->registrosCPU->CX=7;
-    nuevoPCB->registrosCPU->DX=5;
-    nuevoPCB->registrosCPU->EAX=8;
-    nuevoPCB->registrosCPU->EBX=10;
-    nuevoPCB->registrosCPU->ECX=20;
-    nuevoPCB->registrosCPU->EDX=50;
-    //hola
-    t_paquete* paquete = crear_paquete(PCB);
-    agregar_a_paquete(paquete,&nuevoPCB->pc,sizeof(uint32_t));
-    agregar_a_paquete(paquete,&nuevoPCB->pid,sizeof(int));
-    agregar_a_paquete(paquete,nuevoPCB->estado,sizeof(strlen(nuevoPCB->estado)+1));
-    agregar_a_paquete(paquete,&nuevoPCB->quantum,sizeof(int));
-    agregar_a_paquete(paquete, nuevoPCB->registrosCPU,sizeof(registrosGenerales));
-
-    enviar_paquete(paquete,fd_dispatch);
-
-    free(nuevoPCB->registrosCPU);
+    nuevoPCB->registros_CPU.AX=5;
+    nuevoPCB->registros_CPU.BX=6;
+    nuevoPCB->registros_CPU.CX=7;
+    nuevoPCB->registros_CPU.DX=5;
+    nuevoPCB->registros_CPU.EAX=8;
+    nuevoPCB->registros_CPU.EBX=10;
+    nuevoPCB->registros_CPU.ECX=20;
+    nuevoPCB->registros_CPU.EDX=50;
+    //ENVIAR PCB
+    enviar_pcb(nuevoPCB,fd_dispatch);
+    //log_info(logger,"ESTADO: %s",nuevoPCB->estado);
     free(nuevoPCB);
-    eliminar_paquete(paquete);*/
-
 }
 
 

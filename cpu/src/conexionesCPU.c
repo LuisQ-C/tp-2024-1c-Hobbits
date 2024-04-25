@@ -64,9 +64,6 @@ void manejarConexionInterrupt(void* fd_interrupt)
     char* moduloConectado = recibir_mensaje(fd_kernel_interrupt,logger);
     enviar_handshake_ok(logger,fd_kernel_interrupt,moduloConectado);
     free(moduloConectado);
-
-    
-
 }
 
 void manejarConexionDispatch(int cliente_fd_conexion_dispatch)
@@ -76,34 +73,20 @@ void manejarConexionDispatch(int cliente_fd_conexion_dispatch)
     enviar_handshake_ok(logger,cliente_fd_conexion_dispatch,moduloConectado);
     free(moduloConectado);
 
-    
-    /*t_list* lista;
     if(recibir_operacion(cliente_fd_conexion_dispatch) == PCB)
     {
-        lista = recibir_paquete(cliente_fd_conexion_dispatch);
-        uint32_t* pc = list_get(lista,0);
-        int* pid = list_get(lista,1);
-        char* estado = list_get(lista,2);
-        int* quantum = list_get(lista,3);
-        registrosGenerales* registrosRecibidos = list_get(lista,4);
-        log_info(logger,"VALOR BX: %u",registrosRecibidos->BX);
-        log_info(logger,"PC: %u",*pc);
-        log_info(logger,"PID: %d",*pid);
-        log_info(logger,"ESTADO: %s",estado);
-        log_info(logger,"QUANTUM: %d",*quantum);
-        free(pc);
-        free(pid);
-        free(estado);
-        free(quantum);
-        free(registrosRecibidos);
-        list_destroy(lista);
-        
-        // QUIZAS Y SOLO QUIZAS ACA VA EL REALIZARCICLO
-
-    }*/
-
+       t_pcb* pcb_recibido = recibir_pcb(cliente_fd_conexion_dispatch);
+       log_info(logger,"PC RECIBIDO: %u",pcb_recibido->pc);
+       log_debug(logger,"ESTADO RECIBIDO: %s",pcb_recibido->estado);
+       log_debug(logger,"AX: %u",pcb_recibido->registros_CPU.AX);
+       log_info(logger,"BX: %u",pcb_recibido->registros_CPU.BX);
+       log_info(logger,"CX: %u",pcb_recibido->registros_CPU.CX);
+       //realizar ciclo
+       free(pcb_recibido->estado);
+       free(pcb_recibido);
+    }
+     // QUIZAS Y SOLO QUIZAS ACA VA EL REALIZARCICLO
 }
-
 
 void manejarConexionKernel(int* cliente_fd_conexion_dispatch,int* cliente_fd_conexion_interrupt)
 {
