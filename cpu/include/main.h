@@ -10,6 +10,9 @@
 #include <pthread.h>
 #include "../include/cicloInstruccion.h"
 #include "../include/instrucciones.h"
+#include "../include/dispatch.h"
+#include "../include/interrupt.h"
+
 
 
 

@@ -9,13 +9,17 @@
 #include <pthread.h>
 #include<commons/string.h>
 #include<commons/collections/list.h>
+#include "../include/dispatch.h"
+#include "../include/interrupt.h"
 
 int iniciar_conexiones(int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt);
 void manejarConexionKernel(int* cliente_fd_conexion_dispatch,int* cliente_fd_conexion_interrupt);
-void manejarConexionDispatch(int cliente_fd_conexion_dispatch);
-void inicializar_hilo_interrupt(int cliente_fd_conexion_interrupt);
-void manejarConexionInterrupt(void* fd_interrupt);
-void manejarConexionDispatch(int cliente_fd_conexion_dispatch);
+//void manejarConexionDispatch(int cliente_fd_conexion_dispatch);
+void realizar_handshakes_cpu(int fd_conexion_memoria,int cliente_fd_conexion_dispatch, int cliente_fd_conexion_interrupt);
+void habilitar_dispatch_interrupt(int fd_dispatch, int fd_interrupt);
+//void inicializar_hilo_interrupt(int cliente_fd_conexion_interrupt);
+//void manejarConexionInterrupt(void* fd_interrupt);
+//void manejarConexionDispatch(int cliente_fd_conexion_dispatch);
 void terminar_programa(int* fd_conexion_memoria,int* cliente_fd_conexion_dispatch,int*cliente_fd_conexion_interrupt);
 
 

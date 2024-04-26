@@ -11,6 +11,8 @@
 #include "../include/conexionesMemoria.h"
 #include "../include/archivos.h"
 #include <commons/collections/list.h>
+//#include"../include/conexionCPU.h"
+//#include"../include/conexionKernel.h"
 
 //extern t_log* logger;
 

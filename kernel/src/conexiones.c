@@ -1,4 +1,6 @@
 #include "../include/conexiones.h"
+
+extern t_log* logger;
 typedef struct
 {
     int fd_conexion_IO;
@@ -24,6 +26,13 @@ int iniciar_conexiones(t_config* config,t_log* logger,int* fd_memoria,int* fd_cp
     puerto = config_get_string_value(config,"PUERTO_ESCUCHA");
     *fd_escucha_interfaces = iniciar_servidor(logger,ip,puerto);
     return *fd_memoria != 0 && *fd_cpu_dispatch != 0 && *fd_cpu_interrupt != 0 && *fd_escucha_interfaces != 0;
+}
+
+void realizar_handshakes_kernel(int fd_memoria,int fd_cpu_dispatch, int fd_cpu_interrupt)
+{
+    mandarHandshake(logger,fd_memoria,"MODULO MEMORIA","MODULO KERNEL");
+    mandarHandshake(logger,fd_cpu_dispatch,"MODULO CPU DISPATCH","MODULO KERNEL-DISPATCH");
+    mandarHandshake(logger,fd_cpu_interrupt,"MODULO CPU INTERRUPT","MODULO KERNEL-INTERRUPT");
 }
 
 int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces){

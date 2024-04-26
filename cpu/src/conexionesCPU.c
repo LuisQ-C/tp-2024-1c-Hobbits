@@ -17,11 +17,11 @@ typedef struct
     uint32_t EBX;
     uint32_t ECX;
     uint32_t EDX;
-}registrosGenerales;*/
+}registrosGenerales;
 typedef struct{
     int fd;
 }info_fd_conexion;
-
+*/
 int iniciar_conexiones(int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt)
 {
     char* ip;
@@ -44,6 +44,18 @@ int iniciar_conexiones(int* fd_conexion_memoria,int* server_fd_escucha_dispatch,
     return *fd_conexion_memoria != 0 && *server_fd_escucha_dispatch != 0 && *server_fd_escucha_interrupt != 0 && *cliente_fd_conexion_dispatch != 0 && *cliente_fd_conexion_interrupt != 0;
 }
 
+void realizar_handshakes_cpu(int fd_conexion_memoria,int cliente_fd_conexion_dispatch, int cliente_fd_conexion_interrupt)
+{
+    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA","CPU");
+    realizar_handshake_dispatch(cliente_fd_conexion_dispatch);
+    realizar_handshake_interrupt(cliente_fd_conexion_interrupt);
+}
+void habilitar_dispatch_interrupt(int fd_dispatch, int fd_interrupt)
+{
+    inicializar_hilo_interrupt(fd_interrupt);
+    manejarConexionDispatch(fd_dispatch);
+}
+/*
 void inicializar_hilo_interrupt(int cliente_fd_conexion_interrupt)
 {
     //CONEXION INTERRUPT CON HILO
@@ -52,8 +64,8 @@ void inicializar_hilo_interrupt(int cliente_fd_conexion_interrupt)
     fd_interrupt->fd = cliente_fd_conexion_interrupt;
     pthread_create(&hiloInterrupt,NULL,(void*) manejarConexionInterrupt,(void*) fd_interrupt);
     pthread_detach(hiloInterrupt);
-}
-
+}*/
+/*
 void manejarConexionInterrupt(void* fd_interrupt)
 {
     info_fd_conexion* fd_recibido = fd_interrupt;
@@ -64,8 +76,8 @@ void manejarConexionInterrupt(void* fd_interrupt)
     char* moduloConectado = recibir_mensaje(fd_kernel_interrupt,logger);
     enviar_handshake_ok(logger,fd_kernel_interrupt,moduloConectado);
     free(moduloConectado);
-}
-
+}*/
+/*
 void manejarConexionDispatch(int cliente_fd_conexion_dispatch)
 {
     recibir_operacion(cliente_fd_conexion_dispatch); //HAY Q MANEJARLE LOS ERRORES, HACERLO EN RECIBIR_OPERACION
@@ -86,7 +98,7 @@ void manejarConexionDispatch(int cliente_fd_conexion_dispatch)
        free(pcb_recibido);
     }
      // QUIZAS Y SOLO QUIZAS ACA VA EL REALIZARCICLO
-}
+}*/
 
 void manejarConexionKernel(int* cliente_fd_conexion_dispatch,int* cliente_fd_conexion_interrupt)
 {

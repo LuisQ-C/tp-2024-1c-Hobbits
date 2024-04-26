@@ -21,27 +21,19 @@ int main(int argc, char* argv[])
         log_error(logger,"Error al crear conexiones iniciales");
         exit(1);
     }
-    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA","CPU");
-    //
-    
-    //log_info(logger,"%u",registro.BX);
-    //log_info(logger,"%u",registro.AX);
-    //log_info(logger,"%u",registro.BX);
-    //CONEXION DISPATCH - SIN HILO POR SER SECUENCIAL
-    
-    //INICIALIZAR HILO INTERRUPT
-    inicializar_hilo_interrupt(cliente_fd_conexion_interrupt);
 
-    manejarConexionDispatch(cliente_fd_conexion_dispatch);
-    
-    
-    //deshabilitar esto para tomas y luis-roger
+    realizar_handshakes_cpu(fd_conexion_memoria,cliente_fd_conexion_dispatch,cliente_fd_conexion_interrupt);
 
+    //memoria tambien queda habilitado porque mandarHandshake es bloqueante
+    habilitar_dispatch_interrupt(cliente_fd_conexion_dispatch,cliente_fd_conexion_interrupt);
+
+    
+    //deshabilitar esto para tomas y luis-rogerS
     //realizarCicloInstruccion(fd_conexion_memoria);
-    log_info(logger,"VALOR REGISTRO AX: %u",registro.AX);
+    /*log_info(logger,"VALOR REGISTRO AX: %u",registro.AX);
     log_info(logger,"VALOR REGISTRO BX: %u",registro.BX);
     log_info(logger,"VALOR REGISTRO CX: %u",registro.CX);
-    log_info(logger,"VALOR PC: %u",registro.PC);
+    log_info(logger,"VALOR PC: %u",registro.PC);*/
     ///// 
     
     //liberar los mensajes

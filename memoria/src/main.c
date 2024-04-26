@@ -28,6 +28,9 @@ int main(int argc, char* argv[]) {
         log_error(logger,"Error al crear conexiones iniciales");
         exit(1);
     }
+
+    realizar_handshakes_memoria(fd_cpu,fd_kernel);
+
     inicializar_hilos(fd_cpu,fd_kernel);
 
     //////

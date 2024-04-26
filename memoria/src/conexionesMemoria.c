@@ -6,10 +6,7 @@ typedef struct
     int fd_conexion_IO;
 } t_datos_server_interfaces;
 
-typedef struct main
-{
-    int fd;
-}info_fd_hilos;
+
 
 int iniciar_conexiones(int* server_fd,int* fd_cpu,int* fd_kernel)
 {
@@ -27,20 +24,16 @@ int iniciar_conexiones(int* server_fd,int* fd_cpu,int* fd_kernel)
     return *server_fd != 0 && *fd_cpu != 0 && *fd_kernel != 0;
 }
 
+void realizar_handshakes_memoria(int fd_cpu, int fd_kernel)
+{
+    realizar_handshake_cpu(fd_cpu);
+    realizar_handshake_kernel(fd_kernel);
+}
+
 void inicializar_hilos(int fd_cpu, int fd_kernel)
 {
-    //HILO PARA COMUNICACION CON CPU
-    pthread_t hiloCPU;
-    info_fd_hilos* info_fd_cpu = malloc(sizeof(info_fd_hilos));
-    info_fd_cpu->fd = fd_cpu;
-    pthread_create(&hiloCPU,NULL,(void*) conexionCPU,(void*) info_fd_cpu);
-    pthread_detach(hiloCPU);
-    //HILO PARA COMUNICACION CON KERNEL
-    pthread_t hiloKernel;
-    info_fd_hilos* info_fd_kernel = malloc(sizeof(info_fd_hilos));
-    info_fd_kernel->fd = fd_kernel;
-    pthread_create(&hiloKernel,NULL,(void*) conexionKernel,(void*) info_fd_kernel);
-    pthread_detach(hiloKernel);
+    iniciar_hilo_cpu(fd_cpu);
+    iniciar_hilo_kernel(fd_kernel);
 }
 
 int escucharConexionesIO(int fd_escucha_interfaces){
@@ -80,98 +73,9 @@ void procesarConexionesIO(void* datosServerInterfaces){
     free(interfazConectada);
 }
 
-void conexionCPU(void* info_fd_cpu)
-{
-    info_fd_hilos* fd_recibido = info_fd_cpu;
-    int fd_cpu = fd_recibido->fd;
-    free(fd_recibido);
 
-    int retardo = config_get_int_value(config,"RETARDO_RESPUESTA");
-   // char** instruccionesPrueba = pasarArchivoEstructura("codigoPrueba.txt"); // esto debe ir en el switch
 
-    int codigoOperacion;
-    while(1)
-    {
-        codigoOperacion = recibir_operacion(fd_cpu);
 
-        if(codigoOperacion == -1)
-        {
-            log_error(logger,"Error al recibirOperacion");
-            return;
-        }
-
-		switch (codigoOperacion) {
-		case HANDSHAKE:
-            char* moduloConectado = recibir_mensaje(fd_cpu,logger);
-			enviar_handshake_ok(logger,fd_cpu, moduloConectado);
-            free(moduloConectado);
-			break;
-        case INSTRUCCION:
-            char* valor_pc = recibir_mensaje(fd_cpu,logger);
-            uint32_t pc_recibido = atoi(valor_pc);
-            usleep(retardo*1000);
-            //enviar_mensaje(instruccionesPrueba[pc_recibido],fd_cpu,INSTRUCCION);
-            free(valor_pc);
-            break;
-		case -1:
-			log_error(logger, "el cliente se desconecto. Terminando servidor");
-            return;
-			//return EXIT_FAILURE;
-		default:
-			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-			break;
-		}
-    }
-}
-
-void conexionKernel(void* info_fd_kernel)
-{
-    info_fd_hilos* fd_recibido = info_fd_kernel;
-    int fd_kernel = fd_recibido->fd;
-    free(fd_recibido);
-   
-    
-
-    int codigoOperacion;
-    while(1)
-    {
-        codigoOperacion = recibir_operacion(fd_kernel);
-
-        if(codigoOperacion == -1)
-        {
-            log_error(logger,"Error al recibirOperacion");
-            return;
-        }
-
-		switch (codigoOperacion) {
-		case HANDSHAKE:
-            char* moduloConectado = recibir_mensaje(fd_kernel,logger);
-			enviar_handshake_ok(logger,fd_kernel, moduloConectado);
-            free(moduloConectado);
-			break;
-        case INICIAR_PROCESO:
-            /* RECIBE EL PID Y EL PATH AL PID (SUMARLO A PATH DEL CONFIG PARA HALLAR LA RUTA ABSOLUTA)
-            int pid = recibe
-            char* pathPseudocodigo = recibir_mensaje(fd_kernel,logger);
-            //se recibe el path del kernel
-            char* pathPseudocodigo = "codigoPrueba.txt";
-            FILE* archivoPseudocodigo = fopen(pathPseudocodigo,"r+");
-
-            instrucciones = pasarArchivoEstructura(archivoPseudocodigo);
-            fclose(archivoPseudocodigo);
-            string_array_destroy(instrucciones);
-            */
-            break;
-		case -1:
-			log_error(logger, "el cliente se desconecto. Terminando servidor");
-            return;
-			//return EXIT_FAILURE;
-		default:
-			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-			break;
-		}
-    }
-}
 
 void terminar_programa(int* fd_cpu,int* fd_kernel){
     destruir_log_config(logger,config);
