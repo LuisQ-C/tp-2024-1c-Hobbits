@@ -16,7 +16,9 @@ typedef struct
 char** pasarArchivoEstructura(char* path);
 void agregar_proceso_lista(int pid,char* path);
 void destruir_proceso_lista(t_proceso* proceso_a_destruir);
-//void quitar_proceso_lista(int indice);
+t_proceso* buscar_proceso_pid(int pid);
+//bool _es_el_proceso(t_proceso *p);
+void quitar_proceso_lista(int pid);
 //bool buscar_proceso_pid(t_proceso* proceso,int pid);
 
 

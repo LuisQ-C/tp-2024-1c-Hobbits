@@ -38,15 +38,28 @@ void destruir_proceso_lista(t_proceso* proceso_a_destruir)
     free(proceso_a_destruir);
 }
 
-/*
+
 void quitar_proceso_lista(int pid)
 {
-    t_proceso* proceso = malloc(sizeof(t_proceso));
-    proceso->pid = pid;
-    list_find(instrucciones_procesos,buscar_proceso_pid(proceso));
-    list_remove_and_destroy_element(instrucciones_procesos,proceso->pid,destruir_proceso_lista);
+    t_proceso* proceso = buscar_proceso_pid(pid);
+    list_remove_element(instrucciones_procesos,proceso); //devuelve 0 si no encuentra el elemento
+    destruir_proceso_lista(proceso);
 }
 
+t_proceso* buscar_proceso_pid(int pid)
+{
+    int _es_el_proceso(t_proceso *p)
+    {
+        int encontrado = p->pid == pid;
+        return encontrado;
+    }
+    return list_find(instrucciones_procesos, (void*) _es_el_proceso);
+}
+
+
+
+
+/*
 bool buscar_proceso_pid(t_proceso* proceso)
 {
     if(proceso-> pid == *pid)

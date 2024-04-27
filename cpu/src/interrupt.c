@@ -29,5 +29,15 @@ void manejarConexionInterrupt(void* fd_interrupt)
     info_fd_conexion* fd_recibido = fd_interrupt;
     int fd_kernel_interrupt = fd_recibido->fd;
     free(fd_recibido);
+    
+    //chequear que la interrupcion sea sobre el pid que se esta ejecutando
+    /*while(1)
+    {
+        recv(fd_recibido,,,MSG_WAITALL);
+
+    }*/
+    //recv bloqueante
+    //si hay interrupcion
+    //chequear si habia o no info
 
 }

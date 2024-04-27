@@ -3,10 +3,12 @@
 extern t_registro_cpu registro;
 extern t_log* logger;
 
+#define HAY_INTERRUPCION 0
 
-void realizarCicloInstruccion(int fd_conexion_memoria)
+void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido)
 {
     int i=0;
+    establecer_contexto(pcb_recibido);
     while(i<3){
     // FETCH (SOLICITA Y RECIBE LA INSTRUCCION)
     t_instruccion instruccion = solicitarInstruccion(registro.PC,fd_conexion_memoria);
@@ -14,15 +16,39 @@ void realizarCicloInstruccion(int fd_conexion_memoria)
     // DECODIFICA LA INSTRUCCION Y LA EJECUTA
     decode_and_execute(instruccion);
 
-    // ACTUALIZAR PCB
+    //ACTUALIZAR PCB
+    actualizar_pcb(pcb_recibido);
     
     //CHEQUEA SI EN EL HILO DE INTERRUPCION LE LLEGO UNA INTERRUPCION
-
-    //check_interrupt(); // TIENE Q ACTUALIZAR EL PCB 
-    
-    //SINO LLEGO NADA, CONTINUA LA EJECUCION NORMALMENTE (IP+1 SI NO HAY JUMP)
-     i++;
+    //check_interrupt();
+    i++;
     }
+}
+
+void establecer_contexto(t_pcb* pcb_recibido)
+{
+    registro.PC = pcb_recibido->pc;
+    registro.AX = pcb_recibido->registros_CPU.AX;
+    registro.BX = pcb_recibido->registros_CPU.BX;
+    registro.CX = pcb_recibido->registros_CPU.CX;
+    registro.DX = pcb_recibido->registros_CPU.DX;
+    registro.EAX = pcb_recibido->registros_CPU.EAX;
+    registro.EBX = pcb_recibido->registros_CPU.EBX;
+    registro.ECX = pcb_recibido->registros_CPU.ECX;
+    registro.EDX = pcb_recibido->registros_CPU.EDX;
+}
+
+void actualizar_pcb(t_pcb* pcb_a_actualizar)
+{
+    pcb_a_actualizar->pc = registro.PC;
+    pcb_a_actualizar->registros_CPU.AX = registro.AX;
+    pcb_a_actualizar->registros_CPU.BX = registro.BX;
+    pcb_a_actualizar->registros_CPU.CX = registro.CX;
+    pcb_a_actualizar->registros_CPU.DX = registro.DX;
+    pcb_a_actualizar->registros_CPU.EAX = registro.EAX;
+    pcb_a_actualizar->registros_CPU.EBX = registro.EBX;
+    pcb_a_actualizar->registros_CPU.ECX = registro.ECX;
+    pcb_a_actualizar->registros_CPU.EDX = registro.EDX;
 }
 
 /*Solicita la instruccion a memoria de acuerdo al pc indicado*/
@@ -95,6 +121,14 @@ void decode_and_execute(t_instruccion instruccion)
     string_array_destroy(instruccionDesarmada);
     free(instruccion);
     
+}
+
+void check_interrupt()
+{
+    if(HAY_INTERRUPCION)
+    {
+        //le devuelve el pcb con el contexto actualizado con motivoDesalojo
+    }
 }
 
 /*Funcion que convierte char* a opcode del enum, en caso de error retorna -1*/

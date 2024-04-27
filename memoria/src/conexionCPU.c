@@ -2,6 +2,7 @@
 
 extern t_log* logger;
 extern t_config* config;
+extern t_list* instrucciones_procesos;
 
 void realizar_handshake_cpu(int fd_cpu)
 {
@@ -32,7 +33,10 @@ void conexionCPU(void* info_fd)
     free(fd_recibido);
 
     int retardo = config_get_int_value(config,"RETARDO_RESPUESTA");
-   // char** instruccionesPrueba = pasarArchivoEstructura("codigoPrueba.txt"); // esto debe ir en el switch
+    //char** instruccionesPrueba = pasarArchivoEstructura("codigoPrueba.txt");
+    agregar_proceso_lista(14,"codigoPrueba.txt");
+    agregar_proceso_lista(7,"codigoPrueba2.txt");
+    //ESTO DEBERIA IR EN MEMORIA LO DE AGREGARLO SEGUN LO QUE RECIBA
 
     int codigoOperacion;
     while(1)
@@ -50,7 +54,8 @@ void conexionCPU(void* info_fd)
             char* valor_pc = recibir_mensaje(fd_cpu,logger);
             uint32_t pc_recibido = atoi(valor_pc);
             usleep(retardo*1000);
-            //enviar_mensaje(instruccionesPrueba[pc_recibido],fd_cpu,INSTRUCCION);
+            t_proceso* proceso = buscar_proceso_pid(7);
+            enviar_mensaje((proceso->instrucciones)[pc_recibido],fd_cpu,INSTRUCCION);
             free(valor_pc);
             break;
 		case -1:

@@ -25,15 +25,8 @@ int main(int argc, char* argv[])
     realizar_handshakes_cpu(fd_conexion_memoria,cliente_fd_conexion_dispatch,cliente_fd_conexion_interrupt);
 
     //memoria tambien queda habilitado porque mandarHandshake es bloqueante
-    habilitar_dispatch_interrupt(cliente_fd_conexion_dispatch,cliente_fd_conexion_interrupt);
+    habilitar_dispatch_interrupt(cliente_fd_conexion_dispatch,cliente_fd_conexion_interrupt,fd_conexion_memoria);
 
-    
-    //deshabilitar esto para tomas y luis-rogerS
-    //realizarCicloInstruccion(fd_conexion_memoria);
-    /*log_info(logger,"VALOR REGISTRO AX: %u",registro.AX);
-    log_info(logger,"VALOR REGISTRO BX: %u",registro.BX);
-    log_info(logger,"VALOR REGISTRO CX: %u",registro.CX);
-    log_info(logger,"VALOR PC: %u",registro.PC);*/
     ///// 
     
     //liberar los mensajes

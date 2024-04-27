@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "../../utils/include/protocolo.h"
+#include "../include/archivos.h"
 typedef struct
 {
     int fd;
@@ -13,4 +14,5 @@ typedef struct
 void realizar_handshake_cpu(int fd_cpu);
 void iniciar_hilo_cpu(int fd_cpu);
 void conexionCPU(void*);
+t_proceso* buscar_proceso_pid(int pid);
 #endif
