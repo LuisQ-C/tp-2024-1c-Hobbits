@@ -5,6 +5,7 @@ t_config* config;
 t_registro_cpu registro = {0,0,0,0,0,0,0,0,0,0,0};
 int HAY_INTERRUPCION = 0;
 int pid_actual;
+int MOTIVO_DESALOJO = -1;
 
 int main(int argc, char* argv[])
 {
@@ -12,6 +13,7 @@ int main(int argc, char* argv[])
     int fd_conexion_memoria = 0;
     int server_fd_escucha_dispatch = 0;
     int server_fd_escucha_interrupt = 0;
+
     int cliente_fd_conexion_interrupt = 0;
     int cliente_fd_conexion_dispatch = 0;
     logger = iniciar_logger("cpu.log", "MODULO CPU", 1, LOG_LEVEL_DEBUG); //QUEDA PARA SIEMPRE 

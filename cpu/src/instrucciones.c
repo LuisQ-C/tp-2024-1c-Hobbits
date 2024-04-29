@@ -19,6 +19,7 @@ void set_32(uint32_t* reg,uint32_t valor)
 // SUM REGISTRO_DESTINO REGISTRO_ORIGEN
 void sum_8_8(uint8_t* registroDestino,uint8_t* registroOrigen)
 {
+    //uint8_t numero_a_sumar = *registroOrigen;
     *registroDestino += *registroOrigen;
 }
 
@@ -71,6 +72,10 @@ void jnz_32(uint32_t* reg,uint32_t instruccion_proxima){
 
 // IO_GEN_SLEPP INTERFAZ UNIDADES_TRABAJO 
 void io_gen_sleep(int interfaz,int tiempoEspera){
+    //interfaz + tiempo = paquete
+    //send(kernel, paquete)
     //mandarle a kernel para que kernel le mande a la interfaz que se "duerma" n tiemposEspera
 }
+
+
 

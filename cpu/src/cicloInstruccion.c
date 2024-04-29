@@ -4,12 +4,12 @@ extern t_registro_cpu registro;
 extern t_log* logger;
 extern int HAY_INTERRUPCION;
 extern int pid_actual;
+extern int MOTIVO_DESALOJO;
 
 void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int cliente_fd_conexion_dispatch)
 {
-    int i=0;
     establecer_contexto(pcb_recibido);
-    while(i<3){
+    while(1){
     // FETCH (SOLICITA Y RECIBE LA INSTRUCCION)
     t_instruccion instruccion = solicitarInstruccion(registro.PC,fd_conexion_memoria);
     
@@ -19,12 +19,19 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
     //ACTUALIZAR PCB
     actualizar_pcb(pcb_recibido);
     
+    // CHEQUEA SI HUBO DESALOJO POR IO,EXIT O WAIT
+    if(fue_desalojado())
+    {
+        break;
+    }
+
     //CHEQUEA SI EN EL HILO DE INTERRUPCION LE LLEGO UNA INTERRUPCION
     if(check_interrupt(pcb_recibido,cliente_fd_conexion_dispatch))
     {
         break;
     }
-    i++;
+
+    //i++;
     }
 }
 
@@ -98,6 +105,7 @@ void decode_and_execute(t_instruccion instruccion)
         }
         case SUM:
         {
+            
             sum(instruccionDesarmada);
             registro.PC = registro.PC + 1;
             break;
@@ -114,10 +122,16 @@ void decode_and_execute(t_instruccion instruccion)
             break;
         }
         case IO_GEN_SLEEP:
+        {
+            MOTIVO_DESALOJO = IO_GEN_SLEEP;
+            // devolver pcb, + motivo
             break;
+        }
         case EXIT:
         {
-            
+            MOTIVO_DESALOJO = EXIT;
+            // devolver pcb, + motivo
+            break;
         }
         case -1:
             log_warning(logger,"Instruccion invalida");
@@ -131,12 +145,23 @@ void decode_and_execute(t_instruccion instruccion)
     
 }
 
+int fue_desalojado()
+{
+    if(MOTIVO_DESALOJO != -1)
+    {
+        MOTIVO_DESALOJO = -1;
+        return 1;
+    }
+    return 0;
+}
+
 int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
 {
     if(HAY_INTERRUPCION)
     {
         enviar_pcb(pcb_a_chequear,fd_dispatch);
         HAY_INTERRUPCION = 0;
+        // carga el motivo de desalojo sea cual sea
         return 1;
     }
     return 0;
@@ -164,6 +189,10 @@ int string_to_opcode(char* instruccion)
     else if(string_equals_ignore_case("IO_GEN_SLEEP",instruccion))
     {
         return IO_GEN_SLEEP;
+    }
+    else if(string_equals_ignore_case("EXIT",instruccion))
+    {
+        return EXIT;
     }
     else
     {
@@ -261,6 +290,7 @@ void sum(char** instruccion)
                     sum_32_32(registroDestino,registroOrigen);
                 }
             }
+
 }
 
 void sub(char** instruccion)

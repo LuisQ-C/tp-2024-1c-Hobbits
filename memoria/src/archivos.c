@@ -10,14 +10,28 @@ char** pasarArchivoEstructura(char* path)
     char** archivoInstrucciones = string_array_new();
     
     char* instruccionLeida = string_new();
+    char* instruccion_perfecta = string_new();
     size_t longitud = 1;
     while(getline(&instruccionLeida, &longitud,f) != -1)
     {
-        string_array_push(&archivoInstrucciones,instruccionLeida);
-        instruccionLeida = string_new();
-        longitud = 1;
+        if(string_contains(instruccionLeida,"\n"))
+        {
+            instruccion_perfecta= string_substring(instruccionLeida,0,string_length(instruccionLeida)-1);
+            string_array_push(&archivoInstrucciones,instruccion_perfecta);
+            instruccionLeida = string_new();
+            instruccion_perfecta = string_new();
+            // PROBAR FREE ACA TMB
+            longitud = 1;
+        }
+        else{
+            string_array_push(&archivoInstrucciones,instruccionLeida);
+            instruccionLeida = string_new(); // ESTE CAPA NO TIENE Q IR
+             // PROBAR FREE ACA TMB
+            longitud = 1;
+        }
     }
     free(instruccionLeida);
+    free(instruccion_perfecta);
     fclose(f);
     return archivoInstrucciones;
 }

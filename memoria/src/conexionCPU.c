@@ -35,7 +35,7 @@ void conexionCPU(void* info_fd)
     int retardo = config_get_int_value(config,"RETARDO_RESPUESTA");
     //char** instruccionesPrueba = pasarArchivoEstructura("codigoPrueba.txt");
     agregar_proceso_lista(14,"codigoPrueba.txt");
-    agregar_proceso_lista(7,"codigoPrueba2.txt");
+    //agregar_proceso_lista(7,"codigoPrueba2.txt");
     //ESTO DEBERIA IR EN MEMORIA LO DE AGREGARLO SEGUN LO QUE RECIBA
 
     int codigoOperacion;
@@ -54,7 +54,7 @@ void conexionCPU(void* info_fd)
             char* valor_pc = recibir_mensaje(fd_cpu,logger);
             uint32_t pc_recibido = atoi(valor_pc);
             usleep(retardo*1000);
-            t_proceso* proceso = buscar_proceso_pid(7);
+            t_proceso* proceso = buscar_proceso_pid(14);
             enviar_mensaje((proceso->instrucciones)[pc_recibido],fd_cpu,INSTRUCCION);
             free(valor_pc);
             break;

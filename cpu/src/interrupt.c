@@ -35,10 +35,11 @@ void manejarConexionInterrupt(void* fd_interrupt)
     while(1)
     {
         // recibir_operacion no haria falta, estamos seguro q va a llegar solo interrupciones
-        recv(fd_recibido,&pid,sizeof(int),MSG_WAITALL); 
+        recv(fd_kernel_interrupt,&pid,sizeof(int),MSG_WAITALL); 
         if(pid == pid_actual)
         {
             HAY_INTERRUPCION = 1;
+            //setearMotivo
         }
     }
 }

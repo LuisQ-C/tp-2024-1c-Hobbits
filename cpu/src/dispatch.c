@@ -19,6 +19,7 @@ void realizar_handshake_dispatch(int cliente_fd_conexion_dispatch)
 void manejarConexionDispatch(int cliente_fd_conexion_dispatch,int fd_conexion_memoria)
 {
     t_pcb* pcb_recibido;
+    //while(1){
     if(recibir_operacion(cliente_fd_conexion_dispatch) == PCB)
     {
        pcb_recibido = recibir_pcb(cliente_fd_conexion_dispatch);
@@ -37,5 +38,5 @@ void manejarConexionDispatch(int cliente_fd_conexion_dispatch,int fd_conexion_me
     log_debug(logger,"CX DC: %u",pcb_recibido->registros_CPU.CX);
     free(pcb_recibido->estado);
     free(pcb_recibido);
-    
+   // }
 }

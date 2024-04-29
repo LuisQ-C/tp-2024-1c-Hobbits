@@ -19,6 +19,7 @@ t_instruccion recibirInstruccion(int fd_conexion_memoria);
 void establecer_contexto(t_pcb* pcb_recibido);
 void actualizar_pcb(t_pcb* pcb_a_actualizar);
 void decode_and_execute(t_instruccion instruccion);
+int fue_desalojado();
 int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch);
 int string_to_opcode(char* instruccion);
 uint8_t* string_to_register8(char* registroConvertir);
