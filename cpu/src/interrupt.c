@@ -1,5 +1,7 @@
 #include "../include/interrupt.h"
 extern t_log* logger;
+extern int HAY_INTERRUPCION;
+extern int pid_actual;
 
 void realizar_handshake_interrupt(int fd_interrupt)
 {
@@ -29,15 +31,14 @@ void manejarConexionInterrupt(void* fd_interrupt)
     info_fd_conexion* fd_recibido = fd_interrupt;
     int fd_kernel_interrupt = fd_recibido->fd;
     free(fd_recibido);
-    
-    //chequear que la interrupcion sea sobre el pid que se esta ejecutando
-    /*while(1)
+    int pid;
+    while(1)
     {
-        recv(fd_recibido,,,MSG_WAITALL);
-
-    }*/
-    //recv bloqueante
-    //si hay interrupcion
-    //chequear si habia o no info
-
+        // recibir_operacion no haria falta, estamos seguro q va a llegar solo interrupciones
+        recv(fd_recibido,&pid,sizeof(int),MSG_WAITALL); 
+        if(pid == pid_actual)
+        {
+            HAY_INTERRUPCION = 1;
+        }
+    }
 }

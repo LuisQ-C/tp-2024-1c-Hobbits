@@ -2,10 +2,10 @@
 
 extern t_registro_cpu registro;
 extern t_log* logger;
+extern int HAY_INTERRUPCION;
+extern int pid_actual;
 
-#define HAY_INTERRUPCION 0
-
-void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido)
+void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int cliente_fd_conexion_dispatch)
 {
     int i=0;
     establecer_contexto(pcb_recibido);
@@ -20,7 +20,10 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido)
     actualizar_pcb(pcb_recibido);
     
     //CHEQUEA SI EN EL HILO DE INTERRUPCION LE LLEGO UNA INTERRUPCION
-    //check_interrupt();
+    if(check_interrupt(pcb_recibido,cliente_fd_conexion_dispatch))
+    {
+        break;
+    }
     i++;
     }
 }
@@ -36,6 +39,7 @@ void establecer_contexto(t_pcb* pcb_recibido)
     registro.EBX = pcb_recibido->registros_CPU.EBX;
     registro.ECX = pcb_recibido->registros_CPU.ECX;
     registro.EDX = pcb_recibido->registros_CPU.EDX;
+    pid_actual = pcb_recibido->pid;
 }
 
 void actualizar_pcb(t_pcb* pcb_a_actualizar)
@@ -111,6 +115,10 @@ void decode_and_execute(t_instruccion instruccion)
         }
         case IO_GEN_SLEEP:
             break;
+        case EXIT:
+        {
+            
+        }
         case -1:
             log_warning(logger,"Instruccion invalida");
         default:
@@ -123,12 +131,15 @@ void decode_and_execute(t_instruccion instruccion)
     
 }
 
-void check_interrupt()
+int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
 {
     if(HAY_INTERRUPCION)
     {
-        //le devuelve el pcb con el contexto actualizado con motivoDesalojo
+        enviar_pcb(pcb_a_chequear,fd_dispatch);
+        HAY_INTERRUPCION = 0;
+        return 1;
     }
+    return 0;
 }
 
 /*Funcion que convierte char* a opcode del enum, en caso de error retorna -1*/

@@ -3,7 +3,8 @@
 t_log* logger;
 t_config* config;
 t_registro_cpu registro = {0,0,0,0,0,0,0,0,0,0,0};
-
+int HAY_INTERRUPCION = 0;
+int pid_actual;
 
 int main(int argc, char* argv[])
 {

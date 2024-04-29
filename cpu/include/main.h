@@ -15,7 +15,6 @@
 
 
 
-
 //void* atender_cliente(void*);
 //t_buffer *persona_serializar(t_persona *persona);
 //void mandar_persona();

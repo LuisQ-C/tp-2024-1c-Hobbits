@@ -27,15 +27,15 @@ void manejarConexionDispatch(int cliente_fd_conexion_dispatch,int fd_conexion_me
        log_debug(logger,"AX: %u",pcb_recibido->registros_CPU.AX);
        log_debug(logger,"BX: %u",pcb_recibido->registros_CPU.BX);
        log_debug(logger,"CX: %u",pcb_recibido->registros_CPU.CX);
-       //realizar ciclo
+       
        //free(pcb_recibido->estado);
        //free(pcb_recibido);
     }
-    realizarCicloInstruccion(fd_conexion_memoria,pcb_recibido);
+    realizarCicloInstruccion(fd_conexion_memoria,pcb_recibido,cliente_fd_conexion_dispatch);
     log_debug(logger,"AX DESPUES DEL CICLO: %u",pcb_recibido->registros_CPU.AX);
     log_debug(logger,"BX DC: %u",pcb_recibido->registros_CPU.BX);
     log_debug(logger,"CX DC: %u",pcb_recibido->registros_CPU.CX);
     free(pcb_recibido->estado);
     free(pcb_recibido);
-    //QUIZAS Y SOLO QUIZAS ACA VA EL REALIZARCICLO
+    
 }
