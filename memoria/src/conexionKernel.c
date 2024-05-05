@@ -37,9 +37,14 @@ void conexionKernel(void* info_fd)
     {
         codigoOperacion = recibir_operacion(fd_kernel);
 
-        if(codigoOperacion == -1)
+        if(codigoOperacion == DESCONEXION)
         {
-            log_error(logger,"Error al recibirOperacion");
+            log_error(logger,"TE DESCONECTASTE FLACO (KERNEL)");
+            return;
+        }
+        else if(codigoOperacion == ERROR)
+        {
+            log_warning(logger,"ERROR EN EL RECIBIR_OPERACION (KERNEL)");
             return;
         }
 

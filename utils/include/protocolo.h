@@ -8,7 +8,7 @@
 
 
 typedef enum{
-    HANDSHAKE,
+    HANDSHAKE = 1,
     PERSONA,
     EJECUTAR_SCRIPT_OPERACIONES,
     INICIAR_PROCESO,
@@ -26,6 +26,11 @@ typedef enum{
     IO_GEN_SLEEP,
     EXIT
 }cod_op;
+
+enum{
+    DESCONEXION = 150,
+    ERROR
+};
 /*
 typedef struct {
     uint32_t size; // Tamaño del payload
@@ -88,6 +93,9 @@ void eliminar_paquete(t_paquete* paquete);
 
 t_pcb* recibir_pcb(int fd_dispatch);
 void enviar_pcb(t_pcb* pcb_a_enviar,int fd_dispatch);
+t_paquete* armar_paquete_pcb(t_pcb* pcb_a_enviar);
+
+void liberar_elemento(void* self);
 
 //BUFFER, SERIALIZACION
 /*

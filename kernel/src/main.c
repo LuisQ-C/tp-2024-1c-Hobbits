@@ -86,8 +86,32 @@ void conexion_dispatch(void* dispatch)
     nuevoPCB->registros_CPU.EDX=50;
     //ENVIAR PCB
     enviar_pcb(nuevoPCB,fd_dispatch);
+    
+    recibir_operacion(fd_dispatch);
+    t_list* lista = recibir_paquete(fd_dispatch);
+    uint32_t* pc = list_get(lista,0);
+    int* pid = list_get(lista,1);
+    char* estado = list_get(lista,2);
+    int* quantum = list_get(lista,3);
+    t_registros_generales* registros_recibidos = list_get(lista,4);
+    int* numero_recibido = list_get(lista,5);
+    if(*numero_recibido==EXIT)
+    {
+        log_info(logger,"SE RECIBIO EXIT CORRECTAMENTE!");
+    }
+    else{
+        log_info(logger,"NO SE RECIBIO EXIT CORRECTAMENTE!!!!");
+    }
+   
+    //list_destroy(lista);
+    list_destroy_and_destroy_elements(lista,(void*) destruir_pcb_con_motivo);
+
     //log_info(logger,"ESTADO: %s",nuevoPCB->estado);
     free(nuevoPCB);
+}
+void destruir_pcb_con_motivo(void* self)
+{
+    free(self);
 }
 
 

@@ -18,25 +18,54 @@ void realizar_handshake_dispatch(int cliente_fd_conexion_dispatch)
 }
 void manejarConexionDispatch(int cliente_fd_conexion_dispatch,int fd_conexion_memoria)
 {
-    t_pcb* pcb_recibido;
-    //while(1){
-    if(recibir_operacion(cliente_fd_conexion_dispatch) == PCB)
+    int bytes;
+    
+    
+    while(1)
     {
-       pcb_recibido = recibir_pcb(cliente_fd_conexion_dispatch);
-       log_debug(logger,"PC RECIBIDO: %u",pcb_recibido->pc);
-       log_debug(logger,"ESTADO RECIBIDO: %s",pcb_recibido->estado);
-       log_debug(logger,"AX: %u",pcb_recibido->registros_CPU.AX);
-       log_debug(logger,"BX: %u",pcb_recibido->registros_CPU.BX);
-       log_debug(logger,"CX: %u",pcb_recibido->registros_CPU.CX);
-       
-       //free(pcb_recibido->estado);
-       //free(pcb_recibido);
+    bytes = recibir_operacion(cliente_fd_conexion_dispatch);
+
+    if(bytes == DESCONEXION)
+    {
+        log_error(logger,"TE DESCONECTASTE FLACO (KERNEL-DISPATCH)");
+        return;
     }
+    else if(bytes == ERROR)
+    {
+        log_warning(logger,"ERROR EN EL RECIBIR_OPERACION (KERNEL-DISPATCH)");
+        return;
+    }
+
+    t_pcb* pcb_recibido = recibir_pcb(cliente_fd_conexion_dispatch);
+    
     realizarCicloInstruccion(fd_conexion_memoria,pcb_recibido,cliente_fd_conexion_dispatch);
+    
+    free(pcb_recibido->estado);
+    free(pcb_recibido);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+antes
+log_debug(logger,"PC RECIBIDO: %u",pcb_recibido->pc);
+    log_debug(logger,"ESTADO RECIBIDO: %s",pcb_recibido->estado);
+    log_debug(logger,"AX: %u",pcb_recibido->registros_CPU.AX);
+    log_debug(logger,"BX: %u",pcb_recibido->registros_CPU.BX);
+    log_debug(logger,"CX: %u",pcb_recibido->registros_CPU.CX);
+despues
     log_debug(logger,"AX DESPUES DEL CICLO: %u",pcb_recibido->registros_CPU.AX);
     log_debug(logger,"BX DC: %u",pcb_recibido->registros_CPU.BX);
     log_debug(logger,"CX DC: %u",pcb_recibido->registros_CPU.CX);
-    free(pcb_recibido->estado);
-    free(pcb_recibido);
-   // }
-}
+*/

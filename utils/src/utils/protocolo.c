@@ -51,14 +51,20 @@ void enviar_handshake_ok(t_log* logger,int fd_origen, char* nombreOrigen)
 int recibir_operacion(int socket_cliente)
 {
 	int cod_op;
-	if(recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
+    int bytes;
+	if((bytes = recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL)) > 0)
     {
-        //printf("COP: %d",cod_op);
-		return cod_op;}
-	else
+		return cod_op;
+    }
+	else if(bytes == 0)
 	{
 		close(socket_cliente);
-		return -1;
+		return DESCONEXION;
+	}
+    else
+	{
+		close(socket_cliente);
+		return ERROR;
 	}
 }
 
@@ -189,6 +195,18 @@ void eliminar_paquete(t_paquete* paquete)
 // FUNCIONES DE PCB 
 
 /* Liberar estado */
+
+/*
+//t_list* recibir_pcb_motivo(int fd_dispatch);
+//t_pcb* recibir_pcb(lista);
+//t_motivo* recibir_motivo(lista);
+
+t_list* recibir_pcb_motivo(int fd_dispatch)
+{
+    t_list* lista = recibir_paquete(fd_dispatch);
+    return lista;
+}*/
+
 t_pcb* recibir_pcb(int fd_dispatch)
 {
     t_list* lista;
@@ -197,6 +215,7 @@ t_pcb* recibir_pcb(int fd_dispatch)
     //pcb_recibido->registros_CPU ;= malloc(sizeof(t_registros_generales));
 
     lista = recibir_paquete(fd_dispatch);
+
     uint32_t* pc = list_get(lista,0);
     int* pid = list_get(lista,1);
     char* estado = list_get(lista,2);
@@ -216,10 +235,11 @@ t_pcb* recibir_pcb(int fd_dispatch)
     return pcb_recibido;
 }
 
+
 void enviar_pcb(t_pcb* pcb_a_enviar,int fd_dispatch)
 {
     t_paquete* paquete = crear_paquete(PCB);
-    t_pcb* pcb_auxiliar = pcb_a_enviar; 
+    t_pcb* pcb_auxiliar = pcb_a_enviar;
     agregar_a_paquete(paquete,&pcb_auxiliar->pc,sizeof(uint32_t));
     agregar_a_paquete(paquete,&pcb_auxiliar->pid,sizeof(int));
     agregar_a_paquete(paquete,pcb_auxiliar->estado,sizeof(strlen(pcb_auxiliar->estado)+1));
@@ -229,6 +249,46 @@ void enviar_pcb(t_pcb* pcb_a_enviar,int fd_dispatch)
     //free(pcb_auxiliar);
     eliminar_paquete(paquete);
 }
+
+t_paquete* armar_paquete_pcb(t_pcb* pcb_a_enviar)
+{
+    t_paquete* paquete = crear_paquete(PCB);
+    agregar_a_paquete(paquete,&pcb_a_enviar->pc,sizeof(uint32_t));
+    agregar_a_paquete(paquete,&pcb_a_enviar->pid,sizeof(int));
+    agregar_a_paquete(paquete,pcb_a_enviar->estado,sizeof(strlen(pcb_a_enviar->estado)+1));
+    agregar_a_paquete(paquete,&pcb_a_enviar->quantum,sizeof(int));
+    agregar_a_paquete(paquete,&pcb_a_enviar->registros_CPU,sizeof(t_registros_generales));
+    return paquete;
+}
+
+void liberar_elemento(void* self)
+{
+    free(self);
+}
+/*
+void devolver_pcb(t_pcb* pcb_a_enviar,int fd_dispatch, uint32_t motivo_desalojo, char* instruccion)
+{
+    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+    if(motivo==sleep)
+    {
+        agregar_a_paquete()
+        agregar_a_paquete()
+    }
+    enviar_paquete(paquete,fd_dispatch);
+    //free(pcb_a_enviar);
+    eliminar_paquete(paquete);
+    //agregar todo el pcb
+}
+
+t_pcb* recibir_pcb_kernel()
+{
+    //lista[5] = motivo
+    //lista[6] = primer parametro
+    //lista[7] = segundo parametro
+    //recibir cosas extra
+    //recibir el pcb
+    //retornar
+}*/
 
 
 

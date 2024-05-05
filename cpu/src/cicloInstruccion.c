@@ -3,36 +3,49 @@
 extern t_registro_cpu registro;
 extern t_log* logger;
 extern int HAY_INTERRUPCION;
-extern int pid_actual;
+extern int PID_ACTUAL;
 extern int MOTIVO_DESALOJO;
+extern pthread_mutex_t mutex_interrupcion;
+extern pthread_mutex_t mutex_pid;
+extern sem_t semaforo_pcb_recibido;
 
 void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int cliente_fd_conexion_dispatch)
 {
-    establecer_contexto(pcb_recibido);
+    resetear_var_globales();
+    establecer_contexto(pcb_recibido);                                                //CAMBIAR PID_ACTUAL POR EL DEL PCB RECIBIDO
+
     while(1){
-    // FETCH (SOLICITA Y RECIBE LA INSTRUCCION)
-    t_instruccion instruccion = solicitarInstruccion(registro.PC,fd_conexion_memoria);
     
-    // DECODIFICA LA INSTRUCCION Y LA EJECUTA
-    decode_and_execute(instruccion);
+    t_instruccion instruccion = fetch(registro.PC,fd_conexion_memoria,pcb_recibido->pid); //FETCH (SOLICITA Y RECIBE LA INSTRUCCION)
+    
+    decode_and_execute(instruccion,pcb_recibido,cliente_fd_conexion_dispatch);         //DECODIFICA LA INSTRUCCION Y LA EJECUTA 
 
-    //ACTUALIZAR PCB
-    actualizar_pcb(pcb_recibido);
+    actualizar_pcb(pcb_recibido);                                                      //ACTUALIZAR PCB
     
-    // CHEQUEA SI HUBO DESALOJO POR IO,EXIT O WAIT
-    if(fue_desalojado())
+    if(fue_desalojado())                                                               //CHEQUEA SI HUBO DESALOJO POR IO, EXIT, ETC
     {
+        log_debug(logger,"fue desalojado");
         break;
     }
-
-    //CHEQUEA SI EN EL HILO DE INTERRUPCION LE LLEGO UNA INTERRUPCION
-    if(check_interrupt(pcb_recibido,cliente_fd_conexion_dispatch))
+    
+    if(check_interrupt(pcb_recibido,cliente_fd_conexion_dispatch))                     //CHEQUEA SI EN EL HILO DE INTERRUPCION LE LLEGO UNA INTERRUPCION
     {
+        log_debug(logger,"fue interrumpido");
         break;
     }
-
-    //i++;
+    
     }
+}
+
+void resetear_var_globales()
+{
+    MOTIVO_DESALOJO = -1;
+    pthread_mutex_lock(&mutex_pid);
+    PID_ACTUAL = -1;
+    pthread_mutex_unlock(&mutex_pid);
+    pthread_mutex_lock(&mutex_interrupcion);
+    HAY_INTERRUPCION = 0;
+    pthread_mutex_unlock(&mutex_interrupcion);
 }
 
 void establecer_contexto(t_pcb* pcb_recibido)
@@ -46,7 +59,9 @@ void establecer_contexto(t_pcb* pcb_recibido)
     registro.EBX = pcb_recibido->registros_CPU.EBX;
     registro.ECX = pcb_recibido->registros_CPU.ECX;
     registro.EDX = pcb_recibido->registros_CPU.EDX;
-    pid_actual = pcb_recibido->pid;
+    pthread_mutex_lock(&mutex_pid);
+    PID_ACTUAL = pcb_recibido->pid;
+    pthread_mutex_unlock(&mutex_pid);
 }
 
 void actualizar_pcb(t_pcb* pcb_a_actualizar)
@@ -63,14 +78,25 @@ void actualizar_pcb(t_pcb* pcb_a_actualizar)
 }
 
 /*Solicita la instruccion a memoria de acuerdo al pc indicado*/
-t_instruccion solicitarInstruccion(uint32_t pc, int fd_conexion_memoria)
+t_instruccion fetch(uint32_t pc, int fd_conexion_memoria,int pid)
 {
-    char* pc_a_enviar = string_itoa(pc);
-    enviar_mensaje(pc_a_enviar,fd_conexion_memoria,INSTRUCCION);
+    pedir_instruccion(pc,pid,fd_conexion_memoria);
     t_instruccion instruccion = recibirInstruccion(fd_conexion_memoria);
-    free(pc_a_enviar);
+    log_info(logger,"Fetch Instruccion: \"PID: %d - FETCH - Program Counter: %u\".",pid,pc);
     return instruccion;
 }
+
+/*Crea un paquete con pc y pid para mandarselo a memoria*/
+void pedir_instruccion(uint32_t pc, int pid,int fd_conexion_memoria)
+{
+    t_paquete* paquete = crear_paquete(INSTRUCCION);
+    agregar_a_paquete(paquete,&pid,sizeof(int));
+    agregar_a_paquete(paquete,&pc,sizeof(uint32_t));
+    enviar_paquete(paquete,fd_conexion_memoria);
+    eliminar_paquete(paquete);
+}
+
+
 
 /*Recibe la instruccion de la memoria, necesita free luego de utilizarse*/
 t_instruccion recibirInstruccion(int fd_conexion_memoria)
@@ -82,7 +108,7 @@ t_instruccion recibirInstruccion(int fd_conexion_memoria)
     {
         log_error(logger,"Error al recibir la instruccion");
     }
-    log_info(logger,"Valor de CODOP: %d",cod_op);
+    //log_info(logger,"Valor de CODOP: %d",cod_op);
     char* instruccionRecibida = recibir_mensaje(fd_conexion_memoria,logger);
     string_append(&instruccion,instruccionRecibida);
     free(instruccionRecibida);
@@ -90,7 +116,7 @@ t_instruccion recibirInstruccion(int fd_conexion_memoria)
 }
 
 /* Decodifica y ejecuta la instruccion pasada por parametro*/
-void decode_and_execute(t_instruccion instruccion)
+void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dispatch)
 {
     char** instruccionDesarmada = string_split(instruccion," ");
     int op_code = string_to_opcode(instruccionDesarmada[0]);
@@ -124,13 +150,23 @@ void decode_and_execute(t_instruccion instruccion)
         case IO_GEN_SLEEP:
         {
             MOTIVO_DESALOJO = IO_GEN_SLEEP;
-            // devolver pcb, + motivo
+            /*t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+            agregar_a_paquete(paquete,&MOTIVO_DESALOJO,sizeof(int));
+            agregar_a_paquete(paquete,instruccionDesarmada[1],sizeof(strlen(instruccionDesarmada[1])+1));
+            int tiempo_sleep = atoi(instruccionDesarmada[2]);
+            agregar_a_paquete(paquete,&tiempo_sleep,sizeof(int));
+            enviar_paquete(paquete,fd_dispatch);
+            eliminar_paquete(paquete);*/
             break;
         }
         case EXIT:
         {
             MOTIVO_DESALOJO = EXIT;
-            // devolver pcb, + motivo
+            int motivo_desalojado = EXIT;
+            t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+            agregar_a_paquete(paquete,&motivo_desalojado,sizeof(int));
+            enviar_paquete(paquete,fd_dispatch);
+            eliminar_paquete(paquete);
             break;
         }
         case -1:
@@ -138,33 +174,53 @@ void decode_and_execute(t_instruccion instruccion)
         default:
             log_error(logger,"Error al decodificar instruccion");
     }
-
-    //LIBERAMOS EL CHAR** INSTRUCCIONDESARMADA Y LUEGO EL CHAR* INSTRUCCION
+    logear_instruccion_ejecutada(pcb_a_enviar->pid,instruccion);
     string_array_destroy(instruccionDesarmada);
     free(instruccion);
     
 }
 
+void logear_instruccion_ejecutada(int pid,char* instruccion)
+{
+    char** instruccionLogear = string_n_split(instruccion,1," ");
+    if(instruccionLogear[1]!=NULL)
+    {
+        log_info(logger,"Instruccion Ejecutada: \"PID: %d - Ejecutando: %s - %s\".",pid,instruccionLogear[0],instruccionLogear[1]);
+    }
+    else{
+        log_info(logger,"Instruccion Ejecutada: \"PID: %d - Ejecutando: %s\".",pid,instruccionLogear[0]);
+    }
+    string_array_destroy(instruccionLogear);
+}
+
 int fue_desalojado()
 {
+    int desalojado = 0;
     if(MOTIVO_DESALOJO != -1)
     {
-        MOTIVO_DESALOJO = -1;
-        return 1;
+        pthread_mutex_lock(&mutex_interrupcion);
+        HAY_INTERRUPCION = 0;
+        pthread_mutex_unlock(&mutex_interrupcion);
+        desalojado = 1;
     }
-    return 0;
+    return desalojado;
 }
 
 int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
 {
+    int ocurrio_interrupcion = 0;
+    pthread_mutex_lock(&mutex_interrupcion);
+
     if(HAY_INTERRUPCION)
     {
-        enviar_pcb(pcb_a_chequear,fd_dispatch);
+        enviar_pcb(pcb_a_chequear,fd_dispatch); //ACA SE DEBERIA DEVOLVER CONTEXTO CON MOTIVO "INTERRUPCION"
         HAY_INTERRUPCION = 0;
-        // carga el motivo de desalojo sea cual sea
-        return 1;
+        ocurrio_interrupcion = 1;
     }
-    return 0;
+
+    pthread_mutex_unlock(&mutex_interrupcion);
+
+    return ocurrio_interrupcion;
 }
 
 /*Funcion que convierte char* a opcode del enum, en caso de error retorna -1*/

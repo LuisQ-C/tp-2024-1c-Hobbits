@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <semaphore.h>
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/logsConfigs.h"
 #include "../../utils/include/protocolo.h"

@@ -55,50 +55,6 @@ void habilitar_dispatch_interrupt(int fd_dispatch, int fd_interrupt,int fd_memor
     inicializar_hilo_interrupt(fd_interrupt);
     manejarConexionDispatch(fd_dispatch,fd_memoria);
 }
-/*
-void inicializar_hilo_interrupt(int cliente_fd_conexion_interrupt)
-{
-    //CONEXION INTERRUPT CON HILO
-    pthread_t hiloInterrupt;
-    info_fd_conexion* fd_interrupt = malloc(sizeof(info_fd_conexion));
-    fd_interrupt->fd = cliente_fd_conexion_interrupt;
-    pthread_create(&hiloInterrupt,NULL,(void*) manejarConexionInterrupt,(void*) fd_interrupt);
-    pthread_detach(hiloInterrupt);
-}*/
-/*
-void manejarConexionInterrupt(void* fd_interrupt)
-{
-    info_fd_conexion* fd_recibido = fd_interrupt;
-    int fd_kernel_interrupt = fd_recibido->fd;
-    free(fd_recibido);
-
-    recibir_operacion(fd_kernel_interrupt);
-    char* moduloConectado = recibir_mensaje(fd_kernel_interrupt,logger);
-    enviar_handshake_ok(logger,fd_kernel_interrupt,moduloConectado);
-    free(moduloConectado);
-}*/
-/*
-void manejarConexionDispatch(int cliente_fd_conexion_dispatch)
-{
-    recibir_operacion(cliente_fd_conexion_dispatch); //HAY Q MANEJARLE LOS ERRORES, HACERLO EN RECIBIR_OPERACION
-    char* moduloConectado = recibir_mensaje(cliente_fd_conexion_dispatch,logger);
-    enviar_handshake_ok(logger,cliente_fd_conexion_dispatch,moduloConectado);
-    free(moduloConectado);
-
-    if(recibir_operacion(cliente_fd_conexion_dispatch) == PCB)
-    {
-       t_pcb* pcb_recibido = recibir_pcb(cliente_fd_conexion_dispatch);
-       log_info(logger,"PC RECIBIDO: %u",pcb_recibido->pc);
-       log_debug(logger,"ESTADO RECIBIDO: %s",pcb_recibido->estado);
-       log_debug(logger,"AX: %u",pcb_recibido->registros_CPU.AX);
-       log_info(logger,"BX: %u",pcb_recibido->registros_CPU.BX);
-       log_info(logger,"CX: %u",pcb_recibido->registros_CPU.CX);
-       //realizar ciclo
-       free(pcb_recibido->estado);
-       free(pcb_recibido);
-    }
-     // QUIZAS Y SOLO QUIZAS ACA VA EL REALIZARCICLO
-}*/
 
 void manejarConexionKernel(int* cliente_fd_conexion_dispatch,int* cliente_fd_conexion_interrupt)
 {

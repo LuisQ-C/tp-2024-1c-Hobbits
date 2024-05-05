@@ -1,7 +1,10 @@
 #include "../include/interrupt.h"
 extern t_log* logger;
 extern int HAY_INTERRUPCION;
-extern int pid_actual;
+extern int PID_ACTUAL;
+extern pthread_mutex_t mutex_interrupcion;
+extern pthread_mutex_t mutex_pid;
+extern sem_t semaforo_pcb_recibido;
 
 void realizar_handshake_interrupt(int fd_interrupt)
 {
@@ -31,15 +34,27 @@ void manejarConexionInterrupt(void* fd_interrupt)
     info_fd_conexion* fd_recibido = fd_interrupt;
     int fd_kernel_interrupt = fd_recibido->fd;
     free(fd_recibido);
+
     int pid;
+    int coincide_pid = 0;
+
     while(1)
     {
-        // recibir_operacion no haria falta, estamos seguro q va a llegar solo interrupciones
-        recv(fd_kernel_interrupt,&pid,sizeof(int),MSG_WAITALL); 
-        if(pid == pid_actual)
+        recv(fd_kernel_interrupt,&pid,sizeof(int),MSG_WAITALL); /*muchos mas problemas al agregar el semaforo*/
+
+        pthread_mutex_lock(&mutex_pid);
+        coincide_pid = pid==PID_ACTUAL;
+        pthread_mutex_unlock(&mutex_pid);
+
+
+        if(coincide_pid)
         {
+            pthread_mutex_lock(&mutex_interrupcion);
             HAY_INTERRUPCION = 1;
-            //setearMotivo
-        }
+            pthread_mutex_unlock(&mutex_interrupcion);
+            log_debug(logger,"Llego la interrupcion al pid %d",pid); //SI NO ENTRA ES PORQUE SE IGNORO LA INTERRUPCION
+            coincide_pid = 0;
+        }                                                   
+        
     }
 }

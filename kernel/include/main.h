@@ -17,6 +17,7 @@
 
 void iniciar_consola(void);
 void conexion_dispatch(void* dispatch);
+void destruir_pcb_con_motivo(void* self);
 
 
 #endif

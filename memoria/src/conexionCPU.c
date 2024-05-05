@@ -43,20 +43,26 @@ void conexionCPU(void* info_fd)
     {
         codigoOperacion = recibir_operacion(fd_cpu);
 
-        if(codigoOperacion == -1)
+        if(codigoOperacion == DESCONEXION)
         {
-            log_error(logger,"Error al recibirOperacion");
+            log_error(logger,"TE DESCONECTASTE FLACO (CPU)");
+            return;
+        }
+        else if(codigoOperacion == ERROR)
+        {
+            log_warning(logger,"ERROR EN EL RECIBIR_OPERACION (CPU)");
             return;
         }
 
 		switch (codigoOperacion) {
         case INSTRUCCION:
-            char* valor_pc = recibir_mensaje(fd_cpu,logger);
-            uint32_t pc_recibido = atoi(valor_pc);
+            t_list* lista_auxiliar = recibir_paquete(fd_cpu);
+            int* pid = list_get(lista_auxiliar,0);
+            uint32_t* pc = list_get(lista_auxiliar,1);
             usleep(retardo*1000);
-            t_proceso* proceso = buscar_proceso_pid(14);
-            enviar_mensaje((proceso->instrucciones)[pc_recibido],fd_cpu,INSTRUCCION);
-            free(valor_pc);
+            t_proceso* proceso = buscar_proceso_pid(*pid);
+            enviar_mensaje((proceso->instrucciones)[*pc],fd_cpu,INSTRUCCION);
+            list_destroy_and_destroy_elements(lista_auxiliar,(void*) liberar_elemento);
             break;
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
