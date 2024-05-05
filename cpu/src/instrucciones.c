@@ -63,11 +63,15 @@ void sub_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 void jnz_8(uint8_t* reg,uint32_t instruccion_proxima){
     if(*reg != 0)
         registro.PC = instruccion_proxima;
+    else
+        registro.PC++;
 }
 
 void jnz_32(uint32_t* reg,uint32_t instruccion_proxima){
     if(*reg != 0)
         registro.PC = instruccion_proxima;
+    else
+        registro.PC++;
 }
 
 // IO_GEN_SLEPP INTERFAZ UNIDADES_TRABAJO 
