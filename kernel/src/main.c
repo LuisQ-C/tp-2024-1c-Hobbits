@@ -24,10 +24,7 @@ typedef struct
 } pcb;
 
 
-typedef struct
-{
-    int fd;
-}info_dispatch;
+
 
 
 int main(int argc, char* argv[]) {
@@ -36,7 +33,7 @@ int main(int argc, char* argv[]) {
     int fd_cpu_interrupt = 0;
     int fd_escucha_interfaces = 0;
 
-    logger = iniciar_logger("kernel.log","Kernel",1,LOG_LEVEL_INFO);
+    logger = iniciar_logger("kernel.log","Kernel",1,LOG_LEVEL_DEBUG);
     config = iniciar_config("kernel.config",logger);
 
     if(!iniciar_conexiones(config,logger,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt,&fd_escucha_interfaces))
@@ -47,17 +44,24 @@ int main(int argc, char* argv[]) {
 
     realizar_handshakes_kernel(fd_memoria,fd_cpu_dispatch,fd_cpu_interrupt);
     
+    info_fd* info_fd_consola = malloc(sizeof(info_fd));
+    info_fd_consola->fd_cpu_dispatch = fd_cpu_dispatch;
+    info_fd_consola->fd_cpu_interrupt = fd_cpu_interrupt;
+    info_fd_consola->fd_memoria = fd_memoria;
+    info_fd_consola->fd_escucha_interfaces = fd_escucha_interfaces;
 
+
+    iniciar_cosas_necesarias_planificador();
     //Llamamos la inicialización de la consola
+    //iniciar_PLP();
     pthread_t hilo_consola;
-    pthread_create(&hilo_consola, NULL, (void*) iniciar_consola, NULL);
+    pthread_create(&hilo_consola, NULL, (void*) iniciar_consola, (void *) info_fd_consola);
     pthread_detach(hilo_consola);
     //Hilo Dispatch
+    /*
     pthread_t hilo_dispatch;
-    info_dispatch* dispatch = malloc(sizeof(info_dispatch));
-    dispatch->fd = fd_cpu_dispatch;
     pthread_create(&hilo_dispatch,NULL,(void*) conexion_dispatch,(void*) dispatch);
-    pthread_detach(hilo_dispatch);
+    pthread_detach(hilo_dispatch);*/
 
     
     while(escucharConexionesIO(logger,fd_escucha_interfaces));
@@ -66,6 +70,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
+/*
 void conexion_dispatch(void* dispatch)
 {
     info_dispatch* auxiliar = dispatch;
@@ -114,7 +119,7 @@ void destruir_pcb_con_motivo(void* self)
     free(self);
 }
 
-
+*/
 
 
 

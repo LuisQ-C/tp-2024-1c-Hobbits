@@ -34,10 +34,10 @@ void conexionCPU(void* info_fd)
 
     int retardo = config_get_int_value(config,"RETARDO_RESPUESTA");
     //TODO LO QUE SIGUE SE DEBE HACER EN EL KERNEL
-    char* pathKernel = "archivos_pseudocodigo/codigoPrueba.txt";
+    /*char* pathKernel = "archivos_pseudocodigo/codigoPrueba.txt";
     char* pathConfig = config_get_string_value(config,"PATH_INSTRUCCIONES");
     string_append(&pathConfig,pathKernel); //ya esta liberado en conexion_kernel
-    agregar_proceso_lista(14,pathConfig);
+    agregar_proceso_lista(14,pathConfig);*/
     ////////////////////////
 
     int codigoOperacion;

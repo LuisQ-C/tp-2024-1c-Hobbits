@@ -13,8 +13,8 @@ typedef struct
     char** instrucciones;
 } t_proceso;
 
-char** pasarArchivoEstructura(char* path);
-void agregar_proceso_lista(int pid,char* path);
+char** pasarArchivoEstructura(FILE* f);
+void agregar_proceso_lista(int pid,FILE* f);
 void destruir_proceso_lista(t_proceso* proceso_a_destruir);
 t_proceso* buscar_proceso_pid(int pid);
 //bool _es_el_proceso(t_proceso *p);

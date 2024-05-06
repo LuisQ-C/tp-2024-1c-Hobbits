@@ -196,17 +196,8 @@ void eliminar_paquete(t_paquete* paquete)
 
 /* Liberar estado */
 
-/*
-//t_list* recibir_pcb_motivo(int fd_dispatch);
-//t_pcb* recibir_pcb(lista);
-//t_motivo* recibir_motivo(lista);
 
-t_list* recibir_pcb_motivo(int fd_dispatch)
-{
-    t_list* lista = recibir_paquete(fd_dispatch);
-    return lista;
-}*/
-
+//Prueba enviar pcb - Luis
 t_pcb* recibir_pcb(int fd_dispatch)
 {
     t_list* lista;
@@ -214,40 +205,74 @@ t_pcb* recibir_pcb(int fd_dispatch)
     t_pcb* pcb_recibido = malloc(sizeof(t_pcb));
     //pcb_recibido->registros_CPU ;= malloc(sizeof(t_registros_generales));
 
+
+
     lista = recibir_paquete(fd_dispatch);
 
-    uint32_t* pc = list_get(lista,0);
-    int* pid = list_get(lista,1);
-    char* estado = list_get(lista,2);
-    int* quantum = list_get(lista,3);
-    t_registros_generales* registros_recibidos = list_get(lista,4);
+    int* pid = list_get(lista, 0);
+    uint32_t* pc = list_get(lista, 1);
+    int* quantum = list_get(lista, 2);
+    uint32_t* estado = list_get(lista, 3);
+    t_registros_generales* registros_recibidos = list_get(lista, 4);
 
-    pcb_recibido->pc = *pc;
     pcb_recibido->pid = *pid;
-    pcb_recibido->estado = estado;
+    pcb_recibido->pc = *pc;
     pcb_recibido->quantum = *quantum;
+    pcb_recibido->estado = *estado;
     pcb_recibido->registros_CPU = *registros_recibidos;
+
+    free(pid);
     free(pc);
-    free(pid);    //free(estado);
-    free(quantum);        
+    free(quantum);
+    free(estado);
     free(registros_recibidos);
+
     list_destroy(lista);
+    
     return pcb_recibido;
 }
 
 
-void enviar_pcb(t_pcb* pcb_a_enviar,int fd_dispatch)
-{
+
+void enviar_pcb(t_pcb* pcb_a_enviar, int fd_dispatch){
     t_paquete* paquete = crear_paquete(PCB);
-    t_pcb* pcb_auxiliar = pcb_a_enviar;
-    agregar_a_paquete(paquete,&pcb_auxiliar->pc,sizeof(uint32_t));
-    agregar_a_paquete(paquete,&pcb_auxiliar->pid,sizeof(int));
-    agregar_a_paquete(paquete,pcb_auxiliar->estado,sizeof(strlen(pcb_auxiliar->estado)+1));
-    agregar_a_paquete(paquete,&pcb_auxiliar->quantum,sizeof(int));
-    agregar_a_paquete(paquete,&pcb_auxiliar->registros_CPU,sizeof(t_registros_generales));
-    enviar_paquete(paquete,fd_dispatch);
-    //free(pcb_auxiliar);
+    
+    agregar_a_paquete(paquete, &pcb_a_enviar->pid, sizeof(int));
+    agregar_a_paquete(paquete, &pcb_a_enviar->pc, sizeof(uint32_t));
+    agregar_a_paquete(paquete, &pcb_a_enviar->quantum, sizeof(int));
+    agregar_a_paquete(paquete, &pcb_a_enviar->estado, sizeof(uint32_t));
+    agregar_a_paquete(paquete, &pcb_a_enviar->registros_CPU, sizeof(t_registros_generales));
+    
+    enviar_paquete(paquete, fd_dispatch);
+    
     eliminar_paquete(paquete);
+}
+
+void enviar_nuevo_proceso(int* pid, char* nombre_archivo, int fd_memoria){
+    t_paquete* paquete = crear_paquete(INICIAR_PROCESO);
+
+    agregar_a_paquete(paquete, pid, sizeof(int));
+    printf("\nENVIAR NUEVO PROCESO PID: %d\n",*pid);
+    printf("\nENVIAR NUEVO PROCESO NOMBRE ARCHIVO: %s\n",nombre_archivo);
+    agregar_a_paquete(paquete, nombre_archivo, strlen(nombre_archivo)+1);
+    int tamanio = strlen(nombre_archivo);
+    printf("\nLONGITUD NOMBRE ARCHIVO: %d\n",tamanio);
+    enviar_paquete(paquete, fd_memoria);
+
+    eliminar_paquete(paquete);
+}
+
+void recibir_nuevo_proceso(int fd_kernel){
+    t_list* lista;
+    lista = recibir_paquete(fd_kernel);
+    int* pid = list_get(lista, 0);
+    char* nombre_archivo = list_get(lista, 1);
+
+    free(pid);
+    free(nombre_archivo);
+    
+    list_destroy(lista);
+
 }
 
 t_paquete* armar_paquete_pcb(t_pcb* pcb_a_enviar)
@@ -255,7 +280,7 @@ t_paquete* armar_paquete_pcb(t_pcb* pcb_a_enviar)
     t_paquete* paquete = crear_paquete(PCB);
     agregar_a_paquete(paquete,&pcb_a_enviar->pc,sizeof(uint32_t));
     agregar_a_paquete(paquete,&pcb_a_enviar->pid,sizeof(int));
-    agregar_a_paquete(paquete,pcb_a_enviar->estado,sizeof(strlen(pcb_a_enviar->estado)+1));
+    agregar_a_paquete(paquete,&pcb_a_enviar->estado,sizeof(uint32_t));
     agregar_a_paquete(paquete,&pcb_a_enviar->quantum,sizeof(int));
     agregar_a_paquete(paquete,&pcb_a_enviar->registros_CPU,sizeof(t_registros_generales));
     return paquete;
@@ -265,34 +290,9 @@ void liberar_elemento(void* self)
 {
     free(self);
 }
-/*
-void devolver_pcb(t_pcb* pcb_a_enviar,int fd_dispatch, uint32_t motivo_desalojo, char* instruccion)
-{
-    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
-    if(motivo==sleep)
-    {
-        agregar_a_paquete()
-        agregar_a_paquete()
-    }
-    enviar_paquete(paquete,fd_dispatch);
-    //free(pcb_a_enviar);
-    eliminar_paquete(paquete);
-    //agregar todo el pcb
-}
-
-t_pcb* recibir_pcb_kernel()
-{
-    //lista[5] = motivo
-    //lista[6] = primer parametro
-    //lista[7] = segundo parametro
-    //recibir cosas extra
-    //recibir el pcb
-    //retornar
-}*/
 
 
-
-
+   
 
 
 

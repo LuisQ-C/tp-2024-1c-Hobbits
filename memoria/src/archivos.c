@@ -4,9 +4,8 @@ extern t_list* instrucciones_procesos;
 
 
 /*Pasa todo el contenido del archivo a un char**, se debe destruirlo luego de utilizar la funcion*/
-char** pasarArchivoEstructura(char* path)
+char** pasarArchivoEstructura(FILE* f)
 {   
-    FILE* f = fopen(path,"r+");
     char** archivoInstrucciones = string_array_new();
     
     char* instruccionLeida = string_new();
@@ -38,16 +37,15 @@ char** pasarArchivoEstructura(char* path)
     }
     free(instruccionLeida);
     //free(instruccion_perfecta);
-    fclose(f);
     return archivoInstrucciones;
 }
 
 /* Añade el pid  y las intrucciones del proceso a la lista instrucciones_procesos*/
-void agregar_proceso_lista(int pid,char* path)
+void agregar_proceso_lista(int pid,FILE* f)
 {
     t_proceso* proceso_creado = malloc(sizeof(t_proceso));
     proceso_creado->pid = pid;
-    proceso_creado->instrucciones = pasarArchivoEstructura(path);
+    proceso_creado->instrucciones = pasarArchivoEstructura(f);
     list_add(instrucciones_procesos,proceso_creado);
 }
 

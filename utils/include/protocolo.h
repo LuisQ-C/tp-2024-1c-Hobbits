@@ -6,6 +6,13 @@
 #include "../include/sockets.h"
 #include "commons/string.h"
 
+typedef enum{
+    NEW = 100,
+    READY,
+    EXEC,
+    BLOCKED,
+    COLA_EXIT
+}asd;
 
 typedef enum{
     HANDSHAKE = 1,
@@ -29,7 +36,9 @@ typedef enum{
 
 enum{
     DESCONEXION = 150,
-    ERROR
+    ERROR,
+    ARCHIVO_EXISTE,
+    ARCHIVO_INVALIDO
 };
 /*
 typedef struct {
@@ -60,7 +69,7 @@ typedef struct
    int pid;
    uint32_t pc;
    int quantum;
-   char* estado;
+   uint32_t estado;
    t_registros_generales registros_CPU;
 } t_pcb;
 
@@ -96,7 +105,8 @@ void enviar_pcb(t_pcb* pcb_a_enviar,int fd_dispatch);
 t_paquete* armar_paquete_pcb(t_pcb* pcb_a_enviar);
 
 void liberar_elemento(void* self);
-
+void enviar_nuevo_proceso(int* pid, char* nombre_archivo, int fd_memoria);
+void recibir_nuevo_proceso(int fd_kernel);
 //BUFFER, SERIALIZACION
 /*
 t_buffer *buffer_create(uint32_t size);

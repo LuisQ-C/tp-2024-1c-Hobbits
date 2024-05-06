@@ -6,8 +6,12 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <pthread.h>
+#include "../../utils/include/protocolo.h"
+#include "main.h"
+#include "planificadorLP.h"
+#include "planificadorCP.h"
 
-void iniciar_consola(void);
+void iniciar_consola(void* fd_info);
 bool validar_instrucciones_leidas(char* leido);
 void instrucciones_consola(char* leido);
 char** custom_completion(const char* text, int start, int end);
@@ -20,5 +24,12 @@ void detener_planificacion(void);
 void iniciar_planificacion(void);
 void multiprogramacion(int valor);
 void proceso_estado(void);
+
+//copio el logger y config del kernel
+
+
+int asignar_pid();
+t_registros_generales iniciar_registros_vacios();
+t_pcb* crear_pcb();
 
 #endif

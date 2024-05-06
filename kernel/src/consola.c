@@ -1,7 +1,20 @@
 #include "../include/consola.h"
-#include "../include/main.h"
 
 extern t_log* logger;
+extern t_config* config;
+
+extern t_squeue *lista_procesos_new;
+extern t_squeue *lista_procesos_ready;
+extern t_squeue *lista_procesos_exec;
+extern t_squeue *lista_procesos_exit;
+
+extern sem_t grado_de_multiprogramacion;
+extern sem_t proceso_en_cola_new;
+extern sem_t proceso_en_cola_ready;
+extern sem_t pasar_a_ejecucion;
+
+extern bool planificacion_iniciada;
+
 char* opciones[] = {
     "EJECUTAR_SCRIPT",
     "INICIAR_PROCESO",
@@ -44,9 +57,23 @@ char* custom_completion_generator(const char* text, int state){
     return NULL;
 }
 
-void iniciar_consola(){
+pthread_mutex_t hilo_pid_mutex;
+int pid_contador = 0;
+
+int fd_dispatch;
+int fd_interrupt;
+int fd_mem;
+int fd_IO;
+//asdasd
+void iniciar_consola(void* fd_info){
     //t_log* logger;
     //logger = iniciar_logger("kernel.log","Kernel",1,LOG_LEVEL_INFO);
+    info_fd* auxiliar = fd_info;
+    //les asigno un valor a las variables globales
+    fd_dispatch = auxiliar->fd_cpu_dispatch;
+    fd_interrupt = auxiliar->fd_cpu_interrupt;
+    fd_mem = auxiliar->fd_memoria;
+    fd_IO = auxiliar->fd_escucha_interfaces;
 
     rl_attempted_completion_function = custom_completion;
 
@@ -80,18 +107,19 @@ void iniciar_consola(){
 bool validar_instrucciones_leidas(char* leido){
     char** instruccion_leida = string_split(leido, " ");
     bool valido;
+    //log_info(logger, "%s y %s y %s", instruccion_leida[0], instruccion_leida[1], instruccion_leida[2]);
 
-    if(strcmp(instruccion_leida[0], "EJECUTAR_SCRIPT") == 0)
+    if(strcmp(instruccion_leida[0], "EJECUTAR_SCRIPT") == 0 && instruccion_leida[1] != NULL && strcmp(instruccion_leida[1], "") != 0)
         valido = true;
-    else if (strcmp(instruccion_leida[0], "INICIAR_PROCESO") == 0)
+    else if (strcmp(instruccion_leida[0], "INICIAR_PROCESO") == 0 && instruccion_leida[1] != NULL && strcmp(instruccion_leida[1], "") != 0)
         valido = true;
-    else if (strcmp(instruccion_leida[0], "FINALIZAR_PROCESO") == 0)
+    else if (strcmp(instruccion_leida[0], "FINALIZAR_PROCESO") == 0 && instruccion_leida[1] != NULL && strcmp(instruccion_leida[1], "") != 0)
         valido = true;
     else if (strcmp(instruccion_leida[0], "DETENER_PLANIFICACION") == 0)
         valido = true;
     else if (strcmp(instruccion_leida[0], "INICIAR_PLANIFICACION") == 0)
         valido = true;
-    else if (strcmp(instruccion_leida[0], "MULTIPROGRAMACION") == 0)
+    else if (strcmp(instruccion_leida[0], "MULTIPROGRAMACION") == 0 && instruccion_leida[1] != NULL && strcmp(instruccion_leida[1], "") != 0)
         valido = true;
     else if (strcmp(instruccion_leida[0], "PROCESO_ESTADO") == 0)
         valido = true;
@@ -129,7 +157,22 @@ void ejecutar_script(char* path){
 }
 
 void iniciar_proceso(char* path){
-    printf("iniciar_proceso \n");
+    //printf("iniciar_proceso \n");
+    log_debug(logger,"PATH A MANDAR: %s",path);
+    t_pcb *nuevo_pcb = crear_pcb();
+    squeue_push(lista_procesos_new, nuevo_pcb);
+    log_info(logger, "Se crea el proceso %d en NEW", nuevo_pcb->pid);
+    
+    //Le envio las instrucciones a memoria y espero respuesta
+    enviar_nuevo_proceso(&nuevo_pcb->pid, path, fd_mem);
+    //enviar_pcb(nuevo_pcb, fd_dispatch); esto es para enviar el pcb a cpu
+    int ok;
+    recv(fd_mem, &ok,sizeof(int), MSG_WAITALL);
+    log_info(logger, "recibi esto: %d", ok);
+    
+    sem_post(&proceso_en_cola_new);
+
+    //free(nuevo_pcb);
 }
 
 void finalizar_proceso(int pid){
@@ -137,11 +180,24 @@ void finalizar_proceso(int pid){
 }
 
 void detener_planificacion(){
-    printf("detener_planificador \n");
+    //printf("detener_planificador \n");
+    planificacion_iniciada = false;
+    sem_post(&proceso_en_cola_new);
+    sem_post(&proceso_en_cola_ready);
+    sem_post(&pasar_a_ejecucion);
+
+    log_info(logger, "Se detuvo la planificacion");
+    
 }
 
 void iniciar_planificacion(){
-    printf("iniciar_planificacion \n");
+    if(!planificacion_iniciada){
+    //printf("iniciar_planificacion \n");
+    planificacion_iniciada = true;
+    iniciar_PLP();
+    iniciar_PCP();
+    log_info(logger, "Planificación iniciada");
+    }
 }
 
 void multiprogramacion(int valor){
@@ -149,5 +205,65 @@ void multiprogramacion(int valor){
 }
 
 void proceso_estado(){
-    printf("proceso_estado \n");
+    //printf("proceso_estado \n");
+    if(!squeue_is_empty(lista_procesos_new))
+        log_info(logger, "Procesos cola new: %s", listar_pids(lista_procesos_new));
+    else
+        log_info(logger, "La cola new esta vacia");
+
+
+    if(!squeue_is_empty(lista_procesos_ready))
+        log_info(logger, "Procesos cola ready: %s", listar_pids(lista_procesos_ready));
+    else 
+        log_info(logger, "La cola ready esta vacia");
+
+    if(!squeue_is_empty(lista_procesos_exec))
+        log_info(logger, "Proceso en cola exec: %s", listar_pids(lista_procesos_exec));
+    else
+        log_info(logger, "La cola exec esta vacia");
+
+    if(!squeue_is_empty(lista_procesos_exit))
+        log_info(logger, "Proceso en cola exit: %s", listar_pids(lista_procesos_exit));
+    else
+        log_info(logger, "La cola exit esta vacia");
+
+    
+}
+
+
+
+
+//////Funciones procesos
+t_pcb* crear_pcb(){
+    t_pcb* pcb_creado = malloc(sizeof(t_pcb));
+
+    pcb_creado->pid = asignar_pid();
+    pcb_creado->pc = 0;
+    pcb_creado->quantum = config_get_int_value(config, "QUANTUM");
+    pcb_creado->estado = NEW;
+    pcb_creado->registros_CPU = iniciar_registros_vacios();
+    return pcb_creado;
+}
+
+t_registros_generales iniciar_registros_vacios(){
+    t_registros_generales registro_auxiliar;
+
+    registro_auxiliar.AX = 0;
+    registro_auxiliar.BX = 0;
+    registro_auxiliar.CX = 0;
+    registro_auxiliar.DX = 0;
+    registro_auxiliar.EAX = 0;
+    registro_auxiliar.EBX = 0;
+    registro_auxiliar.ECX = 0;
+    registro_auxiliar.EDX = 0;
+
+    return registro_auxiliar;
+}
+
+int asignar_pid(){
+    int pid_a_asignar;
+    pthread_mutex_lock(&hilo_pid_mutex);
+    pid_a_asignar = pid_contador++;
+    pthread_mutex_unlock(&hilo_pid_mutex);
+    return pid_a_asignar;
 }

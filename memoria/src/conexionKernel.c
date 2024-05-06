@@ -53,22 +53,24 @@ void conexionKernel(void* info_fd)
 
 		switch (codigoOperacion) {
         case INICIAR_PROCESO:
-            /*RECIBE EL PID Y EL PATH AL PID (SUMARLO A PATH DEL CONFIG PARA HALLAR LA RUTA ABSOLUTA)
             int archivo_existe = ARCHIVO_EXISTE;
             int archivo_invalido = ARCHIVO_INVALIDO;
             t_list* lista_aux = recibir_paquete(fd_kernel);
             int* pid = list_get(lista_aux,0);
             char* path_kernel = list_get(lista_aux,1);
+            log_debug(logger,"ruta archivo: %s",path_kernel);
             char* path_archivo = string_new();
             string_append(&path_archivo,path_config);
             string_append(&path_archivo,path_kernel);
-            
+
             //ver
+            log_debug(logger,"ruta archivo: %s",path_archivo);
             FILE* archivo_pseudocodigo = fopen(path_archivo,"r");
             if(archivo_pseudocodigo != NULL)
             {
                 agregar_proceso_lista(*pid,archivo_pseudocodigo); //cambiar agregar_proceso_lista y todas las funciones que lo usan
                 send(fd_kernel,&archivo_existe,sizeof(int),0);
+                fclose(archivo_pseudocodigo);
             }
             else
             {
@@ -76,14 +78,13 @@ void conexionKernel(void* info_fd)
             }
             list_destroy_and_destroy_elements(lista_aux,(void*) liberar_elemento);
             free(path_archivo);
-            fclose(archivo_pseudocodigo); //por ahi solo es necesario si el archivo es valido, dentro del if
-            */
+             //por ahi solo es necesario si el archivo es valido, dentro del if
             break;
         case FINALIZAR_PROCESO:
             /*HARIA FALTA MANDARL CONFIRMACION O ERROR A KERNEL??*/
             char* pid_recibido = recibir_mensaje(fd_kernel,logger);
-            int pid = atoi(pid_recibido);
-            quitar_proceso_lista(pid);
+            int pid_XD = atoi(pid_recibido);
+            quitar_proceso_lista(pid_XD);
             /*MARCAR FRAMES COMO LIBRES SIN SOBREESCRIBIR*/
             break;
 		case -1:
