@@ -50,6 +50,7 @@ void realizar_handshakes_cpu(int fd_conexion_memoria,int cliente_fd_conexion_dis
     realizar_handshake_dispatch(cliente_fd_conexion_dispatch);
     realizar_handshake_interrupt(cliente_fd_conexion_interrupt);
 }
+
 void habilitar_dispatch_interrupt(int fd_dispatch, int fd_interrupt,int fd_memoria)
 {
     inicializar_hilo_interrupt(fd_interrupt);

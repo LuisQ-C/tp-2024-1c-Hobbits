@@ -27,6 +27,7 @@ void iniciar_hilo_kernel(int fd_kernel)
     pthread_detach(hiloKernel);
 }
 
+/* Funcion main del hilo KERNEL-MEMORIA */
 void conexionKernel(void* info_fd)
 {
     info_fd_kernel* fd_recibido = info_fd;

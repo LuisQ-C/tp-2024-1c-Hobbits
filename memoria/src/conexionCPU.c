@@ -26,6 +26,7 @@ void iniciar_hilo_cpu(int fd_cpu)
     pthread_detach(hiloCPU);
 }
 
+/* Funcion main del hilo CPU-MEMORIA */
 void conexionCPU(void* info_fd)
 {
     info_fd_cpu* fd_recibido = info_fd;

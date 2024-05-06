@@ -37,6 +37,7 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
     }
 }
 
+/* Resetea las variable globales a sus valores iniciales */
 void resetear_var_globales()
 {
     MOTIVO_DESALOJO = -1;
@@ -48,6 +49,7 @@ void resetear_var_globales()
     pthread_mutex_unlock(&mutex_interrupcion);
 }
 
+/* Actualiza los registros de la CPU segun el PCB recibido (tambien actualiza PID_ACTUAL)*/
 void establecer_contexto(t_pcb* pcb_recibido)
 {
     registro.PC = pcb_recibido->pc;
@@ -64,6 +66,7 @@ void establecer_contexto(t_pcb* pcb_recibido)
     pthread_mutex_unlock(&mutex_pid);
 }
 
+/* Actualiza el PCB con los datos de los registros de la CPU*/
 void actualizar_pcb(t_pcb* pcb_a_actualizar)
 {
     pcb_a_actualizar->pc = registro.PC;
@@ -95,8 +98,6 @@ void pedir_instruccion(uint32_t pc, int pid,int fd_conexion_memoria)
     enviar_paquete(paquete,fd_conexion_memoria);
     eliminar_paquete(paquete);
 }
-
-
 
 /*Recibe la instruccion de la memoria, necesita free luego de utilizarse*/
 t_instruccion recibirInstruccion(int fd_conexion_memoria)
@@ -174,6 +175,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
     
 }
 
+/* Loggea la instruccion ejecutada */
 void logear_instruccion_ejecutada(int pid,char* instruccion)
 {
     char** instruccionLogear = string_n_split(instruccion,1," ");
@@ -187,6 +189,7 @@ void logear_instruccion_ejecutada(int pid,char* instruccion)
     string_array_destroy(instruccionLogear);
 }
 
+/* Chequea si el PID_ACTUAL fue desalojado, de ser asi devuelve 1, de lo contrario 0 */
 int fue_desalojado()
 {
     int desalojado = 0;
@@ -200,6 +203,7 @@ int fue_desalojado()
     return desalojado;
 }
 
+/* Chequea si llego una interrupcion al PID_ACTUAL, de ser asi devuelve el PCB a kernel y retorna 1, de lo contrario devuelve 0*/
 int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
 {
     int ocurrio_interrupcion = 0;

@@ -5,17 +5,20 @@ extern t_log* logger;
 extern t_config* config;
 
 // INSTRUCCIONES 
-// SET REGISTRO VALOR
+// SET
+/* Setea el valor en el registro*/
 void set_8(uint8_t* reg,uint8_t valor)
 {
     *reg = valor;
 }
 
+/* Setea el valor en el registro*/
 void set_32(uint32_t* reg,uint32_t valor)
 {
     *reg = valor;
 }
 
+/* Ejecuta instruccion SET */
 void set(char** instruccion)
 {
     if(instruccion[1][0] != 'E')
@@ -29,28 +32,33 @@ void set(char** instruccion)
     }
 }
 
-// SUM REGISTRO_DESTINO REGISTRO_ORIGEN
+// SUM
+/* Suma los valores de los registros pasados, guardando el resultado en el primero */
 void sum_8_8(uint8_t* registroDestino,uint8_t* registroOrigen)
 {
     //uint8_t numero_a_sumar = *registroOrigen;
     *registroDestino += *registroOrigen;
 }
 
+/* Suma los valores de los registros pasados, guardando el resultado en el primero */
 void sum_8_32(uint8_t* registroDestino,uint32_t* registroOrigen)
 {
     *registroDestino += *registroOrigen;
 }
 
+/* Suma los valores de los registros pasados, guardando el resultado en el primero */
 void sum_32_32(uint32_t* registroDestino,uint32_t* registroOrigen)
 {
     *registroDestino += *registroOrigen;
 }
 
+/* Suma los valores de los registros pasados, guardando el resultado en el primero */
 void sum_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 {
     *registroDestino += *registroOrigen;
 }
 
+/* Ejecuta instruccion SUM */
 void sum(char** instruccion)
 {
     if(instruccion[1][0] != 'E')
@@ -83,27 +91,32 @@ void sum(char** instruccion)
 
 }
 
-// SUB REGISTRO_DESTINO REGISTRO_ORIGEN (PREGUNTAR PROBLEMAS SOBRE RESULTADOS NEGATIVOS)
+// SUB
+/* Resta los valores de los registros pasados, guardando el resultado en el primero */
 void sub_8_8(uint8_t* registroDestino,uint8_t* registroOrigen) 
 {
     *registroDestino -= *registroOrigen;
 }
 
+/* Resta los valores de los registros pasados, guardando el resultado en el primero */
 void sub_8_32(uint8_t* registroDestino,uint32_t* registroOrigen) 
 {
     *registroDestino -= *registroOrigen;
 }
 
+/* Resta los valores de los registros pasados, guardando el resultado en el primero */
 void sub_32_32(uint32_t* registroDestino,uint32_t* registroOrigen)
 {
     *registroDestino -= *registroOrigen;
 }
 
+/* Resta los valores de los registros pasados, guardando el resultado en el primero */
 void sub_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 {
     *registroDestino -= *registroOrigen;
 }
 
+/* Ejecuta instruccion SUB */
 void sub(char** instruccion)
 {
     if(instruccion[1][0] != 'E')
@@ -135,8 +148,8 @@ void sub(char** instruccion)
     }
 }
 
-// JNZ REGISTRO INSTRUCCION (aprobado?)
-
+// JNZ
+/* Compara si el registro pasado es igual a 0, de ser asi el PC salta a la instruccion pasada */
 void jnz_8(uint8_t* reg,uint32_t instruccion_proxima){
     if(*reg != 0)
         registro.PC = instruccion_proxima;
@@ -144,6 +157,7 @@ void jnz_8(uint8_t* reg,uint32_t instruccion_proxima){
         registro.PC++;
 }
 
+/* Compara si el registro pasado es igual a 0, de ser asi el PC salta a la instruccion pasada */
 void jnz_32(uint32_t* reg,uint32_t instruccion_proxima){
     if(*reg != 0)
         registro.PC = instruccion_proxima;
@@ -151,6 +165,7 @@ void jnz_32(uint32_t* reg,uint32_t instruccion_proxima){
         registro.PC++;
 }
 
+/* Ejecuta instruccion JNZ */
 void jnz(char** instruccion)
 {
     if(instruccion[1][0] != 'E')
@@ -166,7 +181,8 @@ void jnz(char** instruccion)
     }
 }
 
-/*Enviar al kernel la solicitud de que duerma a un entrada salida*/
+// IO_GEN_SLEEP
+/* Enviar al kernel la solicitud de que duerma a un entrada salida */
 void io_gen_sleep(t_pcb* pcb_a_enviar,char** instruccionDesarmada,int fd_dispatch){
 
     int motivo_desalojo = IO_GEN_SLEEP;
@@ -184,7 +200,8 @@ void io_gen_sleep(t_pcb* pcb_a_enviar,char** instruccionDesarmada,int fd_dispatc
     eliminar_paquete(paquete);
 }
 
-/*Envia al kernel la solicitud de pasar el pcb a exit (success)*/
+// EXIT
+/* Envia al kernel la solicitud de pasar el pcb a exit (success) */
 void instruccion_exit(t_pcb* pcb_a_enviar,int fd_dispatch)
 {
     int motivo_desalojado = EXIT;

@@ -56,7 +56,7 @@ void destruir_proceso_lista(t_proceso* proceso_a_destruir)
     free(proceso_a_destruir);
 }
 
-
+/* Quitar el proceso (pid) de la lista de procesos*/
 void quitar_proceso_lista(int pid)
 {
     t_proceso* proceso = buscar_proceso_pid(pid);
