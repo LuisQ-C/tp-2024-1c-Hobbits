@@ -33,10 +33,12 @@ void conexionCPU(void* info_fd)
     free(fd_recibido);
 
     int retardo = config_get_int_value(config,"RETARDO_RESPUESTA");
-    //char** instruccionesPrueba = pasarArchivoEstructura("codigoPrueba.txt");
-    agregar_proceso_lista(14,"codigoPrueba.txt");
-    //agregar_proceso_lista(7,"codigoPrueba2.txt");
-    //ESTO DEBERIA IR EN MEMORIA LO DE AGREGARLO SEGUN LO QUE RECIBA
+    //TODO LO QUE SIGUE SE DEBE HACER EN EL KERNEL
+    char* pathKernel = "archivos_pseudocodigo/codigoPrueba.txt";
+    char* pathConfig = config_get_string_value(config,"PATH_INSTRUCCIONES");
+    string_append(&pathConfig,pathKernel); //ya esta liberado en conexion_kernel
+    agregar_proceso_lista(14,pathConfig);
+    ////////////////////////
 
     int codigoOperacion;
     while(1)
@@ -59,8 +61,8 @@ void conexionCPU(void* info_fd)
             t_list* lista_auxiliar = recibir_paquete(fd_cpu);
             int* pid = list_get(lista_auxiliar,0);
             uint32_t* pc = list_get(lista_auxiliar,1);
-            usleep(retardo*1000);
             t_proceso* proceso = buscar_proceso_pid(*pid);
+            usleep(retardo*1000);
             enviar_mensaje((proceso->instrucciones)[*pc],fd_cpu,INSTRUCCION);
             list_destroy_and_destroy_elements(lista_auxiliar,(void*) liberar_elemento);
             break;

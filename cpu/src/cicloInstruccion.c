@@ -150,23 +150,14 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
         case IO_GEN_SLEEP:
         {
             MOTIVO_DESALOJO = IO_GEN_SLEEP;
-            /*t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
-            agregar_a_paquete(paquete,&MOTIVO_DESALOJO,sizeof(int));
-            agregar_a_paquete(paquete,instruccionDesarmada[1],sizeof(strlen(instruccionDesarmada[1])+1));
-            int tiempo_sleep = atoi(instruccionDesarmada[2]);
-            agregar_a_paquete(paquete,&tiempo_sleep,sizeof(int));
-            enviar_paquete(paquete,fd_dispatch);
-            eliminar_paquete(paquete);*/
+            io_gen_sleep(pcb_a_enviar,instruccionDesarmada,fd_dispatch);
+            registro.PC++;
             break;
         }
         case EXIT:
         {
             MOTIVO_DESALOJO = EXIT;
-            int motivo_desalojado = EXIT;
-            t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
-            agregar_a_paquete(paquete,&motivo_desalojado,sizeof(int));
-            enviar_paquete(paquete,fd_dispatch);
-            eliminar_paquete(paquete);
+            instruccion_exit(pcb_a_enviar,fd_dispatch);
             break;
         }
         case -1:
@@ -174,6 +165,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
         default:
             log_error(logger,"Error al decodificar instruccion");
     }
+    //hola
     logear_instruccion_ejecutada(pcb_a_enviar->pid,instruccion);
     string_array_destroy(instruccionDesarmada);
     free(instruccion);
@@ -223,86 +215,7 @@ int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
     return ocurrio_interrupcion;
 }
 
-/*Funcion que convierte char* a opcode del enum, en caso de error retorna -1*/
-int string_to_opcode(char* instruccion)
-{
-    if(string_equals_ignore_case("SET",instruccion))
-    {
-        return SET;
-    }
-    else if(string_equals_ignore_case("SUM",instruccion))
-    {
-        return SUM;
-    }
-    else if(string_equals_ignore_case("SUB",instruccion))
-    {
-        return SUB;
-    }
-    else if(string_equals_ignore_case("JNZ",instruccion))
-    {
-        return JNZ;
-    }
-    else if(string_equals_ignore_case("IO_GEN_SLEEP",instruccion))
-    {
-        return IO_GEN_SLEEP;
-    }
-    else if(string_equals_ignore_case("EXIT",instruccion))
-    {
-        return EXIT;
-    }
-    else
-    {
-        return -1;
-    }
-}
 
-/*Funcion que convierte char* a uint8_t*, en caso de error retorna NULL*/
-uint8_t* string_to_register8(char* registroConvertir)
-{
-    if(string_equals_ignore_case("AX",registroConvertir))
-    {
-        return &registro.AX;
-    }
-    else if(string_equals_ignore_case("BX",registroConvertir))
-    {
-        return &registro.BX;
-    }
-    else if(string_equals_ignore_case("CX",registroConvertir))
-    {
-        return &registro.CX;
-    }
-    else if(string_equals_ignore_case("DX",registroConvertir))
-    {
-        return &registro.DX;
-    }
-    else{
-        return NULL;
-    }
-}
-
-/*Funcion que convierte char* a uint32_t*, en caso de error retorna NULL*/
-uint32_t* string_to_register32(char* registroConvertir)
-{
-    if(string_equals_ignore_case("EAX",registroConvertir))
-    {
-        return &registro.EAX;
-    }
-    else if(string_equals_ignore_case("EBX",registroConvertir))
-    {
-        return &registro.EBX;
-    }
-    else if(string_equals_ignore_case("ECX",registroConvertir))
-    {
-        return &registro.ECX;
-    }
-    else if(string_equals_ignore_case("EDX",registroConvertir))
-    {
-        return &registro.EDX;
-    }
-    else{
-        return NULL;
-    }
-}
 
 void set(char** instruccion)
 {

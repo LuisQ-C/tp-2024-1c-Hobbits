@@ -8,6 +8,7 @@
 #include <commons/log.h>
 #include <commons/string.h>
 #include "../include/instrucciones.h"
+#include "../include/conversores.h"
 #include "../../utils/include/protocolo.h"
 #include <stdint.h>
 
@@ -26,9 +27,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
 void logear_instruccion_ejecutada(int pid,char* instruccion);
 int fue_desalojado();
 int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch);
-int string_to_opcode(char* instruccion);
-uint8_t* string_to_register8(char* registroConvertir);
-uint32_t* string_to_register32(char* registroConvertir);
+
 
 void set(char** instruccion);
 void sum(char** instruccion);

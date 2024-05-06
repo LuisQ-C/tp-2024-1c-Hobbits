@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "../../utils/include/protocolo.h"
-
+#include "../include/archivos.h"
 typedef struct
 {
     int fd;

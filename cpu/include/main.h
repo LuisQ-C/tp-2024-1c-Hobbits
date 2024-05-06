@@ -13,6 +13,7 @@
 #include "../include/instrucciones.h"
 #include "../include/dispatch.h"
 #include "../include/interrupt.h"
+#include "../include/conversores.h"
 
 
 

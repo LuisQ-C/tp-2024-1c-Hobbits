@@ -74,11 +74,34 @@ void jnz_32(uint32_t* reg,uint32_t instruccion_proxima){
         registro.PC++;
 }
 
-// IO_GEN_SLEPP INTERFAZ UNIDADES_TRABAJO 
-void io_gen_sleep(int interfaz,int tiempoEspera){
-    //interfaz + tiempo = paquete
-    //send(kernel, paquete)
-    //mandarle a kernel para que kernel le mande a la interfaz que se "duerma" n tiemposEspera
+/*Enviar al kernel la solicitud de que duerma a un entrada salida*/
+void io_gen_sleep(t_pcb* pcb_a_enviar,char** instruccionDesarmada,int fd_dispatch){
+
+    int motivo_desalojo = IO_GEN_SLEEP;
+
+    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+
+    agregar_a_paquete(paquete,&motivo_desalojo,sizeof(int));
+    agregar_a_paquete(paquete,instruccionDesarmada[1],sizeof(strlen(instruccionDesarmada[1])+1));
+
+    int tiempo_sleep = atoi(instruccionDesarmada[2]);
+
+    agregar_a_paquete(paquete,&tiempo_sleep,sizeof(int));
+
+    enviar_paquete(paquete,fd_dispatch);
+    eliminar_paquete(paquete);
+}
+
+void instruccion_exit(t_pcb* pcb_a_enviar,int fd_dispatch)
+{
+    int motivo_desalojado = EXIT;
+
+    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+
+    agregar_a_paquete(paquete,&motivo_desalojado,sizeof(int));
+
+    enviar_paquete(paquete,fd_dispatch);
+    eliminar_paquete(paquete);
 }
 
 
