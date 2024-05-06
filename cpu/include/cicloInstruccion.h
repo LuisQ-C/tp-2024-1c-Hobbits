@@ -29,9 +29,6 @@ int fue_desalojado();
 int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch);
 
 
-void set(char** instruccion);
-void sum(char** instruccion);
-void sub(char** instruccion);
-void jnz(char** instruccion);
+
 
 #endif
