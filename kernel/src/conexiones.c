@@ -60,11 +60,43 @@ void procesarConexionesIO(void* datosServerInterfaces){
     int fd_conexion_IO = auxiliarDatosServer->fd_conexion_IO;
     t_log* logger = auxiliarDatosServer->logger;
     free(auxiliarDatosServer);
-    
-    recibir_operacion(fd_conexion_IO);
-    char* interfazConectada = recibir_mensaje(fd_conexion_IO,logger);
-    enviar_handshake_ok(logger,fd_conexion_IO,interfazConectada);
-    free(interfazConectada);
+
+    int codigo_operacion;
+    while(1)
+    {
+        codigo_operacion = recibir_operacion(fd_conexion_IO);
+
+        if(codigo_operacion == DESCONEXION)
+        {
+        log_error(logger,"TE DESCONECTASTE FLACO (KERNEL-IO)");
+        return;
+        }
+        else if(codigo_operacion == ERROR)
+        {
+        log_warning(logger,"ERROR EN EL RECIBIR_OPERACION (KERNEL-IO)");
+        return;
+        }
+
+       
+
+        switch (codigo_operacion)
+        {
+        case HANDSHAKE:
+            char* interfazConectada = recibir_mensaje(fd_conexion_IO,logger);
+            enviar_handshake_ok(logger,fd_conexion_IO,interfazConectada);
+            agregar_interfaz_lista(interfazConectada,IO_GEN_SLEEP);
+            free(interfazConectada);
+            break;
+        //case 
+        case -1:
+			log_error(logger, "el cliente se desconecto. Terminando servidor");
+            return;
+        default:
+        	log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+            break;
+        }
+        
+    }
 }
 
 void terminar_programa(t_log* logger,t_config* config,int* fd_memoria,int* fd_cpu_dispatch,int* fd_cpu_interrupt)

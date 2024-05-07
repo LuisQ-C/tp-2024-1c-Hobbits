@@ -6,6 +6,7 @@ t_squeue *lista_procesos_new;
 t_squeue *lista_procesos_ready;
 t_squeue *lista_procesos_exec;
 t_squeue *lista_procesos_exit;
+t_list *lista_procesos_blocked;
 
 sem_t grado_de_multiprogramacion;
 sem_t proceso_en_cola_new;

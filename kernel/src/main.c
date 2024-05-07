@@ -24,9 +24,6 @@ typedef struct
 } pcb;
 
 
-
-
-
 int main(int argc, char* argv[]) {
     int fd_memoria = 0;
     int fd_cpu_dispatch = 0;
@@ -69,57 +66,6 @@ int main(int argc, char* argv[]) {
     terminar_programa(logger,config,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt);
     return 0;
 }
-
-/*
-void conexion_dispatch(void* dispatch)
-{
-    info_dispatch* auxiliar = dispatch;
-    int fd_dispatch = auxiliar->fd;
-    // ARMAR PCB
-    t_pcb* nuevoPCB = malloc(sizeof(t_pcb));
-    nuevoPCB->pc=0;
-    nuevoPCB->pid=14;
-    nuevoPCB->estado="new";
-    nuevoPCB->quantum=3;
-    nuevoPCB->registros_CPU.AX=5;
-    nuevoPCB->registros_CPU.BX=6;
-    nuevoPCB->registros_CPU.CX=7;
-    nuevoPCB->registros_CPU.DX=5;
-    nuevoPCB->registros_CPU.EAX=8;
-    nuevoPCB->registros_CPU.EBX=10;
-    nuevoPCB->registros_CPU.ECX=20;
-    nuevoPCB->registros_CPU.EDX=50;
-    //ENVIAR PCB
-    enviar_pcb(nuevoPCB,fd_dispatch);
-    
-    recibir_operacion(fd_dispatch);
-    t_list* lista = recibir_paquete(fd_dispatch);
-    uint32_t* pc = list_get(lista,0);
-    int* pid = list_get(lista,1);
-    char* estado = list_get(lista,2);
-    int* quantum = list_get(lista,3);
-    t_registros_generales* registros_recibidos = list_get(lista,4);
-    int* numero_recibido = list_get(lista,5);
-    if(*numero_recibido==EXIT)
-    {
-        log_info(logger,"SE RECIBIO EXIT CORRECTAMENTE!");
-    }
-    else{
-        log_info(logger,"NO SE RECIBIO EXIT CORRECTAMENTE!!!!");
-    }
-   
-    //list_destroy(lista);
-    list_destroy_and_destroy_elements(lista,(void*) destruir_pcb_con_motivo);
-
-    //log_info(logger,"ESTADO: %s",nuevoPCB->estado);
-    free(nuevoPCB);
-}
-void destruir_pcb_con_motivo(void* self)
-{
-    free(self);
-}
-
-*/
 
 
 
