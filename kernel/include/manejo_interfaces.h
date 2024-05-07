@@ -14,9 +14,14 @@ typedef struct
 {
     char* nombre;
     int tipo_interfaz;
+    int fd_interfaz;
     t_queue* cola_procesos_blocked;
 } t_list_io;
 
+/*
 
+*/
+
+void agregar_interfaz_lista(char* nombre,int tipo, int fd_interfaz);
 
 #endif

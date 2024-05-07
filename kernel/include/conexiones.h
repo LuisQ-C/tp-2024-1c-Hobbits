@@ -10,12 +10,7 @@
 #include <commons/collections/queue.h>
 #include <commons/collections/list.h>
 
-typedef struct 
-{
-    char* nombre;
-    int tipo_interfaz;
-    t_queue* cola_procesos_blocked;
-} t_list_io;
+
 
 
 //INICIAR CONEXIONES DEBE TENER UN MANEJO DE ERRORES

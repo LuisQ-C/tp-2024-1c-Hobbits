@@ -69,6 +69,7 @@ void procesarConexionesIO(void* datosServerInterfaces){
         if(codigo_operacion == DESCONEXION)
         {
         log_error(logger,"TE DESCONECTASTE FLACO (KERNEL-IO)");
+        //SACARLO DE LA LISTA A LA IO
         return;
         }
         else if(codigo_operacion == ERROR)
@@ -84,10 +85,9 @@ void procesarConexionesIO(void* datosServerInterfaces){
         case HANDSHAKE:
             char* interfazConectada = recibir_mensaje(fd_conexion_IO,logger);
             enviar_handshake_ok(logger,fd_conexion_IO,interfazConectada);
-            agregar_interfaz_lista(interfazConectada,IO_GEN_SLEEP);
+            //agregar_interfaz_lista(interfazConectada,IO_GEN_SLEEP,fd_conexion_IO); //FALTA ENVIARLE EL TIPO, DESGLOSAR LO QUE TE MANDA LA INTERFAZ
             free(interfazConectada);
             break;
-        //case 
         case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
             return;

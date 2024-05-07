@@ -158,9 +158,9 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
         case EXIT:
         {
             MOTIVO_DESALOJO = EXIT;
-            //instruccion_exit(pcb_a_enviar,fd_dispatch);
-            int ok = 1;
-            send(fd_dispatch,&ok,sizeof(int),0);
+            instruccion_exit(pcb_a_enviar,fd_dispatch);
+            //int ok = 1;
+            //send(fd_dispatch,&ok,sizeof(int),0);
             break;
         }
         case -1:

@@ -31,6 +31,7 @@ typedef enum{
     SUB,
     JNZ,
     IO_GEN_SLEEP,
+    INTERRUPCION,
     EXIT
 }cod_op;
 

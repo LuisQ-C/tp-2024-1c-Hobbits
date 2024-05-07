@@ -207,23 +207,39 @@ void multiprogramacion(int valor){
 void proceso_estado(){
     //printf("proceso_estado \n");
     if(!squeue_is_empty(lista_procesos_new))
-        log_info(logger, "Procesos cola new: %s", listar_pids(lista_procesos_new));
+    {
+        char* pids_listar = listar_pids(lista_procesos_new);
+        log_info(logger, "Procesos cola new: %s", pids_listar);
+        free(pids_listar);
+    }
     else
         log_info(logger, "La cola new esta vacia");
 
 
     if(!squeue_is_empty(lista_procesos_ready))
-        log_info(logger, "Procesos cola ready: %s", listar_pids(lista_procesos_ready));
+    {
+        char* pids_listar = listar_pids(lista_procesos_ready);
+        log_info(logger, "Procesos cola ready: %s", pids_listar);
+        free(pids_listar);
+    }
     else 
         log_info(logger, "La cola ready esta vacia");
 
     if(!squeue_is_empty(lista_procesos_exec))
-        log_info(logger, "Proceso en cola exec: %s", listar_pids(lista_procesos_exec));
+    {
+        char* pids_listar = listar_pids(lista_procesos_exec);
+        log_info(logger, "Procesos cola exec: %s", pids_listar);
+        free(pids_listar);
+    }
     else
         log_info(logger, "La cola exec esta vacia");
 
     if(!squeue_is_empty(lista_procesos_exit))
-        log_info(logger, "Proceso en cola exit: %s", listar_pids(lista_procesos_exit));
+    {
+        char* pids_listar = listar_pids(lista_procesos_exit);
+        log_info(logger, "Procesos cola exit: %s", pids_listar);
+        free(pids_listar);
+    }
     else
         log_info(logger, "La cola exit esta vacia");
 
