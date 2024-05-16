@@ -11,6 +11,10 @@ extern sem_t grado_de_multiprogramacion;
 extern sem_t proceso_en_cola_new;
 extern sem_t proceso_en_cola_ready;
 
+extern sem_t planificacion_new_iniciada;
+extern sem_t planificacion_ready_iniciada;
+extern sem_t planificacion_exec_iniciada;
+
 extern bool planificacion_iniciada;
 
 void atender_estados_new(){
@@ -19,13 +23,15 @@ void atender_estados_new(){
     while(1){
 
         sem_wait(&proceso_en_cola_new);
-        if(!planificacion_iniciada){
+        /*if(!planificacion_iniciada){
             break;
-        }
+        }*/
+        sem_wait(&planificacion_new_iniciada);
         sem_wait(&grado_de_multiprogramacion);
         t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_new);
         cambiar_a_ready(pcb_auxiliar);
         sem_post(&proceso_en_cola_ready);
+        sem_post(&planificacion_new_iniciada);
         //Una vez que pasa los estados de new a ready
         log_info(logger, "PID: %d - Estado Anterior: NEW - Estado Actual: READY", pcb_auxiliar->pid);
 

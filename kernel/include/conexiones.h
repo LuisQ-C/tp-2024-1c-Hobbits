@@ -9,6 +9,7 @@
 #include <pthread.h>
 #include <commons/collections/queue.h>
 #include <commons/collections/list.h>
+#include "../include/manejo_interfaces.h"
 
 
 

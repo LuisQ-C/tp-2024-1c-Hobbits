@@ -25,6 +25,10 @@ void iniciar_planificacion(void);
 void multiprogramacion(int valor);
 void proceso_estado(void);
 
+void detener_cola_new(void* arg);
+void detener_cola_ready(void* arg);
+void detener_cola_exec(void* arg);
+
 //copio el logger y config del kernel
 
 

@@ -13,6 +13,10 @@ extern sem_t proceso_en_cola_new;
 extern sem_t proceso_en_cola_ready;
 extern sem_t pasar_a_ejecucion;
 
+extern sem_t planificacion_new_iniciada;
+extern sem_t planificacion_ready_iniciada;
+extern sem_t planificacion_exec_iniciada;
+
 extern bool planificacion_iniciada;
 
 char* opciones[] = {
@@ -179,23 +183,53 @@ void finalizar_proceso(int pid){
     printf("finalizar_proceso \n");
 }
 
+//sem_post(&proceso_en_cola_new);
+        //sem_post(&proceso_en_cola_ready);
+        //sem_post(&pasar_a_ejecucion);
+        
 void detener_planificacion(){
     //printf("detener_planificador \n");
-    planificacion_iniciada = false;
-    sem_post(&proceso_en_cola_new);
-    sem_post(&proceso_en_cola_ready);
-    sem_post(&pasar_a_ejecucion);
-
-    log_info(logger, "Se detuvo la planificacion");
+    if(planificacion_iniciada)
+    {
+        planificacion_iniciada = false;
+        
+        pthread_t detener_new, detener_ready, detener_exec;
+        pthread_create(&detener_new,NULL,(void*) detener_cola_new,NULL);
+        pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
+        pthread_create(&detener_exec,NULL,(void*) detener_cola_exec,NULL);
+        pthread_detach(detener_new);
+        pthread_detach(detener_ready);
+        pthread_detach(detener_exec);
+        
+        
+        log_info(logger, "Se detuvo la planificacion");
+    }else
+    {
+        log_info(logger,"la plani esta pausada ya");
+    }
     
+}
+void detener_cola_new(void* arg)
+{
+    sem_wait(&planificacion_new_iniciada);
+}
+void detener_cola_ready(void* arg)
+{
+    sem_wait(&planificacion_ready_iniciada);
+}
+void detener_cola_exec(void* arg)
+{
+    sem_wait(&planificacion_exec_iniciada);
 }
 
 void iniciar_planificacion(){
     if(!planificacion_iniciada){
     //printf("iniciar_planificacion \n");
     planificacion_iniciada = true;
-    iniciar_PLP();
-    iniciar_PCP();
+    
+    sem_post(&planificacion_new_iniciada);
+    sem_post(&planificacion_ready_iniciada);
+    sem_post(&planificacion_exec_iniciada);
     log_info(logger, "Planificación iniciada");
     }
 }

@@ -85,7 +85,36 @@ void procesarConexionesIO(void* datosServerInterfaces){
         case HANDSHAKE:
             char* interfazConectada = recibir_mensaje(fd_conexion_IO,logger);
             enviar_handshake_ok(logger,fd_conexion_IO,interfazConectada);
-            //agregar_interfaz_lista(interfazConectada,IO_GEN_SLEEP,fd_conexion_IO); //FALTA ENVIARLE EL TIPO, DESGLOSAR LO QUE TE MANDA LA INTERFAZ
+            /////////////////////////////////////////////////////////////////
+            /***********
+            char** tipo_nombre_io = string_split(interfazConectada,"-");
+            int tipo;
+            if(strcmp("GENERICA",tipo_nombre_io[0]))
+            {
+                tipo = IO_GEN_SLEEP;
+            }
+            else if(strcmp("STDIN",tipo_nombre_io[0]))
+            {
+                tipo = IO_STDIN_READ;
+            }
+            else if(strcmp("STDOUT",tipo_nombre_io[0]))
+            {
+                tipo = IO_STDOUT_WRITE;
+            }
+            else if(strcmp("DIALFS",tipo_nombre_io[0]))
+            {
+                tipo = IO_FS;
+            }
+            else
+            {
+                log_warning(logger,"Tipo Invalido");
+                return;
+            }
+            *******************************/
+            /////////////////////////////////////////////////////////////////
+            agregar_interfaz_lista(interfazConectada,IO_GEN_SLEEP,fd_conexion_IO);
+            //t_list_io* buscado = buscar_interfaz("INTERFAZ CUALQUIERA");
+            //log_debug(logger,"El nombre de la interfaz es: %s",buscado->nombre_interfaz);
             free(interfazConectada);
             break;
         case -1:

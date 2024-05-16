@@ -7,13 +7,17 @@ extern t_squeue *lista_procesos_new;
 extern t_squeue *lista_procesos_ready;
 extern t_squeue *lista_procesos_exec;
 extern t_squeue *lista_procesos_exit;
-extern t_list *lista_procesos_blocked;
+extern t_slist *lista_procesos_blocked;
 
 extern sem_t grado_de_multiprogramacion;
 extern sem_t proceso_en_cola_new;
 extern sem_t proceso_en_cola_ready;
 extern sem_t ejecutar_proceso;
 extern sem_t pasar_a_ejecucion;
+
+extern sem_t planificacion_new_iniciada;
+extern sem_t planificacion_ready_iniciada;
+extern sem_t planificacion_exec_iniciada;
 
 extern bool planificacion_iniciada;
 
@@ -47,9 +51,7 @@ void planificacion_fifo(){
     {
         sem_wait(&proceso_en_cola_ready);
         sem_wait(&pasar_a_ejecucion);
-        if(!planificacion_iniciada){
-            break;
-        }
+        sem_wait(&planificacion_ready_iniciada);
         pasar_a_cola_exec();
     }
     
@@ -67,6 +69,7 @@ void pasar_a_cola_exec(){
     squeue_push(lista_procesos_exec, pcb_auxiliar);
     log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
     sem_post(&ejecutar_proceso);
+    sem_post(&planificacion_ready_iniciada);
 }
 
 
@@ -79,7 +82,9 @@ void ejecutar_procesos_exec(){
 //        log_info(logger, "%d", fd_dispatch);
         enviar_pcb(pcb_auxiliar, fd_dispatch);
 
+        
         recibir_contexto_actualizado(fd_dispatch);
+        
 
         log_info(logger, "me ejecute %d", pcb_auxiliar->pid);
         //supongamos que terminó
@@ -95,9 +100,12 @@ void recibir_contexto_actualizado(int fd_dispatch)
 {
     recibir_operacion(fd_dispatch);
     t_list* pcb_con_motivo = recibir_paquete(fd_dispatch);
+    sem_wait(&planificacion_exec_iniciada);
     t_pcb* pcb_a_actualizar = squeue_pop(lista_procesos_exec);
     actualizar_pcb_ejecutado(pcb_a_actualizar,pcb_con_motivo);
+    
     manejar_motivo_interrupcion(pcb_a_actualizar,pcb_con_motivo);
+    sem_post(&planificacion_exec_iniciada);
     list_destroy_and_destroy_elements(pcb_con_motivo,(void*) liberar_elemento);
 
 }
@@ -166,48 +174,3 @@ le manda la operacion, recibe el ok de la interfaz, saca el proceso de blocked y
 //y procede a sacar el 2do proceso de la cola
 
 */
-
-/*
-bool comprobar_validez_io(char* nombreInterfaz,int operacion_solicitada)
-{
-    if(existe_interfaz(nombreInterfaz))
-    {
-        t_list_io* interfaz_encontrada = buscar_interfaz(nombreInterfaz);
-        if(admite_tipo(operacion_solicitada,interfaz_encontrada->tipo_interfaz))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    else{
-        return false;
-    }
-
-}
-bool admite_tipo(int operacion_solicitada,int tipo_interfaz)
-{
-    return operacion_solicitada == tipo_interfaz; //PARA EL FS TIPO_INTERFAZ DEBE SER UNA LISTA
-}
-
-bool existe_interfaz(char* nombre)
-{
-    bool _es_la_interfaz(t_list_io* p)
-    {
-        bool encontrado = strcmp(p->nombre_interfaz,nombre) == 0;
-        return encontrado;
-    }
-    return list_any_satisfy(lista_procesos_blocked, (void*) _es_la_interfaz);
-}
-
-t_list_io* buscar_interfaz(char* nombre)
-{
-    bool _es_la_interfaz(t_list_io* p)
-    {
-        bool encontrado = strcmp(p->nombre_interfaz,nombre) == 0;
-        return encontrado;
-    }
-    return list_find(lista_procesos_blocked, (void*) _es_la_interfaz);
-}*/

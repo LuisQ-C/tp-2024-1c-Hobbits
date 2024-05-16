@@ -31,6 +31,9 @@ typedef enum{
     SUB,
     JNZ,
     IO_GEN_SLEEP,
+    IO_STDIN_READ,
+    IO_STDOUT_WRITE,
+    IO_FS,
     INTERRUPCION,
     EXIT
 }cod_op;
