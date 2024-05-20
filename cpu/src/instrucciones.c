@@ -190,7 +190,7 @@ void io_gen_sleep(t_pcb* pcb_a_enviar,char** instruccionDesarmada,int fd_dispatc
     t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
 
     agregar_a_paquete(paquete,&motivo_desalojo,sizeof(int));
-    agregar_a_paquete(paquete,instruccionDesarmada[1],sizeof(strlen(instruccionDesarmada[1])+1));
+    agregar_a_paquete(paquete,instruccionDesarmada[1],strlen(instruccionDesarmada[1])+1);
 
     int tiempo_sleep = atoi(instruccionDesarmada[2]);
 

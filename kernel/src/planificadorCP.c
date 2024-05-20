@@ -103,7 +103,6 @@ void recibir_contexto_actualizado(int fd_dispatch)
     sem_wait(&planificacion_exec_iniciada);
     t_pcb* pcb_a_actualizar = squeue_pop(lista_procesos_exec);
     actualizar_pcb_ejecutado(pcb_a_actualizar,pcb_con_motivo);
-    
     manejar_motivo_interrupcion(pcb_a_actualizar,pcb_con_motivo);
     sem_post(&planificacion_exec_iniciada);
     list_destroy_and_destroy_elements(pcb_con_motivo,(void*) liberar_elemento);
@@ -130,24 +129,37 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
         case EXIT:
             pcb_a_actualizar->estado = EXIT;
             squeue_push(lista_procesos_exit,pcb_a_actualizar);
+
+            log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
+            
             sem_post(&grado_de_multiprogramacion);
             break;
         case IO_GEN_SLEEP:
-            /*char* nombre_interfaz = list_get(pcb_con_motivo,6);
+            char* nombre_interfaz = list_get(pcb_con_motivo,6);
             int* tiempo_dormicion = list_get(pcb_con_motivo,7);
-            //mutex a la lista
-            bool validez = comprobar_validez_io(nombre_interfaz,IO_GEN_SLEEP);
-            //mutex
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_GEN_SLEEP);
             if(validez)
             {
-                //aniadirlo a la cola de blocked, como le paso el tiempo??
+                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz);
+                pcb_a_actualizar->estado = BLOCKED;
+                t_elemento_iogenerica* nueva_solicitud_gen = malloc(sizeof(t_elemento_iogenerica));
+                nueva_solicitud_gen->pcb= pcb_a_actualizar;
+                nueva_solicitud_gen->tiempo = *tiempo_dormicion;
+                push_elemento_cola_io(interfaz_buscada,nueva_solicitud_gen);
+
+                log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
+
+                sem_post(interfaz_buscada->hay_proceso_cola);
             }
             else
             {
                 pcb_a_actualizar->estado = EXIT;
                 squeue_push(lista_procesos_exit,pcb_a_actualizar);
+
+                log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
+
                 sem_post(&grado_de_multiprogramacion);
-            }*/
+            }
             break;
         case INTERRUPCION:
             break;

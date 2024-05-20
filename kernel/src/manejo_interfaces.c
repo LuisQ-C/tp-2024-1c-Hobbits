@@ -2,16 +2,24 @@
 
 extern t_slist *lista_procesos_blocked;
 
-void agregar_interfaz_lista(char* nombre,int tipo, int fd_interfaz)
+t_list_io* agregar_interfaz_lista(char* nombre,int tipo, int fd_interfaz)
 {
     t_list_io* nueva_interfaz = malloc(sizeof(t_list_io));
 
     nueva_interfaz->nombre_interfaz = nombre;
     nueva_interfaz->tipo_interfaz = tipo;
     nueva_interfaz->fd_interfaz = fd_interfaz;
+    nueva_interfaz->mutex_cola = malloc(sizeof(pthread_mutex_t));
+    pthread_mutex_init(nueva_interfaz->mutex_cola,NULL);
+    nueva_interfaz->hay_proceso_cola = malloc(sizeof(sem_t));
+    sem_init(nueva_interfaz->hay_proceso_cola,0,0);
     nueva_interfaz->cola_procesos_blocked = queue_create();
 
+    pthread_mutex_lock(lista_procesos_blocked->mutex);
     list_add(lista_procesos_blocked->lista,nueva_interfaz);
+    pthread_mutex_unlock(lista_procesos_blocked->mutex);
+
+    return nueva_interfaz;
 
 }
 
@@ -66,6 +74,13 @@ bool slist_comprobate_io(char* nombreInterfaz,int operacion_solicitada)
     }
 
 }
+t_list_io* slist_buscar_interfaz(char* nombre)
+{
+    pthread_mutex_lock(lista_procesos_blocked->mutex);
+    t_list_io* encontrada = buscar_interfaz(nombre);
+    pthread_mutex_unlock(lista_procesos_blocked->mutex);
+    return encontrada;
+}
 bool admite_tipo(int operacion_solicitada,int tipo_interfaz)
 {
     //HACER QUE SI ES IO GEN SLEEP el operacion_solicitad, SE COMPARE el tipo IO_GEN CON tipo_interfaz
@@ -94,13 +109,19 @@ t_list_io* buscar_interfaz(char* nombre)
 
 //ACCEDE CADA IO A SU COLA Y SACA EL PRIMER ELEMENTO PARA HACER SEND Y LUEGO DEL RECV ENVIARLO A READY
 
-void* pop_elemento_cola_io(char* nombre)
+void* pop_elemento_cola_io(t_list_io* interfaz_lista)
 {
-    pthread_mutex_lock(lista_procesos_blocked->mutex);
-    t_list_io* interfaz_buscada = buscar_interfaz(nombre);
-    void* elemento_lista = queue_pop(interfaz_buscada->cola_procesos_blocked);
-    pthread_mutex_unlock(lista_procesos_blocked->mutex);
-    return elemento_lista;
+    pthread_mutex_lock(interfaz_lista->mutex_cola);
+    void* solicitud_io = queue_pop(interfaz_lista->cola_procesos_blocked);
+    pthread_mutex_unlock(interfaz_lista->mutex_cola);
+    return solicitud_io;
+}
+
+void push_elemento_cola_io(t_list_io* interfaz_lista,void* elemento_agregar)
+{
+    pthread_mutex_lock(interfaz_lista->mutex_cola);
+    queue_push(interfaz_lista->cola_procesos_blocked,elemento_agregar);
+    pthread_mutex_unlock(interfaz_lista->mutex_cola);
 }
 
 //

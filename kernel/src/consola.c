@@ -277,6 +277,8 @@ void proceso_estado(){
     else
         log_info(logger, "La cola exit esta vacia");
 
+    //FALTA IMPRIMIR BLOCKED, TODAS SUS COLAS
+
     
 }
 

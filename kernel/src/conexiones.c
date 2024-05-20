@@ -1,6 +1,8 @@
 #include "../include/conexiones.h"
 
 extern t_log* logger;
+extern sem_t planificacion_blocked_iniciada;
+extern t_squeue *lista_procesos_ready;
 typedef struct
 {
     int fd_conexion_IO;
@@ -54,16 +56,60 @@ int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces){
     
     return 1;
 }
-
+/***************************
+          HILOS IOS
+******************************/
 void procesarConexionesIO(void* datosServerInterfaces){
     t_datos_server_interfaces* auxiliarDatosServer = (t_datos_server_interfaces*) datosServerInterfaces;
     int fd_conexion_IO = auxiliarDatosServer->fd_conexion_IO;
     t_log* logger = auxiliarDatosServer->logger;
     free(auxiliarDatosServer);
 
-    int codigo_operacion;
+    recibir_operacion(fd_conexion_IO);
+    char* interfaz_conectada = recibir_mensaje(fd_conexion_IO,logger);
+    enviar_handshake_ok(logger,fd_conexion_IO,interfaz_conectada);
+
+    //int codigo_operacion;
+
+    char** tipo_nombre_io = string_split(interfaz_conectada,"-");
+    int tipo;
+
+    if(strcmp("GENERICA",tipo_nombre_io[0]))
+    {
+        tipo = IO_GEN_SLEEP;
+        
+    }
+    else if(strcmp("STDIN",tipo_nombre_io[0]))
+    {
+        tipo = IO_STDIN_READ;
+    }
+    else if(strcmp("STDOUT",tipo_nombre_io[0]))
+    {
+        tipo = IO_STDOUT_WRITE;
+    }
+    else if(strcmp("DIALFS",tipo_nombre_io[0]))
+    {
+        tipo = IO_FS;
+    }
+    else
+    {
+        log_warning(logger,"Tipo Invalido");
+        return;
+    }
+
+    t_list_io* interfaz_agregada = agregar_interfaz_lista(tipo_nombre_io[1],tipo,fd_conexion_IO);
+
+    string_array_destroy(tipo_nombre_io);
+    free(interfaz_conectada);
+
+
+    /*******************
+    WHILE 1 PARA INTERFAZ GENERICA
+    **************/
+
     while(1)
     {
+        /*
         codigo_operacion = recibir_operacion(fd_conexion_IO);
 
         if(codigo_operacion == DESCONEXION)
@@ -76,54 +122,28 @@ void procesarConexionesIO(void* datosServerInterfaces){
         {
         log_warning(logger,"ERROR EN EL RECIBIR_OPERACION (KERNEL-IO)");
         return;
-        }
+        }*/
 
-       
+        sem_wait(interfaz_agregada->hay_proceso_cola);
 
-        switch (codigo_operacion)
+        sem_wait(&planificacion_blocked_iniciada);          //no podrian trabajar 2 colas al mismo tiempo
+        t_elemento_iogenerica* solicitud_io = pop_elemento_cola_io(interfaz_agregada);
+        
+        int respuesta;
+        send(fd_conexion_IO,&solicitud_io->tiempo,sizeof(int),0);
+        recv(fd_conexion_IO,&respuesta,sizeof(int),MSG_WAITALL);
+        if(respuesta==4)//hardcoadeado el 4
         {
-        case HANDSHAKE:
-            char* interfazConectada = recibir_mensaje(fd_conexion_IO,logger);
-            enviar_handshake_ok(logger,fd_conexion_IO,interfazConectada);
-            /////////////////////////////////////////////////////////////////
-            /***********
-            char** tipo_nombre_io = string_split(interfazConectada,"-");
-            int tipo;
-            if(strcmp("GENERICA",tipo_nombre_io[0]))
-            {
-                tipo = IO_GEN_SLEEP;
-            }
-            else if(strcmp("STDIN",tipo_nombre_io[0]))
-            {
-                tipo = IO_STDIN_READ;
-            }
-            else if(strcmp("STDOUT",tipo_nombre_io[0]))
-            {
-                tipo = IO_STDOUT_WRITE;
-            }
-            else if(strcmp("DIALFS",tipo_nombre_io[0]))
-            {
-                tipo = IO_FS;
-            }
-            else
-            {
-                log_warning(logger,"Tipo Invalido");
-                return;
-            }
-            *******************************/
-            /////////////////////////////////////////////////////////////////
-            agregar_interfaz_lista(interfazConectada,IO_GEN_SLEEP,fd_conexion_IO);
-            //t_list_io* buscado = buscar_interfaz("INTERFAZ CUALQUIERA");
-            //log_debug(logger,"El nombre de la interfaz es: %s",buscado->nombre_interfaz);
-            free(interfazConectada);
-            break;
-        case -1:
-			log_error(logger, "el cliente se desconecto. Terminando servidor");
-            return;
-        default:
-        	log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-            break;
+            printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
         }
+        //transicion a ready
+        cambiar_a_ready(solicitud_io->pcb);
+
+        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", solicitud_io->pcb->pid);
+
+        free(solicitud_io);
+
+        sem_post(&planificacion_blocked_iniciada);
         
     }
 }

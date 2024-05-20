@@ -9,7 +9,7 @@
 #include "../../utils/include/protocolo.h"
 #include "../include/iniciar_planificador.h"
 #include "consola.h"
-#include "../include/manejo_interfaces.h"
+#include "manejo_interfaces.h"
 #include <stdbool.h>
 
 void ejecutar_procesos_exec(void);

@@ -17,6 +17,7 @@ sem_t pasar_a_ejecucion;
 sem_t planificacion_new_iniciada;
 sem_t planificacion_ready_iniciada;
 sem_t planificacion_exec_iniciada;
+sem_t planificacion_blocked_iniciada;
 
 bool planificacion_iniciada = false;
 //Hola, soy un comentario
@@ -37,6 +38,7 @@ void iniciar_cosas_necesarias_planificador(){
     sem_init(&planificacion_new_iniciada, 0, 0);
     sem_init(&planificacion_ready_iniciada, 0, 0);
     sem_init(&planificacion_exec_iniciada, 0, 0);
+    sem_init(&planificacion_blocked_iniciada,0,0);
     sem_init(&grado_de_multiprogramacion, 0, multiprog);
     iniciar_PLP();
     iniciar_PCP();
