@@ -31,7 +31,7 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
     if(check_interrupt(pcb_recibido,cliente_fd_conexion_dispatch))                     //CHEQUEA SI EN EL HILO DE INTERRUPCION LE LLEGO UNA INTERRUPCION
     {
         log_debug(logger,"fue interrumpido");
-        break;
+        break;;
     }
     
     }
@@ -151,8 +151,8 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
         case IO_GEN_SLEEP:
         {
             MOTIVO_DESALOJO = IO_GEN_SLEEP;
+            pcb_a_enviar->pc = registro.PC+1;
             io_gen_sleep(pcb_a_enviar,instruccionDesarmada,fd_dispatch);
-            registro.PC++;
             break;
         }
         case EXIT:

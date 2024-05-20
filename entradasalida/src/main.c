@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
     nombreDeInterfaz = readline(">");
     printf("%s\n", nombreDeInterfaz);
     log_info(logger,"El tipo de interfaz recibida es: %s", nombreDeInterfaz);
-    iniciarInterfaz(nombreDeInterfaz, config, fd_conexion_kernel );
+    iniciarInterfaz(nombreDeInterfaz,config,fd_conexion_kernel,fd_conexion_memoria);
     free(nombreDeInterfaz);
 
     //terminar_programa(logger,config,&fd_conexion_kernel,&fd_conexion_memoria);

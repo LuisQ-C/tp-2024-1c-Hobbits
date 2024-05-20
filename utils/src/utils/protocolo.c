@@ -278,8 +278,8 @@ void recibir_nuevo_proceso(int fd_kernel){
 t_paquete* armar_paquete_pcb(t_pcb* pcb_a_enviar)
 {
     t_paquete* paquete = crear_paquete(PCB);
-    agregar_a_paquete(paquete,&pcb_a_enviar->pc,sizeof(uint32_t));
     agregar_a_paquete(paquete,&pcb_a_enviar->pid,sizeof(int));
+    agregar_a_paquete(paquete,&pcb_a_enviar->pc,sizeof(uint32_t));
     agregar_a_paquete(paquete,&pcb_a_enviar->estado,sizeof(uint32_t));
     agregar_a_paquete(paquete,&pcb_a_enviar->quantum,sizeof(int));
     agregar_a_paquete(paquete,&pcb_a_enviar->registros_CPU,sizeof(t_registros_generales));

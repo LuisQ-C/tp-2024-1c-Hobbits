@@ -16,6 +16,7 @@ extern sem_t pasar_a_ejecucion;
 extern sem_t planificacion_new_iniciada;
 extern sem_t planificacion_ready_iniciada;
 extern sem_t planificacion_exec_iniciada;
+extern sem_t planificacion_blocked_iniciada;
 
 extern bool planificacion_iniciada;
 
@@ -193,13 +194,15 @@ void detener_planificacion(){
     {
         planificacion_iniciada = false;
         
-        pthread_t detener_new, detener_ready, detener_exec;
+        pthread_t detener_new, detener_ready, detener_exec, detener_blocked;
         pthread_create(&detener_new,NULL,(void*) detener_cola_new,NULL);
         pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
         pthread_create(&detener_exec,NULL,(void*) detener_cola_exec,NULL);
+        pthread_create(&detener_blocked,NULL,(void*) detener_cola_blocked,NULL);
         pthread_detach(detener_new);
         pthread_detach(detener_ready);
         pthread_detach(detener_exec);
+        pthread_detach(detener_blocked);
         
         
         log_info(logger, "Se detuvo la planificacion");
@@ -221,6 +224,10 @@ void detener_cola_exec(void* arg)
 {
     sem_wait(&planificacion_exec_iniciada);
 }
+void detener_cola_blocked(void* arg)
+{
+    sem_wait(&planificacion_blocked_iniciada);
+}
 
 void iniciar_planificacion(){
     if(!planificacion_iniciada){
@@ -230,6 +237,7 @@ void iniciar_planificacion(){
     sem_post(&planificacion_new_iniciada);
     sem_post(&planificacion_ready_iniciada);
     sem_post(&planificacion_exec_iniciada);
+    sem_post(&planificacion_blocked_iniciada);
     log_info(logger, "Planificación iniciada");
     }
 }

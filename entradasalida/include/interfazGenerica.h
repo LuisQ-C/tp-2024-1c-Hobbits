@@ -8,6 +8,7 @@
 #include "../../utils/include/protocolo.h"
 
 
-void interfazGenerica( t_config* config, int fd_conexion_kernel);
+//void interfazGenerica(t_config* config, int fd_conexion_kernel);
+
 
 #endif

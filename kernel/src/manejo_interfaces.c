@@ -6,7 +6,8 @@ t_list_io* agregar_interfaz_lista(char* nombre,int tipo, int fd_interfaz)
 {
     t_list_io* nueva_interfaz = malloc(sizeof(t_list_io));
 
-    nueva_interfaz->nombre_interfaz = nombre;
+    nueva_interfaz->nombre_interfaz = string_new();
+    string_append(&nueva_interfaz->nombre_interfaz,nombre);
     nueva_interfaz->tipo_interfaz = tipo;
     nueva_interfaz->fd_interfaz = fd_interfaz;
     nueva_interfaz->mutex_cola = malloc(sizeof(pthread_mutex_t));
@@ -61,15 +62,18 @@ bool slist_comprobate_io(char* nombreInterfaz,int operacion_solicitada)
         pthread_mutex_unlock(lista_procesos_blocked->mutex);
         if(admiteTipo)
         {
+            printf("\ntipo admitido\n");
             return true;
         }
         else
         {
+            printf("\ntipo inadmitido\n");
             return false;
         }
     }
     else{
         pthread_mutex_unlock(lista_procesos_blocked->mutex);
+        printf("\nno existe la interfaz flaco anda programa\n");
         return false;
     }
 
@@ -84,6 +88,8 @@ t_list_io* slist_buscar_interfaz(char* nombre)
 bool admite_tipo(int operacion_solicitada,int tipo_interfaz)
 {
     //HACER QUE SI ES IO GEN SLEEP el operacion_solicitad, SE COMPARE el tipo IO_GEN CON tipo_interfaz
+    printf("OPERACION SOLICITDA: %d",operacion_solicitada);
+    printf("TIPO INTERFAZ: %d",tipo_interfaz);
     return operacion_solicitada == tipo_interfaz; //PARA EL FS TIPO_INTERFAZ DEBE SER UNA LISTA
 }
 

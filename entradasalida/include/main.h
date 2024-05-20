@@ -10,9 +10,8 @@
 #include "../../utils/include/sockets.h"
 #include "../../utils/include/protocolo.h"
 #include "../include/conexionesIO.h"
-#include "../include/interfazGenerica.h"
+#include "iniciarInterfaz.h"
 
-void iniciarInterfaz(char* nombreDeInterfaz,  t_config* config, int fd_conexion_kernel );
 //void interfazGenerica( t_config* config, int fd_conexion_kernel);
 
 #endif

@@ -110,8 +110,8 @@ void recibir_contexto_actualizado(int fd_dispatch)
 }
 void actualizar_pcb_ejecutado(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 {
-    uint32_t* pc = list_get(pcb_con_motivo,0);
-    int* pid = list_get(pcb_con_motivo,1);
+    int* pid = list_get(pcb_con_motivo,0);
+    uint32_t* pc = list_get(pcb_con_motivo,1);
     int* quantum = list_get(pcb_con_motivo,2);
     uint32_t* estado = list_get(pcb_con_motivo,3);
     t_registros_generales* registros_generales = list_get(pcb_con_motivo,4);
@@ -131,16 +131,18 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             squeue_push(lista_procesos_exit,pcb_a_actualizar);
 
             log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
-            
+
             sem_post(&grado_de_multiprogramacion);
             break;
         case IO_GEN_SLEEP:
             char* nombre_interfaz = list_get(pcb_con_motivo,6);
             int* tiempo_dormicion = list_get(pcb_con_motivo,7);
+            t_list_io* prueba = list_get(lista_procesos_blocked->lista,0);
+            printf("\nAccediendo desde otro hilo, primer elem lista %s\n",prueba->nombre_interfaz);
             bool validez = slist_comprobate_io(nombre_interfaz,IO_GEN_SLEEP);
             if(validez)
             {
-                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz);
+                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); //habria que juntarlo con validez
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_iogenerica* nueva_solicitud_gen = malloc(sizeof(t_elemento_iogenerica));
                 nueva_solicitud_gen->pcb= pcb_a_actualizar;
@@ -148,7 +150,6 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_gen);
 
                 log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
-
                 sem_post(interfaz_buscada->hay_proceso_cola);
             }
             else
@@ -157,6 +158,9 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 squeue_push(lista_procesos_exit,pcb_a_actualizar);
 
                 log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
+                int tamanio= strlen(nombre_interfaz);
+                printf("\ntamanio string: %d, contenido: %s\n",tamanio,nombre_interfaz);
+                printf("\ninterfaz invalida\n");
 
                 sem_post(&grado_de_multiprogramacion);
             }
