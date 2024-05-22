@@ -163,21 +163,30 @@ void ejecutar_script(char* path){
 
 void iniciar_proceso(char* path){
     //printf("iniciar_proceso \n");
-    log_debug(logger,"PATH A MANDAR: %s",path);
+    //log_debug(logger,"PATH A MANDAR: %s",path);
     t_pcb *nuevo_pcb = crear_pcb();
-    squeue_push(lista_procesos_new, nuevo_pcb);
-    log_info(logger, "Se crea el proceso %d en NEW", nuevo_pcb->pid);
+    
     
     //Le envio las instrucciones a memoria y espero respuesta
     enviar_nuevo_proceso(&nuevo_pcb->pid, path, fd_mem);
-    //enviar_pcb(nuevo_pcb, fd_dispatch); esto es para enviar el pcb a cpu
-    int ok;
-    recv(fd_mem, &ok,sizeof(int), MSG_WAITALL);
-    log_info(logger, "recibi esto: %d", ok);
+
+    int respuesta;
+    recv(fd_mem, &respuesta,sizeof(int), MSG_WAITALL);
+    if(respuesta==ARCHIVO_INVALIDO)
+    {
+        pthread_mutex_lock(&hilo_pid_mutex);
+        pid_contador--;
+        pthread_mutex_unlock(&hilo_pid_mutex);
+        log_warning(logger,"Archivo_Invalido");
+        free(nuevo_pcb);
+        return;
+    }
+    squeue_push(lista_procesos_new, nuevo_pcb);
+    
+    log_info(logger, "Se crea el proceso %d en NEW", nuevo_pcb->pid);
     
     sem_post(&proceso_en_cola_new);
 
-    //free(nuevo_pcb);
 }
 
 void finalizar_proceso(int pid){

@@ -59,7 +59,9 @@ int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces){
     return 1;
 }
 /***************************
+
           HILOS IOS
+
 ******************************/
 void procesarConexionesIO(void* datosServerInterfaces){
     t_datos_server_interfaces* auxiliarDatosServer = (t_datos_server_interfaces*) datosServerInterfaces;
@@ -73,94 +75,104 @@ void procesarConexionesIO(void* datosServerInterfaces){
 
     //int codigo_operacion;
 
+    
+
     char** tipo_nombre_io = string_split(interfaz_conectada,"-");
-    int tipo;
-    printf("\ntipo: %s, nombre: %s\n",tipo_nombre_io[0],tipo_nombre_io[1]);
-    printf("\nresultado comparacion: %d\n",strcmp("int1",tipo_nombre_io[1]));
-    if(!strcmp("GENERICA",tipo_nombre_io[0]))
+    int tipo = string_to_type(tipo_nombre_io[0]);
+
+    if (tipo==-1)
     {
-        tipo = IO_GEN_SLEEP;
-        
-    }
-    else if(!strcmp("STDIN",tipo_nombre_io[0]))
-    {
-        tipo = IO_STDIN_READ;
-    }
-    else if(!strcmp("STDOUT",tipo_nombre_io[0]))
-    {
-        tipo = IO_STDOUT_WRITE;
-    }
-    else if(!strcmp("DIALFS",tipo_nombre_io[0]))
-    {
-        tipo = IO_FS;
-    }
-    else
-    {
-        log_warning(logger,"Tipo Invalido");
+        log_warning(logger,"Tipo Invalido, finalizando hilo");
         return;
     }
+    
+    
 
     t_list_io* interfaz_agregada = agregar_interfaz_lista(tipo_nombre_io[1],tipo,fd_conexion_IO);
-    printf("\nINTERFAZ AGREGADA A LA LISTA\n");
-    t_list_io* encontrado = buscar_interfaz("int1");
-    int encontrada = existe_interfaz("int1");
-    printf("\nNombre interfaz buscada: %s y valor econtrada: %d\n ",encontrado->nombre_interfaz,encontrada);
+
     string_array_destroy(tipo_nombre_io);
+
     free(interfaz_conectada);
 
 
     /*******************
-    WHILE 1 PARA INTERFAZ GENERICA
+    DECIDIMOS A QUE FUNCION IR DEPENDIENDO DEL TIPO DE INTERFAZ
     **************/
-   /* if(generica)
-    generica
-    else if*/
+    switch(tipo)
+    {
+        case IO_GEN_SLEEP:
+            atender_interfaz_generica(interfaz_agregada);
+            break;
+        case IO_STDIN_READ:
+            break;
+        case IO_STDOUT_WRITE:
+            break;
+        case IO_FS:
+            break;
+    }
 
+    
+}
+
+int string_to_type(char* tipo)
+{
+    if(!strcmp("GENERICA",tipo))
+    {
+        return IO_GEN_SLEEP;
+        
+    }
+    else if(!strcmp("STDIN",tipo))
+    {
+        return IO_STDIN_READ;
+    }
+    else if(!strcmp("STDOUT",tipo))
+    {
+        return IO_STDOUT_WRITE;
+    }
+    else if(!strcmp("DIALFS",tipo))
+    {
+        return IO_FS;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+void atender_interfaz_generica(t_list_io* interfaz)
+{
     while(1)
     {
-
         /*
-        recibir_operacion
-        switch(codigoOperacion)
+        int conexion;
+        conexion = recv(fd_conexion_IO,&conexion,sizeof(int),MSG_PEEK);
+        
+        if(!conexion)
         {
-            case HANDSHAKE;
-
-            case OK:
-
-        }
-
-        */
-        //MANEJAR DESCONEXIONES
-        /*
-        codigo_operacion = recibir_operacion(fd_conexion_IO);
-
-        if(codigo_operacion == DESCONEXION)
-        {
-        log_error(logger,"TE DESCONECTASTE FLACO (KERNEL-IO)");
-        //SACARLO DE LA LISTA A LA IO
-        return;
-        }
-        else if(codigo_operacion == ERROR)
-        {
-        log_warning(logger,"ERROR EN EL RECIBIR_OPERACION (KERNEL-IO)");
-        return;
+            log_error(logger,"SE DESCONECTO LA INTERFAZ: %s", interfaz_agregada->nombre_interfaz);
+            break;
         }*/
-        //printf("\nestoy por hacer wait\n");
-        sem_wait(interfaz_agregada->hay_proceso_cola);
-        //printf("\npaso el wait\n");
+       
 
+        sem_wait(interfaz->hay_proceso_cola);
+        
         sem_wait(&planificacion_blocked_iniciada);          //no podrian trabajar 2 colas al mismo tiempo
-        t_elemento_iogenerica* solicitud_io = pop_elemento_cola_io(interfaz_agregada);
+        t_elemento_iogenerica* solicitud_io = pop_elemento_cola_io(interfaz);
         
         int respuesta;
-        send(fd_conexion_IO,&solicitud_io->tiempo,sizeof(int),0); //mandarle el pid y el tiempo a la interfaz
-        recv(fd_conexion_IO,&respuesta,sizeof(int),MSG_WAITALL);
-        if(respuesta==4)//hardcoadeado el 4
+        int tiempo_dormicion = solicitud_io->tiempo;
+
+        send(interfaz->fd_interfaz,&tiempo_dormicion,sizeof(int),0); //mandarle el pid y el tiempo a la interfaz
+
+        recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
+
+        if(respuesta==INTERFAZ_LISTA)
         {
             printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
         }
-        //transicion a ready
+        
         cambiar_a_ready(solicitud_io->pcb);
+
         sem_post(&proceso_en_cola_ready);
 
         log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", solicitud_io->pcb->pid);
@@ -170,7 +182,10 @@ void procesarConexionesIO(void* datosServerInterfaces){
         sem_post(&planificacion_blocked_iniciada);
         
     }
+    //DESTRUIRSE A SI MISMO, SACARSE DE LA LISTA
 }
+
+
 
 void terminar_programa(t_log* logger,t_config* config,int* fd_memoria,int* fd_cpu_dispatch,int* fd_cpu_interrupt)
 {

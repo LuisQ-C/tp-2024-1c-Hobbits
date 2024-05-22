@@ -137,8 +137,8 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
         case IO_GEN_SLEEP:
             char* nombre_interfaz = list_get(pcb_con_motivo,6);
             int* tiempo_dormicion = list_get(pcb_con_motivo,7);
-            t_list_io* prueba = list_get(lista_procesos_blocked->lista,0);
-            printf("\nAccediendo desde otro hilo, primer elem lista %s\n",prueba->nombre_interfaz);
+            //t_list_io* prueba = list_get(lista_procesos_blocked->lista,0);
+            //printf("\nAccediendo desde otro hilo, primer elem lista %s\n",prueba->nombre_interfaz);
             bool validez = slist_comprobate_io(nombre_interfaz,IO_GEN_SLEEP);
             if(validez)
             {

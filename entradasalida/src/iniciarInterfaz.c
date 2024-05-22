@@ -34,9 +34,9 @@ void interfazGenerica(t_config* config, int fd_conexion_kernel)//pasa el config 
     while(1)
     {
         recv(fd_conexion_kernel,&cantidad_unidad_trabajo,sizeof(int),MSG_WAITALL);
-        int resultado = cantidad_unidad_trabajo * tiempoDeUnidadDeTrabajo; //cantidad viene de kernel
+        int resultado = cantidad_unidad_trabajo * tiempoDeUnidadDeTrabajo; 
         usleep(resultado);
-        int finalizado = 4; // aca deberia ir el valor del ENUM INTERFAZLISTA
+        int finalizado = INTERFAZ_LISTA; 
         log_info(logger,"Finalizo el tiempo en espera de la interfaz generica");
         send(fd_conexion_kernel,&finalizado,sizeof(int),0);
     }

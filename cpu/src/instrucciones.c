@@ -19,16 +19,30 @@ void set_32(uint32_t* reg,uint32_t valor)
 }
 
 /* Ejecuta instruccion SET */
-void set(char** instruccion)
+int set(char** instruccion)
 {
-    if(instruccion[1][0] != 'E')
+    if(strcmp(instruccion[1],"PC")==0)
+    {
+        uint32_t* registroRecibido = string_to_register32(instruccion[1]);
+        set_32(registroRecibido,atoi(instruccion[2]));
+        return PC_MODIFICADO;
+    }
+    else if(strcmp(instruccion[1],"DI")==0 || strcmp(instruccion[1],"SI")==0)
+    {
+        uint32_t* registroRecibido = string_to_register32(instruccion[1]);
+        set_32(registroRecibido,atoi(instruccion[2]));
+        return PC_SIN_MODIFICAR;
+    }
+    else if(instruccion[1][0] != 'E')
     {
         uint8_t* registroRecibido = string_to_register8(instruccion[1]);
         set_8(registroRecibido,atoi(instruccion[2]));
+        return PC_SIN_MODIFICAR;
     }
-    else{
+    else {
         uint32_t* registroRecibido = string_to_register32(instruccion[1]);
         set_32(registroRecibido,atoi(instruccion[2]));
+        return PC_SIN_MODIFICAR;
     }
 }
 

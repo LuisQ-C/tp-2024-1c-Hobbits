@@ -23,7 +23,35 @@ t_list_io* agregar_interfaz_lista(char* nombre,int tipo, int fd_interfaz)
     return nueva_interfaz;
 
 }
+/**************
+QUITAR INTERFAZ DE LA LISTA
 
+>LO REMOVEMOS DE LA LISTA CON list_remove_element()
+>LIBERAMOS LOS RECURSOS DE ESE ELEMENTO CON liberar_recursos_interfaz()
+
+********************/
+void quitar_interfaz_lista(t_list_io* interfaz)
+{
+    pthread_mutex_lock(lista_procesos_blocked->mutex);
+    list_remove_element(lista_procesos_blocked->lista,interfaz);
+    pthread_mutex_unlock(lista_procesos_blocked->mutex);
+    liberar_recursos_interfaz(interfaz);
+}
+void liberar_recursos_interfaz(t_list_io* interfaz)
+{
+    free(interfaz->nombre_interfaz);
+    pthread_mutex_destroy(interfaz->mutex_cola);
+    free(interfaz->mutex_cola);
+    sem_destroy(interfaz->hay_proceso_cola);
+    free(interfaz->hay_proceso_cola);
+}
+
+
+/**********************
+ 
+ CREAR SLIST (LISTA CON MUTEX)
+
+**********************/
 t_slist* slist_create(){
 
     t_slist* slist = malloc(sizeof(t_slist));
@@ -45,6 +73,11 @@ t_slist* slist_create(){
     return slist;
 }
 
+/**********************
+ 
+ DESTRUIR SLIST (LISTA CON MUTEX)
+
+**********************/
 void slist_destroy(t_slist* slist){
     pthread_mutex_destroy(slist->mutex);
     free(slist->mutex);

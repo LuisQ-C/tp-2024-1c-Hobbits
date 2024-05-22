@@ -3,6 +3,7 @@
 t_log* logger;
 t_config* config;
 t_list* instrucciones_procesos;
+pthread_mutex_t mutex_lista_procesos;
 
 int main(int argc, char* argv[]) {
     /*FILE* archivoPseudocodigo = fopen("codigoPrueba.txt","r+");
@@ -20,6 +21,7 @@ int main(int argc, char* argv[]) {
     logger = iniciar_logger("memoria.log", "MODULO MEMORIA", 1, LOG_LEVEL_DEBUG);
     config = iniciar_config("memoria.config",logger);
     instrucciones_procesos = list_create();
+    pthread_mutex_init(&mutex_lista_procesos,NULL);
     //
     
     //

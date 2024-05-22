@@ -39,6 +39,8 @@ typedef struct
 
 
 t_list_io* agregar_interfaz_lista(char* nombre,int tipo, int fd_interfaz);
+void quitar_interfaz_lista(t_list_io* interfaz);
+void liberar_recursos_interfaz(t_list_io* interfaz);
 t_slist* slist_create();
 void slist_destroy(t_slist* slist);
 

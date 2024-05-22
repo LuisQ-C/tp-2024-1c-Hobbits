@@ -1,6 +1,7 @@
 #include "../include/archivos.h"
 
 extern t_list* instrucciones_procesos;
+extern pthread_mutex_t mutex_lista_procesos;
 
 
 /*Pasa todo el contenido del archivo a un char**, se debe destruirlo luego de utilizar la funcion*/
@@ -46,7 +47,9 @@ void agregar_proceso_lista(int pid,FILE* f)
     t_proceso* proceso_creado = malloc(sizeof(t_proceso));
     proceso_creado->pid = pid;
     proceso_creado->instrucciones = pasarArchivoEstructura(f);
+    pthread_mutex_lock(&mutex_lista_procesos);
     list_add(instrucciones_procesos,proceso_creado);
+    pthread_mutex_unlock(&mutex_lista_procesos);
 }
 
 /* Libera las estructuras asociadas al proceso */
@@ -59,9 +62,19 @@ void destruir_proceso_lista(t_proceso* proceso_a_destruir)
 /* Quitar el proceso (pid) de la lista de procesos*/
 void quitar_proceso_lista(int pid)
 {
+    pthread_mutex_lock(&mutex_lista_procesos);
     t_proceso* proceso = buscar_proceso_pid(pid);
     list_remove_element(instrucciones_procesos,proceso); //devuelve 0 si no encuentra el elemento
+    pthread_mutex_unlock(&mutex_lista_procesos);
     destruir_proceso_lista(proceso);
+}
+
+t_proceso* s_buscar_proceso_pid(int pid)
+{
+    pthread_mutex_lock(&mutex_lista_procesos);
+    t_proceso* proceso_devolver = buscar_proceso_pid(pid);
+    pthread_mutex_unlock(&mutex_lista_procesos);
+    return proceso_devolver;
 }
 
 t_proceso* buscar_proceso_pid(int pid)

@@ -42,7 +42,8 @@ enum{
     DESCONEXION = 150,
     ERROR,
     ARCHIVO_EXISTE,
-    ARCHIVO_INVALIDO
+    ARCHIVO_INVALIDO,
+    INTERFAZ_LISTA
 };
 /*
 typedef struct {

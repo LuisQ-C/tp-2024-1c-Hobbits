@@ -126,8 +126,12 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
     {
         case SET:
         {
-            set(instruccionDesarmada);
-            registro.PC = registro.PC + 1;
+            int resultado = set(instruccionDesarmada);
+            if(resultado == PC_SIN_MODIFICAR)
+            {
+                registro.PC = registro.PC + 1;
+            }
+            
             break;
         }
         case SUM:
@@ -159,8 +163,6 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
         {
             MOTIVO_DESALOJO = EXIT;
             instruccion_exit(pcb_a_enviar,fd_dispatch);
-            //int ok = 1;
-            //send(fd_dispatch,&ok,sizeof(int),0);
             break;
         }
         case -1:
@@ -168,7 +170,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
         default:
             log_error(logger,"Error al decodificar instruccion");
     }
-    //hola
+    
     logear_instruccion_ejecutada(pcb_a_enviar->pid,instruccion);
     string_array_destroy(instruccionDesarmada);
     free(instruccion);

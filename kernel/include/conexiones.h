@@ -20,6 +20,8 @@ int iniciar_conexiones(t_config* config,t_log* logger,int* fd_memoria,int* fd_cp
 void realizar_handshakes_kernel(int fd_memoria,int fd_cpu_dispatch, int fd_cpu_interrupt);
 int escucharConexionesIO(t_log* logger,int fd_escucha_interfaces);
 void procesarConexionesIO(void* datosServerInterfaces);
+int string_to_type(char* tipo);
+void atender_interfaz_generica(t_list_io* interfaz);
 void terminar_programa(t_log* logger,t_config* config,int* fd_memoria,int* fd_cpu_dispatch,int* fd_cpu_interrupt);
 //void escucharConexionesIO(void* datosServerInterfaces);
 

@@ -62,7 +62,7 @@ void conexionCPU(void* info_fd)
             t_list* lista_auxiliar = recibir_paquete(fd_cpu);
             int* pid = list_get(lista_auxiliar,0);
             uint32_t* pc = list_get(lista_auxiliar,1);
-            t_proceso* proceso = buscar_proceso_pid(*pid);
+            t_proceso* proceso = s_buscar_proceso_pid(*pid);
             usleep(retardo*1000);
             enviar_mensaje((proceso->instrucciones)[*pc],fd_cpu,INSTRUCCION);
             list_destroy_and_destroy_elements(lista_auxiliar,(void*) liberar_elemento);

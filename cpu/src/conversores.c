@@ -76,6 +76,18 @@ uint32_t* string_to_register32(char* registroConvertir)
     {
         return &registro.EDX;
     }
+    else if(string_equals_ignore_case("PC",registroConvertir))
+    {
+        return &registro.PC;
+    }
+    else if(string_equals_ignore_case("DI",registroConvertir))
+    {
+        return &registro.DI;
+    }
+    else if(string_equals_ignore_case("SI",registroConvertir))
+    {
+        return &registro.SI;
+    }
     else{
         return NULL;
     }
