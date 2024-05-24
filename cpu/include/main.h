@@ -14,6 +14,8 @@
 #include "../include/dispatch.h"
 #include "../include/interrupt.h"
 #include "../include/conversores.h"
+#include "mmu.h"
+#include "tlb.h"
 
 
 

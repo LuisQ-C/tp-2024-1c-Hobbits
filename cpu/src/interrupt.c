@@ -1,4 +1,5 @@
 #include "../include/interrupt.h"
+
 extern t_log* logger;
 extern int HAY_INTERRUPCION;
 extern int PID_ACTUAL;

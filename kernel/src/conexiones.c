@@ -143,17 +143,6 @@ void atender_interfaz_generica(t_list_io* interfaz)
 {
     while(1)
     {
-        /*
-        int conexion;
-        conexion = recv(fd_conexion_IO,&conexion,sizeof(int),MSG_PEEK);
-        
-        if(!conexion)
-        {
-            log_error(logger,"SE DESCONECTO LA INTERFAZ: %s", interfaz_agregada->nombre_interfaz);
-            break;
-        }*/
-       
-
         sem_wait(interfaz->hay_proceso_cola);
         
         sem_wait(&planificacion_blocked_iniciada);          //no podrian trabajar 2 colas al mismo tiempo
@@ -164,7 +153,11 @@ void atender_interfaz_generica(t_list_io* interfaz)
 
         send(interfaz->fd_interfaz,&tiempo_dormicion,sizeof(int),0); //mandarle el pid y el tiempo a la interfaz
 
+        // MANEJAR DESCONEXION ACA tmb
+
         recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
+
+        // MANEJAR DESCONEXION ACA 
 
         if(respuesta==INTERFAZ_LISTA)
         {
