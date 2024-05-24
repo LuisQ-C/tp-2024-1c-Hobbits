@@ -145,25 +145,31 @@ void atender_interfaz_generica(t_list_io* interfaz)
     {
         sem_wait(interfaz->hay_proceso_cola);
         
-        sem_wait(&planificacion_blocked_iniciada);          //no podrian trabajar 2 colas al mismo tiempo
-        t_elemento_iogenerica* solicitud_io = pop_elemento_cola_io(interfaz);
-        
+        t_elemento_iogenerica* solicitud_io = peek_elemento_cola_io(interfaz);
+        int a = 10;
         int respuesta;
         int tiempo_dormicion = solicitud_io->tiempo;
 
-        send(interfaz->fd_interfaz,&tiempo_dormicion,sizeof(int),0); //mandarle el pid y el tiempo a la interfaz
+        enviar_solicitud_io_generico(solicitud_io->pcb->pid,tiempo_dormicion,interfaz->fd_interfaz);
+        //int err = send(interfaz->fd_interfaz,&tiempo_dormicion,sizeof(int),SIGPIPE); //mandarle el pid y el tiempo a la interfaz
 
         // MANEJAR DESCONEXION ACA tmb
 
-        recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
+        int err = recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
+        if(err == 0)
+        {
+            printf("\nLA %s SE DESCONECTO \n",interfaz->nombre_interfaz);
+        }
 
-        // MANEJAR DESCONEXION ACA 
-
-        if(respuesta==INTERFAZ_LISTA)
+        if(respuesta==INTERFAZ_LISTA) 
         {
             printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
         }
         
+        sem_wait(&planificacion_blocked_iniciada);
+
+        pop_elemento_cola_io(interfaz);
+
         cambiar_a_ready(solicitud_io->pcb);
 
         sem_post(&proceso_en_cola_ready);

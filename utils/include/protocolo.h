@@ -109,10 +109,16 @@ void eliminar_paquete(t_paquete* paquete);
 t_pcb* recibir_pcb(int fd_dispatch);
 void enviar_pcb(t_pcb* pcb_a_enviar,int fd_dispatch);
 t_paquete* armar_paquete_pcb(t_pcb* pcb_a_enviar);
-
 void liberar_elemento(void* self);
 void enviar_nuevo_proceso(int* pid, char* nombre_archivo, int fd_memoria);
 void recibir_nuevo_proceso(int fd_kernel);
+
+// FUNCIONES PARA MANEJO DE INTERFACES
+
+void enviar_solicitud_io_generico(int pid, int tiempo, int fd_interfaz);
+void recibir_solicitud_io_generico(int* pid,int* tiempo, int fd_kernel);
+
+
 //BUFFER, SERIALIZACION
 /*
 t_buffer *buffer_create(uint32_t size);

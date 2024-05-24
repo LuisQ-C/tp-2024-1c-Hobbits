@@ -248,6 +248,28 @@ void enviar_pcb(t_pcb* pcb_a_enviar, int fd_dispatch){
     eliminar_paquete(paquete);
 }
 
+void enviar_solicitud_io_generico(int pid, int tiempo, int fd_interfaz)
+{
+    t_paquete* paquete = crear_paquete(IO_GEN_SLEEP);
+    
+    agregar_a_paquete(paquete, &pid, sizeof(int));
+    agregar_a_paquete(paquete, &tiempo, sizeof(int));
+    
+    enviar_paquete(paquete, fd_interfaz); // EL SEND NECESITA EL SIGPIPE PQ VA A TIRAR ERROR
+    
+    eliminar_paquete(paquete);
+}
+
+void recibir_solicitud_io_generico(int* pid,int* tiempo, int fd_kernel)
+{
+    t_list* lista = recibir_paquete(fd_kernel);
+    int* pid_recibido = list_get(lista, 0);
+    int* tiempo_recibido = list_get(lista, 1);
+    *pid = *pid_recibido;
+    *tiempo = *tiempo_recibido;
+    list_destroy_and_destroy_elements(lista,(void*) liberar_elemento);
+}
+
 void enviar_nuevo_proceso(int* pid, char* nombre_archivo, int fd_memoria){
     t_paquete* paquete = crear_paquete(INICIAR_PROCESO);
 

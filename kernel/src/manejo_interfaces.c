@@ -156,6 +156,14 @@ void* pop_elemento_cola_io(t_list_io* interfaz_lista)
     return solicitud_io;
 }
 
+void* peek_elemento_cola_io(t_list_io* interfaz_lista)
+{
+    pthread_mutex_lock(interfaz_lista->mutex_cola);
+    void* solicitud_io = queue_peek(interfaz_lista->cola_procesos_blocked);
+    pthread_mutex_unlock(interfaz_lista->mutex_cola);
+    return solicitud_io;
+}
+
 void push_elemento_cola_io(t_list_io* interfaz_lista,void* elemento_agregar)
 {
     pthread_mutex_lock(interfaz_lista->mutex_cola);

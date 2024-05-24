@@ -50,6 +50,7 @@ bool admite_tipo(int operacion_solicitada,int tipo_interfaz);
 bool existe_interfaz(char* nombre);
 t_list_io* buscar_interfaz(char* nombre);
 void* pop_elemento_cola_io(t_list_io* interfaz_lista);
+void* peek_elemento_cola_io(t_list_io* interfaz_lista);
 void push_elemento_cola_io(t_list_io* interfaz_lista,void* elemento_agregar);
 
 #endif

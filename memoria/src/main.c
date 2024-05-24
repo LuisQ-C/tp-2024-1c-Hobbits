@@ -5,7 +5,7 @@ t_config* config;
 t_list* instrucciones_procesos;
 pthread_mutex_t mutex_lista_procesos;
 
-/*
+
 int main(int argc, char* argv[]) {
     
     //ESTO ANDA NO BORRARLO
@@ -42,8 +42,8 @@ int main(int argc, char* argv[]) {
     terminar_programa(&fd_cpu,&fd_kernel);
     return 0; //puede ir exit_sucess
 }
-*/
 
+/*
 int main(int argc, char* argv[]) {
     
     //ESTO ANDA NO BORRARLO
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
     /////////////////////////////////////////////////////////////////
     return 0; //puede ir exit_sucess
-}
+}*/
 
 
 
