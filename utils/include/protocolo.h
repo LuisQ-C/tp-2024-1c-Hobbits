@@ -43,7 +43,8 @@ enum{
     ERROR,
     ARCHIVO_EXISTE,
     ARCHIVO_INVALIDO,
-    INTERFAZ_LISTA
+    INTERFAZ_LISTA,
+    MARCO_INVALIDO
 };
 /*
 typedef struct {

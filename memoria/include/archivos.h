@@ -12,6 +12,7 @@ typedef struct
 {
     int pid;
     char** instrucciones;
+    // agregar tabla pag
 } t_proceso;
 
 char** pasarArchivoEstructura(FILE* f);

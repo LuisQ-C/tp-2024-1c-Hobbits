@@ -10,6 +10,8 @@
 #include "../../utils/include/protocolo.h"
 #include "../include/conexionesMemoria.h"
 #include "../include/archivos.h"
+#include "user_space.h"
+#include "tabla_paginas.h"
 #include <commons/collections/list.h>
 //#include"../include/conexionCPU.h"
 //#include"../include/conexionKernel.h"
