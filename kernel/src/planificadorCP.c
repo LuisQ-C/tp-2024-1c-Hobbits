@@ -22,30 +22,35 @@ extern sem_t planificacion_exec_iniciada;
 extern bool planificacion_iniciada;
 
 extern int fd_dispatch;
+extern int fd_interrupt;
 
+int quantum;
 
 void iniciar_PCP(){
     char* algoritmo = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
 
-    pthread_t hilo_CP;
 
-    if(strcmp(algoritmo, "FIFO")==0)
+    pthread_t hilo_CP;
+    if(strcmp(algoritmo, "FIFO")==0){
         pthread_create(&hilo_CP, NULL, (void*) planificacion_fifo, NULL);
-    if(strcmp(algoritmo, "RR")==0)
+
+        pthread_t hilo_ejecucion;
+        pthread_create(&hilo_ejecucion, NULL, (void *) ejecutar_procesos_exec, NULL);
+        pthread_detach(hilo_ejecucion);
+    }
+    if(strcmp(algoritmo, "RR")==0){
+        quantum = config_get_int_value(config, "QUANTUM");
         pthread_create(&hilo_CP, NULL, (void*) planificacion_rr, NULL);
+    }
     
     pthread_detach(hilo_CP);
 
-    pthread_t hilo_ejecucion;
-    pthread_create(&hilo_ejecucion, NULL, (void *) ejecutar_procesos_exec, NULL);
-    pthread_detach(hilo_ejecucion);
+    //log_debug(logger, "Planificacion %s iniciada", algoritmo); // ---- POR ALGUNA RAZON NO LO IMPRE ---> NO IMPORTA
 
     //CREAR OTRO HILO PARA MANDAR PROCESOS A BLOCKED
 
-    log_info(logger, "Planificacion %s iniciada", algoritmo);
-
 }
-
+/*
 void planificacion_fifo(){
     while (1)
     {
@@ -58,7 +63,49 @@ void planificacion_fifo(){
 }
 
 void planificacion_rr(){
+    while (1)
+    {
+        sem_wait(&proceso_en_cola_ready);
+        sem_wait(&pasar_a_ejecucion);
+        sem_wait(&planificacion_ready_iniciada);
+        //pthread_t hilo_int_quantum;
+        //pthread_create(&hilo_int_quantum, NULL, (void*)interrupcion_quantum, NULL);
+        //pthread_detach(hilo_int_quantum);
+        // POR AHORA NO LA USES! pasar_a_cola_exec();
+        t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_ready);
+        pcb_auxiliar->estado = EXEC;
+        squeue_push(lista_procesos_exec, pcb_auxiliar);
+        log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
+        
+        //t_pcb* pcb_auxiliar1 = squeue_peek(lista_procesos_exec);
+//        log_info(logger, "%d", fd_dispatch);
+        enviar_pcb(pcb_auxiliar, fd_dispatch);
+        //interrupcion_quantum();
+        //usleep(quantum * 1000);
 
+        //int pid_a_enviar = 0;
+        //pid_a_enviar = pcb_auxiliar->pid;
+        interrupcion_quantum(pcb_auxiliar);
+        //send(fd_interrupt, &pid_a_enviar, sizeof(int),0);
+
+        //log_debug(logger, "deberias haber ido a fin de q");
+        //recibir_contexto_actualizado(fd_dispatch);
+        recibir_contexto_actualizado(fd_dispatch);
+        //log_warning(logger, "pude actualizarme");
+        //recibir_operacion(fd_dispatch);
+        //t_list* pcb_con_motivo = recibir_paquete(fd_dispatch);
+        sem_post(&pasar_a_ejecucion);
+        sem_post(&planificacion_ready_iniciada);
+
+    }
+    
+}
+
+void interrupcion_quantum(t_pcb* pcb_auxiliar){
+    usleep(quantum * 1000);
+    int pid_a_enviar = 0;
+    pid_a_enviar = pcb_auxiliar->pid;
+    send(fd_interrupt, &pid_a_enviar, sizeof(int), 0);
 }
 
 
@@ -81,17 +128,17 @@ void ejecutar_procesos_exec(){
         t_pcb* pcb_auxiliar = squeue_peek(lista_procesos_exec);
 //        log_info(logger, "%d", fd_dispatch);
         enviar_pcb(pcb_auxiliar, fd_dispatch);
-
-        
+    
         recibir_contexto_actualizado(fd_dispatch);
-        
-
-        log_info(logger, "me ejecute %d", pcb_auxiliar->pid);
+    
+        //log_info(logger, "me ejecute %d", pcb_auxiliar->pid);
         //supongamos que terminó
         sem_post(&pasar_a_ejecucion);
         //sem_post(&grado_de_multiprogramacion); LO MANDAMOS AL CASE EXIT, PORQUE ES EN EL UNICO CASO DONDE AUMENTA EL GRADO MULTRIPROGR.
     }
 }
+
+*/
 
 //HILO ENCARGADO DE MANEJAR LOS PROCESOS DE BLOCKED, CON QUE CRITERIO? NI IDEA
 //SEMAFORO QUE TIENE CADA IO TE PUEDE AVISAR CUANDO LE PODES MANDAR UNA SOLICITUD DE VUELTA
@@ -129,9 +176,9 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
         case EXIT:
             pcb_a_actualizar->estado = EXIT;
             squeue_push(lista_procesos_exit,pcb_a_actualizar);
-
+            log_debug(logger, "PID: %d Fue desalojado por EXIT", pcb_a_actualizar->pid);
             log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
-
+            
             sem_post(&grado_de_multiprogramacion);
             break;
         case IO_GEN_SLEEP:
@@ -166,6 +213,14 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             }
             break;
         case INTERRUPCION:
+            log_warning(logger, "PID: %d Fue desalojado por fin de Q", pcb_a_actualizar->pid);
+            pcb_a_actualizar->estado = READY;
+            squeue_push(lista_procesos_ready, pcb_a_actualizar);
+            log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: READY", pcb_a_actualizar->pid);
+            mostrar_cola_ready();
+            sem_post(&proceso_en_cola_ready);
+
+
             break;
         default:
             log_warning(logger,"MOTIVO DE DESALOJO DESCONOCIDO");

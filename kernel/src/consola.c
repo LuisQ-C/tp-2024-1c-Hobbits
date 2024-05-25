@@ -165,25 +165,23 @@ void iniciar_proceso(char* path){
     //printf("iniciar_proceso \n");
     //log_debug(logger,"PATH A MANDAR: %s",path);
     t_pcb *nuevo_pcb = crear_pcb();
-    
+    enviar_nuevo_proceso(&nuevo_pcb->pid, path, fd_mem);
     
     //Le envio las instrucciones a memoria y espero respuesta
-    enviar_nuevo_proceso(&nuevo_pcb->pid, path, fd_mem);
-
     int respuesta;
     recv(fd_mem, &respuesta,sizeof(int), MSG_WAITALL);
-    if(respuesta==ARCHIVO_INVALIDO)
-    {
+    if(respuesta == ARCHIVO_INVALIDO){
         pthread_mutex_lock(&hilo_pid_mutex);
         pid_contador--;
         pthread_mutex_unlock(&hilo_pid_mutex);
-        log_warning(logger,"Archivo_Invalido");
+        log_warning(logger, "PARA UN POCO, REVISA LA RUTA DEL ARCHIVO");
         free(nuevo_pcb);
         return;
     }
+
     squeue_push(lista_procesos_new, nuevo_pcb);
-    
     log_info(logger, "Se crea el proceso %d en NEW", nuevo_pcb->pid);
+    
     
     sem_post(&proceso_en_cola_new);
 
@@ -247,7 +245,7 @@ void iniciar_planificacion(){
     sem_post(&planificacion_ready_iniciada);
     sem_post(&planificacion_exec_iniciada);
     sem_post(&planificacion_blocked_iniciada);
-    log_info(logger, "Planificación iniciada");
+    log_info(logger, "Planificación %s iniciada", config_get_string_value(config, "ALGORITMO_PLANIFICACION"));
     }
 }
 

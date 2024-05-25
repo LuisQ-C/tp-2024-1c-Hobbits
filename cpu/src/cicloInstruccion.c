@@ -15,7 +15,7 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
     establecer_contexto(pcb_recibido);                                                //CAMBIAR PID_ACTUAL POR EL DEL PCB RECIBIDO
 
     while(1){
-    
+
     t_instruccion instruccion = fetch(registro.PC,fd_conexion_memoria,pcb_recibido->pid); //FETCH (SOLICITA Y RECIBE LA INSTRUCCION)
     
     decode_and_execute(instruccion,pcb_recibido,cliente_fd_conexion_dispatch);         //DECODIFICA LA INSTRUCCION Y LA EJECUTA 
@@ -27,11 +27,11 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
         log_debug(logger,"fue desalojado");
         break;
     }
-    
+
     if(check_interrupt(pcb_recibido,cliente_fd_conexion_dispatch))                     //CHEQUEA SI EN EL HILO DE INTERRUPCION LE LLEGO UNA INTERRUPCION
     {
-        log_debug(logger,"fue interrumpido");
-        break;;
+        log_warning(logger,"fue interrumpido");
+        break;
     }
     
     }
@@ -213,7 +213,12 @@ int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
 
     if(HAY_INTERRUPCION)
     {
-        enviar_pcb(pcb_a_chequear,fd_dispatch); //ACA SE DEBERIA DEVOLVER CONTEXTO CON MOTIVO "INTERRUPCION"
+        int motivo_interrupcion = INTERRUPCION;
+        t_paquete* paquete = armar_paquete_pcb(pcb_a_chequear);
+        agregar_a_paquete(paquete, &motivo_interrupcion, sizeof(int));
+        enviar_paquete(paquete, fd_dispatch);
+        eliminar_paquete(paquete);
+        //enviar_pcb(pcb_a_chequear,fd_dispatch); //ACA SE DEBERIA DEVOLVER CONTEXTO CON MOTIVO "INTERRUPCION"
         HAY_INTERRUPCION = 0;
         ocurrio_interrupcion = 1;
     }

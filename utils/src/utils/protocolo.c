@@ -274,11 +274,11 @@ void enviar_nuevo_proceso(int* pid, char* nombre_archivo, int fd_memoria){
     t_paquete* paquete = crear_paquete(INICIAR_PROCESO);
 
     agregar_a_paquete(paquete, pid, sizeof(int));
-    printf("\nENVIAR NUEVO PROCESO PID: %d\n",*pid);
-    printf("\nENVIAR NUEVO PROCESO NOMBRE ARCHIVO: %s\n",nombre_archivo);
+    //printf("\nENVIAR NUEVO PROCESO PID: %d\n",*pid);
+    //printf("\nENVIAR NUEVO PROCESO NOMBRE ARCHIVO: %s\n",nombre_archivo);
     agregar_a_paquete(paquete, nombre_archivo, strlen(nombre_archivo)+1);
-    int tamanio = strlen(nombre_archivo);
-    printf("\nLONGITUD NOMBRE ARCHIVO: %d\n",tamanio);
+    //int tamanio = strlen(nombre_archivo);
+    //printf("\nLONGITUD NOMBRE ARCHIVO: %d\n",tamanio);
     enviar_paquete(paquete, fd_memoria);
 
     eliminar_paquete(paquete);
