@@ -41,7 +41,7 @@ void manejarConexionInterrupt(void* fd_interrupt)
 
     while(1)
     {
-        int todo_ok = recv(fd_kernel_interrupt,&pid,sizeof(int),MSG_WAITALL); /*muchos mas problemas al agregar el semaforo*/
+        int todo_ok = recv(fd_kernel_interrupt,&pid,sizeof(int),MSG_WAITALL); 
         
         if(todo_ok == 0){
             log_error(logger, "ME DESCONECTE AYUDAME POR FAVOR");
@@ -49,23 +49,26 @@ void manejarConexionInterrupt(void* fd_interrupt)
         }
 
         pthread_mutex_lock(&mutex_pid);
-        coincide_pid = pid==PID_ACTUAL;
+        PID_ACTUAL = pid;
         pthread_mutex_unlock(&mutex_pid);
 
-
+        /*
         if(coincide_pid)
         {
-            log_debug(logger,"INTERRUPCION ACEPTADA");
+            log_debug(logger,"[INTERRUPTION ACCEPTED] PID: %d",pid);
             pthread_mutex_lock(&mutex_interrupcion);
             HAY_INTERRUPCION = 1;
             pthread_mutex_unlock(&mutex_interrupcion);
-            //log_debug(logger,"Llego la interrupcion al pid %d",pid); //SI NO ENTRA ES PORQUE SE IGNORO LA INTERRUPCION // COMENTADO POR AHORA --- NO ES NECESARIO
+            
             coincide_pid = 0;
         }
         else
         {
-            log_debug(logger,"INTERRUPCION IGNORADA");
-        }                                                
+            pthread_mutex_lock(&mutex_pid);
+            log_error(logger,"[INTERRUPTION IGNORED] KERNEL ENVIO EL PID: %d Y EL ACTUAL ES: %d",pid,PID_ACTUAL);
+            pthread_mutex_unlock(&mutex_pid);  
+            
+        }*/                                              
         
     }
 }

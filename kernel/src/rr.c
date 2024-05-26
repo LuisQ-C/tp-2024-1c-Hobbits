@@ -24,45 +24,55 @@ extern int fd_interrupt;
 
 extern int quantum;
 
+
+
+
 void planificacion_rr(){
+    
     while (1)
     {
         sem_wait(&proceso_en_cola_ready);
         sem_wait(&pasar_a_ejecucion);
         sem_wait(&planificacion_ready_iniciada);
-        //pthread_t hilo_int_quantum;
-        //pthread_create(&hilo_int_quantum, NULL, (void*)interrupcion_quantum, NULL);
-        //pthread_detach(hilo_int_quantum);
-        // POR AHORA NO LA USES! pasar_a_cola_exec();
+        
         t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_ready);
         pcb_auxiliar->estado = EXEC;
         squeue_push(lista_procesos_exec, pcb_auxiliar);
         log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
         
-        //t_pcb* pcb_auxiliar1 = squeue_peek(lista_procesos_exec);
-//        log_info(logger, "%d", fd_dispatch);
+        
         enviar_pcb(pcb_auxiliar, fd_dispatch);
-        //interrupcion_quantum();
-        //usleep(quantum * 1000);
+        
 
-        //int pid_a_enviar = 0;
-        //pid_a_enviar = pcb_auxiliar->pid;
-        interrupcion_quantum(pcb_auxiliar);
-        //send(fd_interrupt, &pid_a_enviar, sizeof(int),0);
-
-        //log_debug(logger, "deberias haber ido a fin de q");
-        //recibir_contexto_actualizado(fd_dispatch);
+        
+        //interrupcion_quantum(pcb_auxiliar);
+        
+        pthread_t hilo_q;
+        data* new_data = malloc(sizeof(data));
+        new_data->quantum = quantum;
+        new_data->pid = pcb_auxiliar->pid;
+        pthread_create(&hilo_q,NULL,(void*)hilo_quantum,(void*) new_data);
+        
         recibir_contexto_actualizado(fd_dispatch);
-        //log_warning(logger, "pude actualizarme");
-        //recibir_operacion(fd_dispatch);
-        //t_list* pcb_con_motivo = recibir_paquete(fd_dispatch);
+        pthread_cancel(hilo_q); //PODRIA IR DENTRO DE RECIBIR CONTEXTO ACTUALIZADO LUEGO DE RECIBIR OPERACION PARA QUE LO CANCELE LO ANTES POSIBLE
+        
         sem_post(&pasar_a_ejecucion);
         sem_post(&planificacion_ready_iniciada);
 
     }
     
 }
+void hilo_quantum(void* arg)
+{
+    data* quantum_recibido = arg;
+    int quantum_r = quantum_recibido->quantum;
+    int pid_r = quantum_recibido->pid;
+    free(quantum_recibido);
+    usleep(quantum_r*1000);
+    send(fd_interrupt,&pid_r,sizeof(int),0);
+}
 
+//HILO QUE ESPERE Y MANDE LA INTERRUPCION, EL OTRO SE QUEDARA BLOQUEANTE
 void interrupcion_quantum(t_pcb* pcb_auxiliar){
     usleep(quantum * 1000);
     int pid_a_enviar = 0;

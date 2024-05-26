@@ -18,6 +18,7 @@ typedef char* t_instruccion;
 void realizarCicloInstruccion(int fd_conexion_memoria,t_pcb* pcb_recibido,int cliente_fd_conexion_dispatch);
 
 void resetear_var_globales();
+void resetear_pid_actual();
 void establecer_contexto(t_pcb* pcb_recibido);
 
 t_instruccion fetch(uint32_t pc, int fd_conexion_memoria, int pid);

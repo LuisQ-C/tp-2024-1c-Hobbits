@@ -15,7 +15,6 @@ t_squeue* squeue_create(){
         perror("No se puede iniciar el mutex");
         free(squeue->mutex);
     }
-
     squeue->cola = queue_create();
 
     return squeue;
