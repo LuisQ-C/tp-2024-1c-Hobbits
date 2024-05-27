@@ -85,6 +85,13 @@ void slist_destroy(t_slist* slist){
     free(slist);
 }
 
+bool lista_interfaces_is_empty(){
+    bool isEmpty;
+    pthread_mutex_lock(lista_procesos_blocked->mutex);
+    isEmpty = list_is_empty(lista_procesos_blocked->lista);
+    pthread_mutex_unlock(lista_procesos_blocked->mutex);
+}
+
 bool slist_comprobate_io(char* nombreInterfaz,int operacion_solicitada)
 {
     pthread_mutex_lock(lista_procesos_blocked->mutex);
@@ -168,6 +175,13 @@ void push_elemento_cola_io(t_list_io* interfaz_lista,void* elemento_agregar)
 {
     pthread_mutex_lock(interfaz_lista->mutex_cola);
     queue_push(interfaz_lista->cola_procesos_blocked,elemento_agregar);
+    pthread_mutex_unlock(interfaz_lista->mutex_cola);
+}
+
+bool cola_io_is_empty(t_list_io* interfaz_lista){
+    bool isEmpty;
+    pthread_mutex_lock(interfaz_lista->mutex_cola);
+    isEmpty = queue_is_empty(interfaz_lista->cola_procesos_blocked);
     pthread_mutex_unlock(interfaz_lista->mutex_cola);
 }
 

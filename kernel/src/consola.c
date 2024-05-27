@@ -7,6 +7,7 @@ extern t_squeue *lista_procesos_new;
 extern t_squeue *lista_procesos_ready;
 extern t_squeue *lista_procesos_exec;
 extern t_squeue *lista_procesos_exit;
+extern t_slist *lista_procesos_blocked;
 
 extern sem_t grado_de_multiprogramacion;
 extern sem_t proceso_en_cola_new;
@@ -320,7 +321,7 @@ void cambiar_grado_de_multiprogramacion(int nuevo_grado_mp){
             pthread_detach(hilo_cambio_mp);
         }
     }
-    log_warning(logger, "Se cambio el grado de multiprogramacion: Anterior %d - Nuvo: %d", multiprog, nuevo_grado_mp);
+    log_warning(logger, "Se cambio el grado de multiprogramacion: Anterior %d - Nuevo: %d", multiprog, nuevo_grado_mp);
     multiprog = nuevo_grado_mp;
 }
 
