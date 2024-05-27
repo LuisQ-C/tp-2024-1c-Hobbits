@@ -20,11 +20,12 @@ sem_t planificacion_exec_iniciada;
 sem_t planificacion_blocked_iniciada;
 
 bool planificacion_iniciada = false;
+int multiprog;
 //Hola, soy un comentario
 
 void iniciar_cosas_necesarias_planificador(){
 
-    int multiprog = config_get_int_value(config, "GRADO_MULTIPROGRAMACION");
+    multiprog = config_get_int_value(config, "GRADO_MULTIPROGRAMACION");
     //printf("multiprog, %d", multiprog);
     lista_procesos_new = squeue_create();
     lista_procesos_ready = squeue_create();

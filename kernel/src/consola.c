@@ -22,7 +22,7 @@ extern bool planificacion_iniciada;
 
 char* opciones[] = {
     "EJECUTAR_SCRIPT",
-    "INICIAR_PROCESO",
+    "INICIAR_PROCESO pseudos/",
     "FINALIZAR_PROCESO",
     "DETENER_PLANIFICACION",
     "INICIAR_PLANIFICACION",
@@ -64,6 +64,8 @@ char* custom_completion_generator(const char* text, int state){
 
 pthread_mutex_t hilo_pid_mutex;
 int pid_contador = 0;
+
+extern int multiprog;
 
 int fd_dispatch;
 int fd_interrupt;
@@ -250,7 +252,8 @@ void iniciar_planificacion(){
 }
 
 void multiprogramacion(int valor){
-    printf("multiprogramacion \n");
+    //printf("multiprogramacion \n");
+    cambiar_grado_de_multiprogramacion(valor);
 }
 
 void proceso_estado(){
@@ -297,8 +300,33 @@ void proceso_estado(){
     
 }
 
+////////////
 
+void cambiar_grado_de_multiprogramacion(int nuevo_grado_mp){
+    if(nuevo_grado_mp > multiprog){
+        int diferencia_entre_grados = nuevo_grado_mp - multiprog;
+        for (int i = 0; i < diferencia_entre_grados; i++)
+        {
+            sem_post(&grado_de_multiprogramacion);
+        }
+    }
+    else if (nuevo_grado_mp < multiprog){
+        int diferencia_entre_grados = multiprog - nuevo_grado_mp;
+        for (int i = 0; i < diferencia_entre_grados; i++)
+        {
+            //creo el hilo para que no se congele la consola
+            pthread_t hilo_cambio_mp;
+            pthread_create(&hilo_cambio_mp, NULL, (void *) bajar_grado, NULL);
+            pthread_detach(hilo_cambio_mp);
+        }
+    }
+    log_warning(logger, "Se cambio el grado de multiprogramacion: Anterior %d - Nuvo: %d", multiprog, nuevo_grado_mp);
+    multiprog = nuevo_grado_mp;
+}
 
+void bajar_grado(){
+    sem_wait(&grado_de_multiprogramacion);
+}
 
 //////Funciones procesos
 t_pcb* crear_pcb(){

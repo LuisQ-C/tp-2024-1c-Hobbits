@@ -25,6 +25,9 @@ void iniciar_planificacion(void);
 void multiprogramacion(int valor);
 void proceso_estado(void);
 
+void cambiar_grado_de_multiprogramacion(int nuevo_grado_mp);
+void bajar_grado();
+
 void detener_cola_new(void* arg);
 void detener_cola_ready(void* arg);
 void detener_cola_exec(void* arg);
