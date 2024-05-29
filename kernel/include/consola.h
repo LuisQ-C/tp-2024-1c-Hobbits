@@ -33,6 +33,7 @@ void detener_cola_ready(void* arg);
 void detener_cola_exec(void* arg);
 void detener_cola_blocked(void* arg);
 
+
 //copio el logger y config del kernel
 char* pids_blocked(t_list_io* interfaz);
 

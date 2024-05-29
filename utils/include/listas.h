@@ -24,5 +24,7 @@ void squeue_push(t_squeue* queue, void* elemento);
 void* squeue_peek(t_squeue* queue);
 void squeue_iterate(t_squeue* squeue, void(*closure)(void*));
 bool squeue_is_empty(t_squeue* squeue);
-
+void* squeue_remove_by_condition(t_squeue* squeue, bool(*condition)(void*));
+void* squeue_find(t_squeue* squeue, void(*closure)(void*));
+bool squeue_any_satisfy(t_squeue* squeue, bool(*condition)(void*));
 #endif

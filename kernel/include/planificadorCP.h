@@ -24,6 +24,18 @@ void actualizar_pcb_ejecutado(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo);
 
 void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo);
 
+typedef enum{
+    SUCCESS = 777,
+    INVALID_RESOURCE,
+    INVALID_INTERFACE,
+    OUT_OF_MEMORY,
+    INTERRUPTED_BY_USER,
+    INTERRUPTED_BY_USER_NEW
+}motivos_fin;
+
+void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar);
+
+
 //void interrupcion_quantum(t_pcb* pcb_auxiliar);
 
 #endif

@@ -191,7 +191,31 @@ void iniciar_proceso(char* path){
 }
 
 void finalizar_proceso(int pid){
-    printf("finalizar_proceso \n");
+    //printf("finalizar_proceso \n");
+    t_pcb* pcb_auxiliar;
+
+    bool _elemento_encontrado(t_pcb* pcb){
+        bool coincide = pcb->pid == pid;
+        return coincide;
+    }
+
+    if(squeue_any_satisfy(lista_procesos_new, (void*) _elemento_encontrado)){
+        pcb_auxiliar = squeue_remove_by_condition(lista_procesos_new, (void*) _elemento_encontrado);
+        manejar_fin_con_motivo(INTERRUPTED_BY_USER_NEW, pcb_auxiliar);
+    }
+    else if(squeue_any_satisfy(lista_procesos_ready, (void*) _elemento_encontrado)){
+        pcb_auxiliar = squeue_remove_by_condition(lista_procesos_ready, (void*) _elemento_encontrado);
+        manejar_fin_con_motivo(INTERRUPTED_BY_USER, pcb_auxiliar);
+    }
+    else if(squeue_any_satisfy(lista_procesos_exec, (void*) _elemento_encontrado)){
+        printf("hola exec");
+    }
+    else if(squeue_any_satisfy(lista_procesos_exit, (void*) _elemento_encontrado)){
+        log_error(logger, "QUE HACES, SI YA ESTA EN EXIT");
+    }
+    
+    
+
 }
 
 //sem_post(&proceso_en_cola_new);

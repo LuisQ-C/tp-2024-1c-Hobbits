@@ -50,95 +50,6 @@ void iniciar_PCP(){
     //CREAR OTRO HILO PARA MANDAR PROCESOS A BLOCKED
 
 }
-/*
-void planificacion_fifo(){
-    while (1)
-    {
-        sem_wait(&proceso_en_cola_ready);
-        sem_wait(&pasar_a_ejecucion);
-        sem_wait(&planificacion_ready_iniciada);
-        pasar_a_cola_exec();
-    }
-    
-}
-
-void planificacion_rr(){
-    while (1)
-    {
-        sem_wait(&proceso_en_cola_ready);
-        sem_wait(&pasar_a_ejecucion);
-        sem_wait(&planificacion_ready_iniciada);
-        //pthread_t hilo_int_quantum;
-        //pthread_create(&hilo_int_quantum, NULL, (void*)interrupcion_quantum, NULL);
-        //pthread_detach(hilo_int_quantum);
-        // POR AHORA NO LA USES! pasar_a_cola_exec();
-        t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_ready);
-        pcb_auxiliar->estado = EXEC;
-        squeue_push(lista_procesos_exec, pcb_auxiliar);
-        log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
-        
-        //t_pcb* pcb_auxiliar1 = squeue_peek(lista_procesos_exec);
-//        log_info(logger, "%d", fd_dispatch);
-        enviar_pcb(pcb_auxiliar, fd_dispatch);
-        //interrupcion_quantum();
-        //usleep(quantum * 1000);
-
-        //int pid_a_enviar = 0;
-        //pid_a_enviar = pcb_auxiliar->pid;
-        interrupcion_quantum(pcb_auxiliar);
-        //send(fd_interrupt, &pid_a_enviar, sizeof(int),0);
-
-        //log_debug(logger, "deberias haber ido a fin de q");
-        //recibir_contexto_actualizado(fd_dispatch);
-        recibir_contexto_actualizado(fd_dispatch);
-        //log_warning(logger, "pude actualizarme");
-        //recibir_operacion(fd_dispatch);
-        //t_list* pcb_con_motivo = recibir_paquete(fd_dispatch);
-        sem_post(&pasar_a_ejecucion);
-        sem_post(&planificacion_ready_iniciada);
-
-    }
-    
-}
-
-void interrupcion_quantum(t_pcb* pcb_auxiliar){
-    usleep(quantum * 1000);
-    int pid_a_enviar = 0;
-    pid_a_enviar = pcb_auxiliar->pid;
-    send(fd_interrupt, &pid_a_enviar, sizeof(int), 0);
-}
-
-
-void pasar_a_cola_exec(){
-
-    t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_ready);
-    pcb_auxiliar->estado = EXEC;
-    squeue_push(lista_procesos_exec, pcb_auxiliar);
-    log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
-    sem_post(&ejecutar_proceso);
-    sem_post(&planificacion_ready_iniciada);
-}
-
-
-//HILO ENCARGADO DE UNICAMENTE ENVIAR A EXEC, RECIBIR CONTEXTO ACTUALIZADO Y ENVIAR A BLOCKED, EXIT DEPENDIENDO DEL CASO
-void ejecutar_procesos_exec(){
-    while (1)
-    {
-        sem_wait(&ejecutar_proceso);
-        t_pcb* pcb_auxiliar = squeue_peek(lista_procesos_exec);
-//        log_info(logger, "%d", fd_dispatch);
-        enviar_pcb(pcb_auxiliar, fd_dispatch);
-    
-        recibir_contexto_actualizado(fd_dispatch);
-    
-        //log_info(logger, "me ejecute %d", pcb_auxiliar->pid);
-        //supongamos que terminó
-        sem_post(&pasar_a_ejecucion);
-        //sem_post(&grado_de_multiprogramacion); LO MANDAMOS AL CASE EXIT, PORQUE ES EN EL UNICO CASO DONDE AUMENTA EL GRADO MULTRIPROGR.
-    }
-}
-
-*/
 
 //HILO ENCARGADO DE MANEJAR LOS PROCESOS DE BLOCKED, CON QUE CRITERIO? NI IDEA
 //SEMAFORO QUE TIENE CADA IO TE PUEDE AVISAR CUANDO LE PODES MANDAR UNA SOLICITUD DE VUELTA
@@ -174,10 +85,11 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
     switch(*motivo_interrupcion)
     {
         case EXIT:
-            pcb_a_actualizar->estado = EXIT;
-            squeue_push(lista_procesos_exit,pcb_a_actualizar);
-            log_debug(logger, "PID: %d Fue desalojado por EXIT", pcb_a_actualizar->pid);
-            log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
+            manejar_fin_con_motivo(SUCCESS, pcb_a_actualizar);
+            //pcb_a_actualizar->estado = EXIT;
+            //squeue_push(lista_procesos_exit,pcb_a_actualizar);
+            //log_debug(logger, "PID: %d Fue desalojado por EXIT", pcb_a_actualizar->pid);
+            //log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
             
             sem_post(&grado_de_multiprogramacion);
             break;
@@ -226,6 +138,43 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             log_warning(logger,"MOTIVO DE DESALOJO DESCONOCIDO");
             break;
     }
+}
+
+void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
+    pcb_a_finalizar->estado = EXIT;
+    switch (motivo_interrupcion){
+    case SUCCESS:
+        squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        log_info(logger, "Finaliza el proceso %d - Motivo: SUCCESS", pcb_a_finalizar->pid);
+        log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
+        break;
+    case INVALID_RESOURCE:
+        break;
+    case INVALID_INTERFACE:
+        squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        log_info(logger, "Finaliza el proceso %d - Motivo: INVALID INTERFACE", pcb_a_finalizar->pid);
+        log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
+
+        break;
+    case OUT_OF_MEMORY:
+        break;
+    case INTERRUPTED_BY_USER:
+        squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
+        log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
+        sem_wait(&proceso_en_cola_ready);
+        sem_post(&grado_de_multiprogramacion);
+        break;
+    case INTERRUPTED_BY_USER_NEW:
+        squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
+        log_info(logger, "PID: %d - Estado Anterior: NEW - Estado Actual: EXIT", pcb_a_finalizar->pid);
+        sem_wait(&proceso_en_cola_new);
+        break;
+    default:
+        break;
+    }
+
 }
 
 

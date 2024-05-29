@@ -43,6 +43,7 @@ void pasar_a_cola_exec(){
     sem_post(&planificacion_ready_iniciada);
 }
 
+//HILO ENCARGADO DE UNICAMENTE ENVIAR A EXEC, RECIBIR CONTEXTO ACTUALIZADO Y ENVIAR A BLOCKED, EXIT DEPENDIENDO DEL CASO
 void ejecutar_procesos_exec(){
     while (1)
     {

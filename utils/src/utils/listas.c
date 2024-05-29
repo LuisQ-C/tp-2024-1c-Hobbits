@@ -63,3 +63,28 @@ bool squeue_is_empty(t_squeue* squeue){
 
     return isEmpty;
 }
+
+void* squeue_remove_by_condition(t_squeue* squeue, bool(*condition)(void*)){
+    void* elemento;
+    pthread_mutex_lock(squeue->mutex);
+    elemento = list_remove_by_condition(squeue->cola->elements, (void*) condition);
+    pthread_mutex_unlock(squeue->mutex);
+    return elemento;
+}
+
+void* squeue_find(t_squeue* squeue, void(*closure)(void*)){
+    void* elemento;
+    pthread_mutex_lock(squeue->mutex);
+    elemento = list_find(squeue->cola->elements, (void*) closure);
+    pthread_mutex_unlock(squeue->mutex);
+
+    return elemento;
+}
+
+bool squeue_any_satisfy(t_squeue* squeue, bool(*condition)(void*)){
+    bool found;
+    pthread_mutex_lock(squeue->mutex);
+    found = list_any_satisfy(squeue->cola->elements, (void*) condition);
+    pthread_mutex_unlock(squeue->mutex);
+    return found;
+}
