@@ -295,10 +295,46 @@ void proceso_estado(){
     }
     else
         log_info(logger, "La cola exit esta vacia");
+    if(!lista_interfaces_is_empty()){
 
+        char* pids = string_new();
+        void listar_pids_blocked(t_list_io* interfaz){
+            if(!cola_io_is_empty(interfaz)){
+            char* auxiliar_pids = pids_blocked(interfaz);
+            string_append_with_format(&pids, "%s, ", auxiliar_pids);    
+            }
+        }
+
+        pthread_mutex_lock(lista_procesos_blocked->mutex);
+        list_iterate(lista_procesos_blocked->lista, (void*) listar_pids_blocked);
+        pthread_mutex_unlock(lista_procesos_blocked->mutex);
+
+        if(!string_is_empty(pids)){
+            log_info(logger, "Procesos cola blocked: %s", pids);
+            free(pids);
+        }
+        else
+            log_info(logger, "La cola blocked esta vacia");
+    }
+    else
+        log_info(logger, "No hay interfaz conectada");
     //FALTA IMPRIMIR BLOCKED, TODAS SUS COLAS
+}
 
-    
+char* pids_blocked(t_list_io* interfaz){
+    char* pids = string_new();
+
+    void obtener_pids_blocked(t_elemento_iogenerica* elemento_iogenerico){
+        char* pid = string_itoa(elemento_iogenerico->pcb->pid);
+        if(!(strcmp(pid, " ") == 0)){
+            string_append_with_format(&pids, "%s", pid);
+            log_warning(logger, "%s", pid);
+        }
+        free(pid);
+    }
+
+    cola_io_iterate(interfaz, (void*) obtener_pids_blocked);
+    return pids;
 }
 
 ////////////

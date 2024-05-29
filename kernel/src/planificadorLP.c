@@ -57,7 +57,6 @@ char* listar_pids(t_squeue* squeue){
     char* pids = string_new();    
 
     void obtener_string_pids(t_pcb* pcb){
-
         char* pid = string_itoa(pcb->pid);
         string_append_with_format(&pids, "%s, ", pid);
         free(pid);

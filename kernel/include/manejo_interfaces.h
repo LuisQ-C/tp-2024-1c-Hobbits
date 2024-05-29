@@ -53,4 +53,8 @@ void* pop_elemento_cola_io(t_list_io* interfaz_lista);
 void* peek_elemento_cola_io(t_list_io* interfaz_lista);
 void push_elemento_cola_io(t_list_io* interfaz_lista,void* elemento_agregar);
 
+bool cola_io_is_empty(t_list_io* interfaz_lista);
+bool lista_interfaces_is_empty();
+void cola_io_iterate(t_list_io* interfaz_lista, void(*closure)(void*));
+
 #endif
