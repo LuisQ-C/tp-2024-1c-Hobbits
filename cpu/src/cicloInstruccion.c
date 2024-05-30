@@ -249,7 +249,7 @@ int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
     if(coincide_pid)
     {
         log_debug(logger,"INTERRUPCION ACEPTADA A PID: %d",pcb_a_chequear->pid);
-        int motivo_interrupcion = INTERRUPCION;
+        int motivo_interrupcion = INTERRUPCION_QUANTUM;
         t_paquete* paquete = armar_paquete_pcb(pcb_a_chequear);
         agregar_a_paquete(paquete, &motivo_interrupcion, sizeof(int));
         enviar_paquete(paquete, fd_dispatch);

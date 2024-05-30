@@ -34,7 +34,8 @@ typedef enum{
     IO_STDIN_READ,
     IO_STDOUT_WRITE,
     IO_FS,
-    INTERRUPCION,
+    INTERRUPCION_QUANTUM,
+    USER_INTERRUPT,
     EXIT
 }cod_op;
 

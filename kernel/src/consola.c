@@ -68,6 +68,8 @@ int pid_contador = 0;
 
 extern int multiprog;
 
+bool interrupcion_usuario;
+
 int fd_dispatch;
 int fd_interrupt;
 int fd_mem;
@@ -198,17 +200,19 @@ void finalizar_proceso(int pid){
         bool coincide = pcb->pid == pid;
         return coincide;
     }
-
     if(squeue_any_satisfy(lista_procesos_new, (void*) _elemento_encontrado)){
         pcb_auxiliar = squeue_remove_by_condition(lista_procesos_new, (void*) _elemento_encontrado);
         manejar_fin_con_motivo(INTERRUPTED_BY_USER_NEW, pcb_auxiliar);
     }
     else if(squeue_any_satisfy(lista_procesos_ready, (void*) _elemento_encontrado)){
         pcb_auxiliar = squeue_remove_by_condition(lista_procesos_ready, (void*) _elemento_encontrado);
-        manejar_fin_con_motivo(INTERRUPTED_BY_USER, pcb_auxiliar);
+        manejar_fin_con_motivo(INTERRUPTED_BY_USER_READY, pcb_auxiliar);
     }
     else if(squeue_any_satisfy(lista_procesos_exec, (void*) _elemento_encontrado)){
-        printf("hola exec");
+        pcb_auxiliar = squeue_peek(lista_procesos_exec);
+        int pid_auxiliar = pcb_auxiliar->pid;
+        interrupcion_usuario = true;
+        enviar_interrupcion(USER_INTERRUPT, pid_auxiliar);    
     }
     else if(squeue_any_satisfy(lista_procesos_exit, (void*) _elemento_encontrado)){
         log_error(logger, "QUE HACES, SI YA ESTA EN EXIT");

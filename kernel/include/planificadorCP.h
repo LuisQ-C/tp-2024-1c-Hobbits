@@ -29,12 +29,13 @@ typedef enum{
     INVALID_RESOURCE,
     INVALID_INTERFACE,
     OUT_OF_MEMORY,
-    INTERRUPTED_BY_USER,
-    INTERRUPTED_BY_USER_NEW
+    INTERRUPTED_BY_USER_READY,
+    INTERRUPTED_BY_USER_NEW,
+    INTERRUPTED_BY_USER_EXEC
 }motivos_fin;
 
 void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar);
-
+void enviar_interrupcion(int interrupcion, int pid);
 
 //void interrupcion_quantum(t_pcb* pcb_auxiliar);
 

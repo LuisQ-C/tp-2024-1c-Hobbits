@@ -77,3 +77,4 @@ void mostrar_cola_ready(){
     free(lista_pids);
 
 }
+
