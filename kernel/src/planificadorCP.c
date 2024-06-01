@@ -60,11 +60,11 @@ void recibir_contexto_actualizado(int fd_dispatch)
 {
     recibir_operacion(fd_dispatch);
     t_list* pcb_con_motivo = recibir_paquete(fd_dispatch);
-    sem_wait(&planificacion_exec_iniciada);
+    sem_wait(&planificacion_exec_iniciada);/*
     if(interrupcion_usuario){
         list_replace(pcb_con_motivo, 5, (int*)USER_INTERRUPT);
         interrupcion_usuario = false;
-    }
+    }*/
     t_pcb* pcb_a_actualizar = squeue_pop(lista_procesos_exec);
     actualizar_pcb_ejecutado(pcb_a_actualizar,pcb_con_motivo);
     manejar_motivo_interrupcion(pcb_a_actualizar,pcb_con_motivo);

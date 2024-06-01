@@ -68,7 +68,7 @@ int pid_contador = 0;
 
 extern int multiprog;
 
-bool interrupcion_usuario;
+bool interrupcion_usuario = false;
 
 int fd_dispatch;
 int fd_interrupt;
