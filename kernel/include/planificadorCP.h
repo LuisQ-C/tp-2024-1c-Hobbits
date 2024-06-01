@@ -35,7 +35,8 @@ typedef enum{
 }motivos_fin;
 
 void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar);
-void enviar_interrupcion(int interrupcion, int pid);
+
+//void enviar_interrupcion(int interrupcion, int pid);
 
 //void interrupcion_quantum(t_pcb* pcb_auxiliar);
 

@@ -60,7 +60,7 @@ void hilo_quantum(void* arg)
     int pid_r = quantum_recibido->pid;
     free(quantum_recibido);
     usleep(quantum_r*1000);
-    enviar_interrupcion(INTERRUPCION_QUANTUM, pid_r);
+    enviar_interrupcion(INTERRUPCION_QUANTUM, pid_r,fd_interrupt);
 }
 
 //HILO QUE ESPERE Y MANDE LA INTERRUPCION, EL OTRO SE QUEDARA BLOQUEANTE

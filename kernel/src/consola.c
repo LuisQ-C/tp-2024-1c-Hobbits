@@ -212,7 +212,7 @@ void finalizar_proceso(int pid){
         pcb_auxiliar = squeue_peek(lista_procesos_exec);
         int pid_auxiliar = pcb_auxiliar->pid;
         interrupcion_usuario = true;
-        enviar_interrupcion(USER_INTERRUPT, pid_auxiliar);    
+        enviar_interrupcion(USER_INTERRUPT, pid_auxiliar, fd_interrupt);    
     }
     else if(squeue_any_satisfy(lista_procesos_exit, (void*) _elemento_encontrado)){
         log_error(logger, "QUE HACES, SI YA ESTA EN EXIT");

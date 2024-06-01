@@ -2,7 +2,7 @@
 
 extern t_registro_cpu registro;
 extern t_log* logger;
-extern int HAY_INTERRUPCION;
+extern int MOTIVO_INTERRUPCION;
 extern int PID_ACTUAL;
 extern int MOTIVO_DESALOJO;
 extern pthread_mutex_t mutex_interrupcion;
@@ -12,7 +12,7 @@ extern sem_t semaforo_pcb_recibido;
 void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int cliente_fd_conexion_dispatch)
 {
     //resetear_var_globales();
-    resetear_pid_actual();
+    resetear_interrupcion();
     establecer_contexto(pcb_recibido);                                                //CAMBIA EL VALOR DE TODOS LOS REGISTROS GENERALES
     //sem_post(&semaforo_pcb_recibido);
     int i = 1;
@@ -54,25 +54,30 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
 }
 
 /* Resetea las variable globales a sus valores iniciales */
-void resetear_var_globales()
+/*void resetear_var_globales()
 {
     MOTIVO_DESALOJO = -1;
     pthread_mutex_lock(&mutex_pid);
     PID_ACTUAL = -1;
     pthread_mutex_unlock(&mutex_pid);
-    pthread_mutex_lock(&mutex_interrupcion);
-    HAY_INTERRUPCION = 0;
-    pthread_mutex_unlock(&mutex_interrupcion);
     log_debug(logger,"TODO RESETEADO CAPO");
-}
+}*/
 
 /*resetea la variable global PID_ACTUAL*/
-void resetear_pid_actual()
+void resetear_interrupcion()
 {
-    pthread_mutex_lock(&mutex_pid);
+    pthread_mutex_lock(&mutex_interrupcion);
     PID_ACTUAL = -1;
-    pthread_mutex_unlock(&mutex_pid);
+    MOTIVO_INTERRUPCION = -1;
+    pthread_mutex_unlock(&mutex_interrupcion);
 }
+
+/*void resetear_motivo_interrupcion()
+{
+    pthread_mutex_lock(&mutex_interrupcion);
+    MOTIVO_INTERRUPCION = -1;
+    pthread_mutex_unlock(&mutex_interrupcion);
+}*/
 
 
 /* Actualiza los registros de la CPU segun el PCB recibido (tambien actualiza PID_ACTUAL)*/
@@ -227,9 +232,6 @@ int fue_desalojado()
     if(MOTIVO_DESALOJO != -1)
     {
         MOTIVO_DESALOJO = -1;
-        pthread_mutex_lock(&mutex_interrupcion);
-        HAY_INTERRUPCION = 0;
-        pthread_mutex_unlock(&mutex_interrupcion);
         desalojado = 1;
     }
     return desalojado;
@@ -239,17 +241,19 @@ int fue_desalojado()
 int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
 {
     int ocurrio_interrupcion = 0;
+    int motivo_interrupcion = -1;
     int coincide_pid = 0;
     int pid_interrupcion = -1;
-    pthread_mutex_lock(&mutex_pid);
+    pthread_mutex_lock(&mutex_interrupcion);
     coincide_pid = pcb_a_chequear->pid ==  PID_ACTUAL;
     pid_interrupcion = PID_ACTUAL;
+    motivo_interrupcion = MOTIVO_INTERRUPCION;
     PID_ACTUAL = -1;
-    pthread_mutex_unlock(&mutex_pid);
+    MOTIVO_INTERRUPCION = -1;
+    pthread_mutex_unlock(&mutex_interrupcion);
     if(coincide_pid)
     {
         log_debug(logger,"INTERRUPCION ACEPTADA A PID: %d",pcb_a_chequear->pid);
-        int motivo_interrupcion = INTERRUPCION_QUANTUM;
         t_paquete* paquete = armar_paquete_pcb(pcb_a_chequear);
         agregar_a_paquete(paquete, &motivo_interrupcion, sizeof(int));
         enviar_paquete(paquete, fd_dispatch);

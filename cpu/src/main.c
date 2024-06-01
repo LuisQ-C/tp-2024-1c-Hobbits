@@ -8,7 +8,7 @@ pthread_mutex_t mutex_pid;
 sem_t semaforo_pcb_recibido;
 
 
-int HAY_INTERRUPCION = 0;
+int MOTIVO_INTERRUPCION = -1;
 int PID_ACTUAL = -1;
 int MOTIVO_DESALOJO = -1;
 

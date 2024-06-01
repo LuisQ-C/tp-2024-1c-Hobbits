@@ -119,6 +119,11 @@ void recibir_nuevo_proceso(int fd_kernel);
 void enviar_solicitud_io_generico(int pid, int tiempo, int fd_interfaz);
 void recibir_solicitud_io_generico(int* pid,int* tiempo, int fd_kernel);
 
+// INTERRUPCIONES
+
+void enviar_interrupcion(int interrupcion, int pid, int fd_interrupt);
+int recibir_interrupcion(int* pid, int fd_interrupt);
+
 
 //BUFFER, SERIALIZACION
 /*

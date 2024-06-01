@@ -187,12 +187,7 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
 
 }
 
-void enviar_interrupcion(int interrupcion, int pid){
-    t_paquete* paquete = crear_paquete(interrupcion);
-    agregar_a_paquete(paquete, &pid, sizeof(int));
-    enviar_paquete(paquete, fd_interrupt);
-    eliminar_paquete(paquete);
-}
+
 
 
 /*

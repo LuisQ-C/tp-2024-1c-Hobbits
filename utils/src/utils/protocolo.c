@@ -308,6 +308,30 @@ t_paquete* armar_paquete_pcb(t_pcb* pcb_a_enviar)
     return paquete;
 }
 
+//ENVIO Y RECEPCION DE INTERRUPCIONES
+
+void enviar_interrupcion(int interrupcion, int pid, int fd_interrupt){
+    t_paquete* paquete = crear_paquete(interrupcion);
+    agregar_a_paquete(paquete, &pid, sizeof(int));
+    enviar_paquete(paquete, fd_interrupt);
+    eliminar_paquete(paquete);
+}
+
+int recibir_interrupcion(int* pid, int fd_interrupt)
+{
+    int interrupcion_recibida = recibir_operacion(fd_interrupt);//CONFIAMOS EN QUE SOLO LLEGAN INTERRUPCIONES, NOS LO DIJO UN AYUDANTE
+    if(interrupcion_recibida !=  DESCONEXION && interrupcion_recibida != ERROR)
+    {
+        t_list* paquete = recibir_paquete(fd_interrupt);
+        int* pid_recibido = list_get(paquete,0);
+
+        *pid = *pid_recibido;
+
+        list_destroy_and_destroy_elements(paquete,(void*)liberar_elemento);
+    }
+    return interrupcion_recibida;
+}
+
 void liberar_elemento(void* self)
 {
     free(self);

@@ -1,7 +1,7 @@
 #include "../include/interrupt.h"
 
 extern t_log* logger;
-extern int HAY_INTERRUPCION;
+extern int MOTIVO_INTERRUPCION;
 extern int PID_ACTUAL;
 extern pthread_mutex_t mutex_interrupcion;
 extern pthread_mutex_t mutex_pid;
@@ -37,20 +37,26 @@ void manejarConexionInterrupt(void* fd_interrupt)
     free(fd_recibido);
 
     int pid;
-    int coincide_pid = 0;
+    //int coincide_pid = 0;
 
     while(1)
     {
-        int todo_ok = recv(fd_kernel_interrupt,&pid,sizeof(int),MSG_WAITALL); 
+        int codigo_op = recibir_interrupcion(&pid,fd_kernel_interrupt); 
         
-        if(todo_ok == 0){
+        if(codigo_op == DESCONEXION){
             log_error(logger, "ME DESCONECTE AYUDAME POR FAVOR");
+            break;
+        }else if (codigo_op == ERROR)
+        {
+            log_error(logger, "ERROR EN EL SOCKET INTERRUPCION");
             break;
         }
 
-        pthread_mutex_lock(&mutex_pid);
+
+        pthread_mutex_lock(&mutex_interrupcion);
         PID_ACTUAL = pid;
-        pthread_mutex_unlock(&mutex_pid);
+        MOTIVO_INTERRUPCION = codigo_op;
+        pthread_mutex_unlock(&mutex_interrupcion);
 
         /*
         if(coincide_pid)
