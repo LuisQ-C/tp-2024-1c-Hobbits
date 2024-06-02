@@ -23,7 +23,7 @@ extern int fd_dispatch;
 extern int fd_interrupt;
 
 extern int quantum;
-
+extern char* algoritmo;
 
 
 
