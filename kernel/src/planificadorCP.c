@@ -62,19 +62,22 @@ void recibir_contexto_actualizado(int fd_dispatch)
     recibir_operacion(fd_dispatch);
     t_list* pcb_con_motivo = recibir_paquete(fd_dispatch);
     sem_wait(&planificacion_exec_iniciada);
+
     if(interrupcion_usuario){
-        int* aux = list_get(pcb_con_motivo, 5);
-        aux = USER_INTERRUPT;
-        //list_replace(pcb_con_motivo, 5, (int*)USER_INTERRUPT);
+        int* aux = malloc(sizeof(int));
+        *aux = USER_INTERRUPT;
+        int* valor_reemplazado = list_replace(pcb_con_motivo, 5, aux);
+        free(valor_reemplazado);
         interrupcion_usuario = false;
     }
+    
     t_pcb* pcb_a_actualizar = squeue_pop(lista_procesos_exec);
     actualizar_pcb_ejecutado(pcb_a_actualizar,pcb_con_motivo);
     manejar_motivo_interrupcion(pcb_a_actualizar,pcb_con_motivo);
     sem_post(&planificacion_exec_iniciada);
     list_destroy_and_destroy_elements(pcb_con_motivo,(void*) liberar_elemento);
-
 }
+
 void actualizar_pcb_ejecutado(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 {
     int* pid = list_get(pcb_con_motivo,0);
@@ -82,8 +85,8 @@ void actualizar_pcb_ejecutado(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
     int* quantum = list_get(pcb_con_motivo,2);
     uint32_t* estado = list_get(pcb_con_motivo,3);
     t_registros_generales* registros_generales = list_get(pcb_con_motivo,4);
-    //int* aux = list_get(pcb_con_motivo, 5);
-    //log_info(logger, "%d", aux);
+    int* aux = list_get(pcb_con_motivo, 5);
+    log_debug(logger, "%d", *aux);
     pcb_a_actualizar->pid = *pid;
     pcb_a_actualizar->pc = *pc;
     pcb_a_actualizar->quantum = *quantum;

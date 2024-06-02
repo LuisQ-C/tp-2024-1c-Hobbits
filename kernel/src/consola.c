@@ -212,9 +212,10 @@ void finalizar_proceso(int pid){
     else if(squeue_any_satisfy(lista_procesos_exec, (void*) _elemento_encontrado)){
         pcb_auxiliar = squeue_peek(lista_procesos_exec);
         int pid_auxiliar = pcb_auxiliar->pid;
-        enviar_interrupcion(USER_INTERRUPT, pid_auxiliar, fd_interrupt);    
         if(strcmp(algoritmo, "RR") == 0 || strcmp(algoritmo, "VRR") == 0)
             interrupcion_usuario = true;
+        
+        enviar_interrupcion(USER_INTERRUPT, pid_auxiliar, fd_interrupt);    
 
     }
     else if(squeue_any_satisfy(lista_procesos_exit, (void*) _elemento_encontrado)){
