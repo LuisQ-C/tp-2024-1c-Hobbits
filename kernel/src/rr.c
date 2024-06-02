@@ -64,9 +64,9 @@ void hilo_quantum(void* arg)
 }
 
 //HILO QUE ESPERE Y MANDE LA INTERRUPCION, EL OTRO SE QUEDARA BLOQUEANTE
-void interrupcion_quantum(t_pcb* pcb_auxiliar){
+/*void interrupcion_quantum(t_pcb* pcb_auxiliar){
     usleep(quantum * 1000);
     int pid_a_enviar = 0;
     pid_a_enviar = pcb_auxiliar->pid;
     send(fd_interrupt, &pid_a_enviar, sizeof(int), 0);
-}
+}*/

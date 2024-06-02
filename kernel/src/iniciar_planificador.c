@@ -8,6 +8,7 @@ t_squeue *lista_procesos_exec;
 t_squeue *lista_procesos_exit;
 t_slist *lista_procesos_blocked;
 t_list *lista_recursos_blocked;
+t_sdictionary *instancias_utilizadas;
 
 sem_t grado_de_multiprogramacion;
 sem_t proceso_en_cola_new;
@@ -36,6 +37,7 @@ void iniciar_cosas_necesarias_planificador(){
     lista_procesos_exec = squeue_create();
     lista_procesos_exit = squeue_create();
     lista_procesos_blocked = slist_create();
+    instancias_utilizadas = sdictionary_create();
     sem_init(&pasar_a_ejecucion,0,1);
     sem_init(&proceso_en_cola_new, 0, 0);
     sem_init(&proceso_en_cola_ready, 0, 0);
@@ -54,26 +56,3 @@ void iniciar_cosas_necesarias_planificador(){
 
 }
 
-void iniciar_recursos(){
-    char** lista_recursos = config_get_array_value(config, "RECURSOS");
-    char** instancia_por_recurso = config_get_array_value(config, "INSTANCIAS_RECURSOS");
-    for (int i = 0; instancia_por_recurso[i] != NULL; i++)
-    {
-        t_recurso* nuevo_recurso = crear_recurso(lista_recursos[i], atoi(instancia_por_recurso[i]));
-        list_add(lista_recursos_blocked, nuevo_recurso);
-    }
-
-    string_array_destroy(lista_recursos);
-    string_array_destroy(instancia_por_recurso);
-
-}
-
-t_recurso* crear_recurso(char* nombre, int cantInstancias){
-    t_recurso* recurso = malloc(sizeof(t_recurso));
-    recurso->nombre = string_new();
-    string_append(&recurso->nombre, nombre);
-    recurso->instancias_recurso = cantInstancias;
-    recurso->cola_blocked = squeue_create();
-
-    return recurso;
-}

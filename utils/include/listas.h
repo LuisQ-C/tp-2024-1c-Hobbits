@@ -27,4 +27,17 @@ bool squeue_is_empty(t_squeue* squeue);
 void* squeue_remove_by_condition(t_squeue* squeue, bool(*condition)(void*));
 void* squeue_find(t_squeue* squeue, void(*closure)(void*));
 bool squeue_any_satisfy(t_squeue* squeue, bool(*condition)(void*));
+
+typedef struct{
+    t_dictionary* diccionario;
+    pthread_mutex_t* mutex;
+} t_sdictionary;
+
+t_sdictionary* sdictionary_create();
+void* sdictionary_get(t_sdictionary* dicc, char* key);
+void sdictionary_put(t_sdictionary* dicc, char* key, void* elemento);
+void* sdictionary_remove(t_sdictionary* dicc, char* key);
+void sdictionary_remove_and_destroy(t_sdictionary* dicc, char* key, void(*element_destroyer)(void*));
+bool sdictionary_has_key(t_sdictionary* dicc, char* key);
+
 #endif

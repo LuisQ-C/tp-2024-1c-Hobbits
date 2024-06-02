@@ -8,7 +8,5 @@
 //asdasdasd
 
 void iniciar_cosas_necesarias_planificador(void);
-void iniciar_recursos();
-t_recurso* crear_recurso(char* nombre, int cantInstancias);
 
 #endif

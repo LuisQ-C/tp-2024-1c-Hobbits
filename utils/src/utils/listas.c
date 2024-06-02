@@ -88,3 +88,61 @@ bool squeue_any_satisfy(t_squeue* squeue, bool(*condition)(void*)){
     pthread_mutex_unlock(squeue->mutex);
     return found;
 }
+
+
+t_sdictionary* sdictionary_create(){
+
+    t_sdictionary* sdictionary = malloc(sizeof(t_sdictionary));
+
+    sdictionary->mutex = malloc(sizeof(pthread_mutex_t));
+    if (sdictionary->mutex == NULL) {
+        perror("Error al asignar memoria para el mutex");
+        free(sdictionary); // Liberar la memoria asignada previamente
+        return NULL;
+    }
+
+    if(pthread_mutex_init(sdictionary->mutex, NULL) != 0){
+        perror("No se puede iniciar el mutex");
+        free(sdictionary->mutex);
+    }
+    sdictionary->diccionario = dictionary_create();
+
+    return sdictionary;
+}
+
+void* sdictionary_get(t_sdictionary* dicc, char* key){
+    void* elemento;
+    pthread_mutex_lock(dicc->mutex);
+    elemento = dictionary_get(dicc->diccionario, key);
+    pthread_mutex_unlock(dicc->mutex);
+    
+    return elemento;
+}
+
+void sdictionary_put(t_sdictionary* dicc, char* key, void* elemento){
+    pthread_mutex_lock(dicc->mutex);
+    dictionary_put(dicc->diccionario, key, elemento);
+    pthread_mutex_unlock(dicc->mutex);
+}
+
+void* sdictionary_remove(t_sdictionary* dicc, char* key){
+    pthread_mutex_lock(dicc->mutex);
+    void* elemento = dictionary_remove(dicc->diccionario, key);
+    pthread_mutex_unlock(dicc->mutex);
+    return elemento;
+}
+
+void sdictionary_remove_and_destroy(t_sdictionary* dicc, char* key, void(*element_destroyer)(void*)){
+    pthread_mutex_lock(dicc->mutex);
+    dictionary_remove_and_destroy(dicc->diccionario, key, (void*) element_destroyer);
+    pthread_mutex_unlock(dicc->mutex);
+}
+
+bool sdictionary_has_key(t_sdictionary* dicc, char* key){
+    bool hasKey;
+    pthread_mutex_lock(dicc->mutex);
+    hasKey = dictionary_has_key(dicc->diccionario, key);
+    pthread_mutex_unlock(dicc->mutex);
+    
+    return hasKey;
+}

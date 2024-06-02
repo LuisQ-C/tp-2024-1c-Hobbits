@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include "../../utils/include/protocolo.h"
 #include "../../utils/include/listas.h"
+#include "iniciar_planificador.h"
 #include <stdbool.h>
 
 typedef struct{
@@ -15,5 +16,13 @@ typedef struct{
     int instancias_recurso;
     t_squeue* cola_blocked;
 } t_recurso;
+
+typedef struct{
+    char* nombre;
+    int cantInstanciasUtil;
+} t_instancias_usadas;
+
+void iniciar_recursos();
+t_recurso* crear_recurso(char* nombre, int cantInstancias);
 
 #endif
