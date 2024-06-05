@@ -221,10 +221,10 @@ void finalizar_proceso(int pid){
     else if(squeue_any_satisfy(lista_procesos_exit, (void*) _elemento_encontrado)){
         log_error(logger, "QUE HACES, SI YA ESTA EN EXIT");
     }
-    
-    
 
 }
+
+
 
 //sem_post(&proceso_en_cola_new);
         //sem_post(&proceso_en_cola_ready);

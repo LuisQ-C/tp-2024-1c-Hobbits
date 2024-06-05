@@ -36,6 +36,8 @@ typedef enum{
     IO_FS,
     INTERRUPCION_QUANTUM,
     USER_INTERRUPT,
+    WAIT,
+    SIGNAL,
     EXIT
 }cod_op;
 

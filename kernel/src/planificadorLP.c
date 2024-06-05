@@ -22,11 +22,11 @@ void atender_estados_new(){
     
     while(1){
 
+        sem_wait(&planificacion_new_iniciada);
         sem_wait(&proceso_en_cola_new);
         /*if(!planificacion_iniciada){
             break;
         }*/
-        sem_wait(&planificacion_new_iniciada);
         sem_wait(&grado_de_multiprogramacion);
         t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_new);
         cambiar_a_ready(pcb_auxiliar);

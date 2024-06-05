@@ -8,6 +8,8 @@ extern t_squeue *lista_procesos_ready;
 extern t_squeue *lista_procesos_exec;
 extern t_squeue *lista_procesos_exit;
 extern t_slist *lista_procesos_blocked;
+extern t_list *lista_recursos_blocked;
+extern t_sdictionary *instancias_utilizadas;
 
 extern sem_t grado_de_multiprogramacion;
 extern sem_t proceso_en_cola_new;
@@ -69,6 +71,7 @@ void recibir_contexto_actualizado(int fd_dispatch)
         int* valor_reemplazado = list_replace(pcb_con_motivo, 5, aux);
         free(valor_reemplazado);
         interrupcion_usuario = false;
+        
     }
     
     t_pcb* pcb_a_actualizar = squeue_pop(lista_procesos_exec);
@@ -85,8 +88,6 @@ void actualizar_pcb_ejecutado(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
     int* quantum = list_get(pcb_con_motivo,2);
     uint32_t* estado = list_get(pcb_con_motivo,3);
     t_registros_generales* registros_generales = list_get(pcb_con_motivo,4);
-    int* aux = list_get(pcb_con_motivo, 5);
-    log_debug(logger, "%d", *aux);
     pcb_a_actualizar->pid = *pid;
     pcb_a_actualizar->pc = *pc;
     pcb_a_actualizar->quantum = *quantum;
@@ -147,6 +148,34 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             manejar_fin_con_motivo(INTERRUPTED_BY_USER_EXEC, pcb_a_actualizar);
 
             break;
+        case WAIT:
+            char* nombre_recurso = list_get(pcb_con_motivo, 6);
+            bool esValido; //= validar_recurso(nombre_recurso);
+            t_instancias_usadas* auxiliar_asdasd = malloc(sizeof(t_instancias_usadas));
+            if(esValido){
+                if(sdictionary_has_key(instancias_utilizadas, string_itoa(pcb_a_actualizar->pid))){
+                    //SI EXISTE LA KEY ES PORQUE YA USO UN RECURSO ALGUNA VEZ
+                    //DEBO EXTRAER LA LISTA ASOCIADA A ESA KEY CON UN T_LIST AUX?
+                    //ACCEDO AL INDEX DONDE ESTA EL NOMBRE DE RECURSO
+                    //SI NO EXISTE ESE RECURSO EN LA LISTA CREO UN NUEVO T_INSTANCIAS_USADAS
+                    //Y A LA CANTIDAD ASOCIADA A ESE NOMBRE DE RECURSO LE SUMO UNO
+                    //AL TERMINAR DE MODIFICARLO UTILIZO SD_PUT Y SOBREESCRIBO LA POSICION DE LA KEY
+                }else{
+                    //SI NUNCA ESTUVO EN EL DICC ENTONCES LE TENGO QUE CREAR UNA LISTA
+                    //Y LUEGO VUELVO A CREAR UN 
+                    //T_INSTANCIAS_USADAS* AUXILIAR Y LE HAGO MALLOC
+                    //LUEGO HAGO LIST_ADD AUXILIAR Y ESA LISTA LA METO EN EL DICCIONARIO
+                    //CON SD_PUT Y LA KEY EN ESTE CASO PID
+                }
+                //t_instancias_usadas* auxiliar = malloc(t_instancias_usadas);
+            }
+            else{
+                manejar_fin_con_motivo(INVALID_RESOURCE, pcb_a_actualizar);
+            }
+            break;
+        case SIGNAL:
+
+            break;
         default:
             log_warning(logger,"MOTIVO DE DESALOJO DESCONOCIDO");
             break;
@@ -181,7 +210,10 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: NEW - Estado Actual: EXIT", pcb_a_finalizar->pid);
-        sem_wait(&proceso_en_cola_new);
+        pthread_t hilo_fin;
+        pthread_create(&hilo_fin, NULL, (void*)fin_fin, NULL);
+        pthread_detach(hilo_fin);
+
         break;
     case INTERRUPTED_BY_USER_EXEC:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
@@ -195,6 +227,11 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
 
 }
 
+
+
+void fin_fin(){
+    sem_wait(&proceso_en_cola_new);
+}
 
 
 
