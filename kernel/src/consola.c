@@ -163,8 +163,32 @@ void instrucciones_consola(char* leido){
     string_array_destroy(instruccion_leida);
 }
 
+
 void ejecutar_script(char* path){
-    printf("ejecutar_script \n");
+    FILE* arch_instrucciones;
+    char* linea_almacenada = NULL;
+    size_t tam_almacenamiento = 0;
+    int linea_leida;
+    
+    arch_instrucciones = fopen(path, "rt");
+    if(arch_instrucciones == NULL)
+    {
+        log_error(logger, "No se pudo abrir el archivo de instrucciones");
+        return;
+    }
+    while((linea_leida = getline(&linea_almacenada, &tam_almacenamiento, arch_instrucciones)) != -1){
+        strtok(linea_almacenada, "\n");
+        if(!string_is_empty(linea_almacenada)){
+            if(!validar_instrucciones_leidas(linea_almacenada)){
+                log_error(logger, "Instruccion no reconocida");
+                continue;
+            }
+            instrucciones_consola(linea_almacenada);
+            
+        }
+    }
+    free(linea_almacenada);
+    fclose(arch_instrucciones);
 }
 
 void iniciar_proceso(char* path){

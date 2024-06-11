@@ -135,6 +135,20 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 sem_post(&grado_de_multiprogramacion);
             }
             break;
+        case IO_STDIN_READ:
+            break;
+        case IO_STDOUT_WRITE:
+            break;
+        case IO_FS_CREATE:
+            break;
+        case IO_FS_DELETE:
+            break;
+        case IO_FS_TRUNCATE:
+            break;
+        case IO_FS_WRITE:
+            break;
+        case IO_FS_READ:
+            break;
         case INTERRUPCION_QUANTUM:
             log_warning(logger, "PID: %d Fue desalojado por fin de Q", pcb_a_actualizar->pid);
             pcb_a_actualizar->estado = READY;
