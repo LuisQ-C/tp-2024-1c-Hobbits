@@ -16,6 +16,7 @@ void ejecutar_procesos_exec(void);
 //void pasar_a_cola_exec(void);
 void planificacion_fifo(void);
 void planificacion_rr(void);
+void planificacion_vrr(void);
 void iniciar_PCP(void);
 
 void recibir_contexto_actualizado(int fd_dispatch);
@@ -37,6 +38,15 @@ typedef enum{
 void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar);
 
 void fin_fin();
+
+typedef struct
+{
+    int quantum;
+    int pid;
+}data;
+
+
+void hilo_quantum(void* arg);
 //void enviar_interrupcion(int interrupcion, int pid);
 
 //void interrupcion_quantum(t_pcb* pcb_auxiliar);

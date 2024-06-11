@@ -47,6 +47,10 @@ void iniciar_PCP(){
         quantum = config_get_int_value(config, "QUANTUM");
         pthread_create(&hilo_CP, NULL, (void*) planificacion_rr, NULL);
     }
+    if(strcmp(algoritmo, "VRR") == 0){
+        quantum = config_get_int_value(config, "QUANTUM");
+        pthread_create(&hilo_CP, NULL, (void*) planificacion_vrr, NULL);
+    }
     
     pthread_detach(hilo_CP);
 
@@ -117,7 +121,14 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 nueva_solicitud_gen->pcb= pcb_a_actualizar;
                 nueva_solicitud_gen->tiempo = *tiempo_dormicion;
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_gen);
+                /*
+                if(NO EJECUTO TODO SU QUANTUM){
+                    int numero de instrucciones ejecutadas =list_get(pcb_con_motivo, 8)
+                    pcb_a_actualizar->quantum = pcb_a_actualizar->quantum - (instrucciones_ejecutadas * retardo_memoria);
 
+                }
+
+                */
                 log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
                 sem_post(interfaz_buscada->hay_proceso_cola);
             }
@@ -152,6 +163,7 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
         case INTERRUPCION_QUANTUM:
             log_warning(logger, "PID: %d Fue desalojado por fin de Q", pcb_a_actualizar->pid);
             pcb_a_actualizar->estado = READY;
+            pcb_a_actualizar->quantum = quantum; //PARA VRR
             squeue_push(lista_procesos_ready, pcb_a_actualizar);
             log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: READY", pcb_a_actualizar->pid);
             mostrar_cola_ready();
@@ -247,7 +259,15 @@ void fin_fin(){
     sem_wait(&proceso_en_cola_new);
 }
 
-
+void hilo_quantum(void* arg)
+{
+    data* quantum_recibido = arg;
+    int quantum_r = quantum_recibido->quantum;
+    int pid_r = quantum_recibido->pid;
+    free(quantum_recibido);
+    usleep(quantum_r*1000);
+    enviar_interrupcion(INTERRUPCION_QUANTUM, pid_r,fd_interrupt);
+}
 
 /*
 hilo que manda a ejecutar a las interfaces

@@ -4,6 +4,7 @@
 extern t_config* config;
 t_squeue *lista_procesos_new;
 t_squeue *lista_procesos_ready;
+t_squeue *lista_procesos_ready_plus;
 t_squeue *lista_procesos_exec;
 t_squeue *lista_procesos_exit;
 t_slist *lista_procesos_blocked;
@@ -20,6 +21,7 @@ sem_t planificacion_new_iniciada;
 sem_t planificacion_ready_iniciada;
 sem_t planificacion_exec_iniciada;
 sem_t planificacion_blocked_iniciada;
+sem_t hay_una_peticion_de_proceso;
 
 bool planificacion_iniciada = false;
 int multiprog;
@@ -34,6 +36,7 @@ void iniciar_cosas_necesarias_planificador(){
     iniciar_recursos();
     lista_procesos_new = squeue_create();
     lista_procesos_ready = squeue_create();
+    lista_procesos_ready_plus = squeue_create();
     lista_procesos_exec = squeue_create();
     lista_procesos_exit = squeue_create();
     lista_procesos_blocked = slist_create();
@@ -47,6 +50,7 @@ void iniciar_cosas_necesarias_planificador(){
     sem_init(&planificacion_exec_iniciada, 0, 0);
     sem_init(&planificacion_blocked_iniciada,0,0);
     sem_init(&grado_de_multiprogramacion, 0, multiprog);
+    sem_init(&hay_una_peticion_de_proceso, 0, 0);
     iniciar_PLP();
     iniciar_PCP();
 

@@ -1,10 +1,13 @@
-#include "../include/rr.h"
+#include "../include/vrr.h"
 
 extern t_config* config;
 extern t_log* logger;
 
 extern t_squeue *lista_procesos_new;
 extern t_squeue *lista_procesos_ready;
+
+extern t_squeue *lista_procesos_ready_plus;
+
 extern t_squeue *lista_procesos_exec;
 extern t_squeue *lista_procesos_exit;
 extern t_slist *lista_procesos_blocked;
@@ -26,39 +29,31 @@ extern int quantum;
 extern char* algoritmo;
 
 
-
-void planificacion_rr(){
-    
+void planificacion_vrr(){
     while (1)
     {
         sem_wait(&proceso_en_cola_ready);
         sem_wait(&planificacion_ready_iniciada);
-        
-        t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_ready);
-        pcb_auxiliar->estado = EXEC;
-        squeue_push(lista_procesos_exec, pcb_auxiliar);
-        log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
-        
-        enviar_pcb(pcb_auxiliar, fd_dispatch);
+        t_pcb* pcb_auxiliar;
+
+        if(!squeue_is_empty(lista_procesos_ready_plus)){
+            pcb_auxiliar = squeue_pop(lista_procesos_ready_plus);    
+        }
+        else{
+            pcb_auxiliar = squeue_pop(lista_procesos_ready);
+        }
 
         pthread_t hilo_q;
         data* new_data = malloc(sizeof(data));
-        new_data->quantum = quantum;
+        new_data->quantum = pcb_auxiliar->quantum;
         new_data->pid = pcb_auxiliar->pid;
-        pthread_create(&hilo_q,NULL,(void*)hilo_quantum,(void*) new_data);
+        pthread_create(&hilo_q, NULL, (void *)hilo_quantum, (void*) new_data);
         pthread_detach(hilo_q);
         recibir_contexto_actualizado(fd_dispatch);
-        pthread_cancel(hilo_q); //PODRIA IR DENTRO DE RECIBIR CONTEXTO ACTUALIZADO LUEGO DE RECIBIR OPERACION PARA QUE LO CANCELE LO ANTES POSIBLE
+        pthread_cancel(hilo_q);
         sem_post(&planificacion_ready_iniciada);
+
+
     }
     
 }
-
-
-//HILO QUE ESPERE Y MANDE LA INTERRUPCION, EL OTRO SE QUEDARA BLOQUEANTE
-/*void interrupcion_quantum(t_pcb* pcb_auxiliar){
-    usleep(quantum * 1000);
-    int pid_a_enviar = 0;
-    pid_a_enviar = pcb_auxiliar->pid;
-    send(fd_interrupt, &pid_a_enviar, sizeof(int), 0);
-}*/

@@ -24,6 +24,7 @@ void detener_planificacion(void);
 void iniciar_planificacion(void);
 void multiprogramacion(int valor);
 void proceso_estado(void);
+void crear_proceso(void);
 
 void cambiar_grado_de_multiprogramacion(int nuevo_grado_mp);
 void bajar_grado();

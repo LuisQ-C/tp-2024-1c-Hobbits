@@ -18,8 +18,11 @@ extern sem_t planificacion_new_iniciada;
 extern sem_t planificacion_ready_iniciada;
 extern sem_t planificacion_exec_iniciada;
 extern sem_t planificacion_blocked_iniciada;
+extern sem_t hay_una_peticion_de_proceso;
 
 extern bool planificacion_iniciada;
+
+t_squeue* squeue_path;
 
 char* opciones[] = {
     "EJECUTAR_SCRIPT",
@@ -77,6 +80,10 @@ int fd_mem;
 int fd_IO;
 //asdasd
 void iniciar_consola(void* fd_info){
+    squeue_path = squeue_create();
+    pthread_t hilo_crear_proceso;
+    pthread_create(&hilo_crear_proceso, NULL, (void*) crear_proceso, NULL);
+    pthread_detach(hilo_crear_proceso);
     //t_log* logger;
     //logger = iniciar_logger("kernel.log","Kernel",1,LOG_LEVEL_INFO);
     info_fd* auxiliar = fd_info;
@@ -147,8 +154,12 @@ void instrucciones_consola(char* leido){
 
     if(strcmp(instruccion_leida[0], "EJECUTAR_SCRIPT") == 0)
         ejecutar_script(instruccion_leida[1]);
-    else if (strcmp(instruccion_leida[0], "INICIAR_PROCESO") == 0)
-        iniciar_proceso(instruccion_leida[1]);
+    else if (strcmp(instruccion_leida[0], "INICIAR_PROCESO") == 0){
+        //iniciar_proceso(instruccion_leida[1]);
+        char* aux = string_duplicate(instruccion_leida[1]);
+        squeue_push(squeue_path, aux);
+        sem_post(&hay_una_peticion_de_proceso);
+    }
     else if (strcmp(instruccion_leida[0], "FINALIZAR_PROCESO") == 0)
         finalizar_proceso(atoi(instruccion_leida[1]));
     else if (strcmp(instruccion_leida[0], "DETENER_PLANIFICACION") == 0)
@@ -217,7 +228,20 @@ void iniciar_proceso(char* path){
 
 }
 
+void crear_proceso(){
+
+    while(1){
+        sem_wait(&hay_una_peticion_de_proceso);
+        char* path_aux = squeue_pop(squeue_path);
+        iniciar_proceso(path_aux);
+        free(path_aux);
+    }
+
+}
+
+
 void finalizar_proceso(int pid){
+    detener_planificacion();
     //printf("finalizar_proceso \n");
     t_pcb* pcb_auxiliar;
 
@@ -245,6 +269,8 @@ void finalizar_proceso(int pid){
     else if(squeue_any_satisfy(lista_procesos_exit, (void*) _elemento_encontrado)){
         log_error(logger, "QUE HACES, SI YA ESTA EN EXIT");
     }
+
+    iniciar_planificacion();
 
 }
 
