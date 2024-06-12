@@ -285,6 +285,10 @@ void detener_planificacion(){
     if(planificacion_iniciada)
     {
         planificacion_iniciada = false;
+
+        pthread_t detener_exec;
+        pthread_create(&detener_exec,NULL,(void*) detener_cola_exec,NULL);
+        pthread_detach(detener_exec);
         /*
         pthread_t detener_new, detener_ready, detener_exec, detener_blocked;
         pthread_create(&detener_new,NULL,(void*) detener_cola_new,NULL);
@@ -298,7 +302,8 @@ void detener_planificacion(){
         */
         
         log_info(logger, "Se detuvo la planificacion");
-    }else
+    }
+    else
     {
         log_info(logger,"la plani esta pausada ya");
     }
@@ -322,11 +327,13 @@ void detener_cola_blocked(void* arg)
 }
 
 void iniciar_planificacion(){
-    if(!planificacion_iniciada){
+    if(planificacion_iniciada == false){
     //printf("iniciar_planificacion \n");
     planificacion_iniciada = true;
-    
+    int valor;
     sem_post(&planificacion_new_iniciada);
+    sem_getvalue(&planificacion_new_iniciada,&valor);
+    printf("\nESTO EN CONSOLA, VALOR NEW INICIADA: %d \n",valor);
     sem_post(&planificacion_ready_iniciada);
     sem_post(&planificacion_exec_iniciada);
     sem_post(&planificacion_blocked_iniciada);

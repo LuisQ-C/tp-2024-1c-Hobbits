@@ -239,18 +239,18 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXIT", pcb_a_finalizar->pid);
-        pthread_t hilo_fin_ready;
+        /*pthread_t hilo_fin_ready;
         pthread_create(&hilo_fin_ready, NULL, (void*) fin_fin_ready, NULL);
-        pthread_detach(hilo_fin_ready);//Agregar un hilo para que no se bloquee
+        pthread_detach(hilo_fin_ready);//Agregar un hilo para que no se bloquee*/
         sem_post(&grado_de_multiprogramacion);
         break;
     case INTERRUPTED_BY_USER_NEW:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: NEW - Estado Actual: EXIT", pcb_a_finalizar->pid);
-        pthread_t hilo_fin;
+        /*pthread_t hilo_fin;
         pthread_create(&hilo_fin, NULL, (void*)fin_fin, NULL);
-        pthread_detach(hilo_fin);
+        pthread_detach(hilo_fin);*/
         break;
     case INTERRUPTED_BY_USER_EXEC:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);

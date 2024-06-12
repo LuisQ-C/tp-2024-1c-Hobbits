@@ -26,37 +26,63 @@ extern bool planificacion_iniciada;
 void planificacion_fifo(){
     while (1)
     {
+        int valor;
+        sem_getvalue(&planificacion_ready_iniciada,&valor);
+        //printf("\nVALOR: %d\n",valor);
         sem_wait(&planificacion_ready_iniciada);
         sem_wait(&proceso_en_cola_ready);
+        
         if(!planificacion_iniciada){
+            sem_getvalue(&planificacion_ready_iniciada,&valor);
+            //printf("\nVALOR DEL IF: %d\n",valor);
             sem_post(&proceso_en_cola_ready);
+            log_info(logger,"ENTRE AL IF DE LA PLANI PAUSADA");
             continue;
         }
 
-        if(squeue_is_empty(lista_procesos_ready)){
+
+        if(squeue_is_empty(lista_procesos_ready) == false)
+        {
+            t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_ready);
+            pcb_auxiliar->estado = EXEC;
+            squeue_push(lista_procesos_exec, pcb_auxiliar);
+            enviar_pcb(pcb_auxiliar, fd_dispatch);
+            log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
+            recibir_contexto_actualizado(fd_dispatch);
+            //sem_post(&ejecutar_proceso);
             sem_post(&planificacion_ready_iniciada);
-            continue;
         }
-        sem_wait(&pasar_a_ejecucion);
+        else{
+            log_info(logger,"ENTRE AL ELSE DE COLA VACIA");
+            sem_post(&planificacion_ready_iniciada);
+        }
 
-        pasar_a_cola_exec();
+        
+        
     }
     
 }
 
 void pasar_a_cola_exec(){
-
-    t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_ready);
-    pcb_auxiliar->estado = EXEC;
-    squeue_push(lista_procesos_exec, pcb_auxiliar);
-    log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
-    sem_post(&ejecutar_proceso);
-    sem_post(&planificacion_ready_iniciada);
+    //sem_wait(&pasar_a_ejecucion);
+    /*sem_wait(&pasar_a_ejecucion);
+    if(squeue_is_empty(lista_procesos_ready) == false)
+    {
+        t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_ready);
+        pcb_auxiliar->estado = EXEC;
+        squeue_push(lista_procesos_exec, pcb_auxiliar);
+        enviar_pcb(pcb_auxiliar, fd_dispatch);
+        log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
+        recibir_contexto_actualizado(fd_dispatch);
+        //sem_post(&ejecutar_proceso);
+        sem_post(&planificacion_ready_iniciada);
+    }
+    sem_post(&planificacion_ready_iniciada);*/
 }
 
 //HILO ENCARGADO DE UNICAMENTE ENVIAR A EXEC, RECIBIR CONTEXTO ACTUALIZADO Y ENVIAR A BLOCKED, EXIT DEPENDIENDO DEL CASO
 void ejecutar_procesos_exec(){
-    while (1)
+   /* while (1)
     {
         sem_wait(&ejecutar_proceso);
         t_pcb* pcb_auxiliar = squeue_peek(lista_procesos_exec);
@@ -69,5 +95,5 @@ void ejecutar_procesos_exec(){
         //supongamos que terminó
         sem_post(&pasar_a_ejecucion);
         //sem_post(&grado_de_multiprogramacion); LO MANDAMOS AL CASE EXIT, PORQUE ES EN EL UNICO CASO DONDE AUMENTA EL GRADO MULTRIPROGR.
-    }
+    }*/
 }
