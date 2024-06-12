@@ -20,20 +20,32 @@ void iniciarInterfaz(char* nombreDeInterfaz,  t_config* config, int fd_conexion_
     {
         return;
     }
-    
+
     free(tipoYnombreDeInterfaz);
 
     if (!(strcmp(tipoDeInterfaz, "GENERICA")))
     {
         log_info(logger,"La interfaz recibida es: GENERICA");
-        interfazGenerica(config, fd_conexion_kernel);
+        interfazGenerica(config,fd_conexion_kernel);
     }
+    else if (!(strcmp(tipoDeInterfaz, "STDIN")))
+    {
+        log_info(logger,"La interfaz recibida es: STDIN");
+        stDin(config, fd_conexion_kernel,fd_conexion_memoria);
+    }
+    else  if (!(strcmp(tipoDeInterfaz, "STDOUT")))
+    {
+        log_info(logger,"La interfaz recibida es: STDOUT");
+        stdOut(config, fd_conexion_kernel, fd_conexion_memoria);
+    }
+
     else
     {
         printf("\nERROR\n");
     }
 }
 
+/*
 void interfazGenerica(t_config* config, int fd_conexion_kernel)//pasa el config para no leer cada vez que inicia una interfaz todo completo
 {
     int tiempoDeUnidadDeTrabajo;
@@ -53,4 +65,4 @@ void interfazGenerica(t_config* config, int fd_conexion_kernel)//pasa el config 
     }
 
 
-}
+}*/

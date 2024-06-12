@@ -1,5 +1,5 @@
-#ifndef INTERFAZ_GENERICA_H_
-#define INTERFAZ_GENERICA_H_
+#ifndef INTERFAZ_GEN_H_
+#define INTERFAZ_GEN_H_
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -8,7 +8,6 @@
 #include "../../utils/include/protocolo.h"
 
 
-//void interfazGenerica(t_config* config, int fd_conexion_kernel);
-
+void interfazGenerica(t_config* config, int fd_conexion_kernel);
 
 #endif

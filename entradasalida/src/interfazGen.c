@@ -1,7 +1,7 @@
-#include "../include/interfazGenerica.h"
+#include "../include/interfazGen.h"
 
 extern t_log* logger;
-/*
+
 void interfazGenerica(t_config* config, int fd_conexion_kernel)//pasa el config para no leer cada vez que inicia una interfaz todo completo
 {
     int tiempoDeUnidadDeTrabajo;
@@ -18,4 +18,4 @@ void interfazGenerica(t_config* config, int fd_conexion_kernel)//pasa el config 
     }
 
 
-}*/
+}
