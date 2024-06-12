@@ -339,13 +339,61 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             int tamanio_dato = obtener_valor_registro(instruccionDesarmada[3]);
             
             pcb_a_enviar->pc = registro.PC+1;
-            io_stdin_read(pcb_a_enviar,nombre_interfaz,direccion_logica,tamanio_dato,fd_dispatch);
+            io_stdin_stdout(pcb_a_enviar,nombre_interfaz,direccion_logica,tamanio_dato,fd_dispatch,fd_memoria,IO_STDIN_READ);
+            free(nombre_interfaz);
             break;
         }
         case IO_STDOUT_WRITE:
         {
             MOTIVO_DESALOJO = IO_STDOUT_WRITE;
+            //INTERFAZ, REGISTRO DIRECCION, REGISTRO TAMANIO
+            char* nombre_interfaz = string_duplicate(instruccionDesarmada[1]);
+            int direccion_logica = obtener_valor_registro(instruccionDesarmada[2]);
+            int tamanio_dato = obtener_valor_registro(instruccionDesarmada[3]);
 
+            pcb_a_enviar->pc = registro.PC+1;
+            io_stdin_stdout(pcb_a_enviar,nombre_interfaz,direccion_logica,tamanio_dato,fd_dispatch,fd_memoria,IO_STDOUT_WRITE);
+            free(nombre_interfaz);
+            break;
+        }
+        case IO_FS_CREATE:
+        {
+            MOTIVO_DESALOJO = IO_FS_CREATE;
+            char* nombre_interfaz = string_duplicate(instruccionDesarmada[1]);
+            char* nombre_archivo = string_duplicate(instruccionDesarmada[2]);
+
+            pcb_a_enviar->pc = registro.PC+1;
+
+            io_fs_create(pcb_a_enviar,nombre_interfaz,nombre_archivo,fd_dispatch);
+            free(nombre_archivo);
+            free(nombre_interfaz);
+            break;
+        }
+        case IO_FS_DELETE:
+        {
+            MOTIVO_DESALOJO = IO_FS_DELETE;
+            char* nombre_interfaz = string_duplicate(instruccionDesarmada[1]);
+            char* nombre_archivo = string_duplicate(instruccionDesarmada[2]);
+
+            pcb_a_enviar->pc = registro.PC+1;
+
+            io_fs_delete(pcb_a_enviar,nombre_interfaz,nombre_archivo,fd_dispatch);
+            free(nombre_archivo);
+            free(nombre_interfaz);
+            break;
+        }
+        case IO_FS_TRUNCATE:
+        {
+            MOTIVO_DESALOJO = IO_FS_TRUNCATE;
+            char* nombre_interfaz = string_duplicate(instruccionDesarmada[1]);
+            char* nombre_archivo = string_duplicate(instruccionDesarmada[2]);
+            int tamanio_archivo = obtener_valor_registro(instruccionDesarmada[3]);
+
+            pcb_a_enviar->pc = registro.PC+1;
+
+            io_fs_truncate(pcb_a_enviar,nombre_interfaz,nombre_archivo,tamanio_archivo,fd_dispatch);
+            free(nombre_archivo);
+            free(nombre_interfaz);
             break;
         }
         case EXIT:
