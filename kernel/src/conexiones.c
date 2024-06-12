@@ -71,7 +71,7 @@ void procesarConexionesIO(void* datosServerInterfaces){
 
     recibir_operacion(fd_conexion_IO);
     char* interfaz_conectada = recibir_mensaje(fd_conexion_IO,logger);
-    enviar_handshake_ok(logger,fd_conexion_IO,interfaz_conectada);
+    
 
     //int codigo_operacion;
 
@@ -80,11 +80,23 @@ void procesarConexionesIO(void* datosServerInterfaces){
     char** tipo_nombre_io = string_split(interfaz_conectada,"-");
     int tipo = string_to_type(tipo_nombre_io[0]);
 
+    //CHEQUEO INTERFACES EXISTENES Y TIPOS CORRECTOS
+    if(sinterfaz_name_already_took(tipo_nombre_io[1]))
+    {
+        enviar_handshake_error(logger,fd_conexion_IO,interfaz_conectada);
+        close(fd_conexion_IO);
+        return;
+    }else
+    {
+        enviar_handshake_ok(logger,fd_conexion_IO,interfaz_conectada);
+    }
+
     if (tipo==-1)
     {
         log_warning(logger,"Tipo Invalido, finalizando hilo");
         return;
     }
+    
     
     
 

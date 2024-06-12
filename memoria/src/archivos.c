@@ -47,6 +47,7 @@ void agregar_proceso_lista(int pid,FILE* f)
     t_proceso* proceso_creado = malloc(sizeof(t_proceso));
     proceso_creado->pid = pid;
     proceso_creado->instrucciones = pasarArchivoEstructura(f);
+    proceso_creado->tabla_paginas = crear_tabla_paginas();
     pthread_mutex_lock(&mutex_lista_procesos);
     list_add(instrucciones_procesos,proceso_creado);
     pthread_mutex_unlock(&mutex_lista_procesos);
@@ -55,19 +56,30 @@ void agregar_proceso_lista(int pid,FILE* f)
 /* Libera las estructuras asociadas al proceso */
 void destruir_proceso_lista(t_proceso* proceso_a_destruir)
 {
+    destruir_tabla_paginas(proceso_a_destruir->tabla_paginas);
     string_array_destroy(proceso_a_destruir->instrucciones);
     free(proceso_a_destruir);
 }
 
 /* Quitar el proceso (pid) de la lista de procesos*/
-void quitar_proceso_lista(int pid)
+int quitar_proceso_lista(int pid)
 {
+    int cant_pag_eliminadas;
     pthread_mutex_lock(&mutex_lista_procesos);
     t_proceso* proceso = buscar_proceso_pid(pid);
+    if(proceso == NULL)
+    {
+        pthread_mutex_unlock(&mutex_lista_procesos);
+        return -1;
+    }
     list_remove_element(instrucciones_procesos,proceso); //devuelve 0 si no encuentra el elemento
     pthread_mutex_unlock(&mutex_lista_procesos);
+    cant_pag_eliminadas = list_size(proceso->tabla_paginas);
+    liberar_frames_tabla(proceso->tabla_paginas);
     destruir_proceso_lista(proceso);
+    return cant_pag_eliminadas;
 }
+
 
 t_proceso* s_buscar_proceso_pid(int pid)
 {

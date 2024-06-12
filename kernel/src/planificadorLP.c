@@ -24,10 +24,37 @@ void atender_estados_new(){
 
         sem_wait(&planificacion_new_iniciada);
         sem_wait(&proceso_en_cola_new);
+        /*
+            printf("\nPLANIFICACION NEW INICIADA \n");
+            int hola;
+            sem_getvalue(&proceso_en_cola_new, &hola);
+            printf("\n %d \n", hola);
+            int hola2;
+            sem_getvalue(&planificacion_new_iniciada, &hola2);
+            printf("\n %d \n", hola2);*/
+
+        /*
+        if(squeue_is_empty(lista_procesos_new)){
+            sem_post(&planificacion_new_iniciada);
+            continue;
+        }*/
         /*if(!planificacion_iniciada){
             break;
         }*/
+        if(!planificacion_iniciada){
+            printf("\nESTA VACIA ? \n");
+            sem_post(&proceso_en_cola_new);
+            continue;
+                
+        }
         sem_wait(&grado_de_multiprogramacion);
+        if (squeue_is_empty(lista_procesos_new)){
+            printf("\nESTA VACIA \n");
+            sem_post(&planificacion_new_iniciada);
+            sem_post(&grado_de_multiprogramacion);
+            
+            continue;
+        }
         t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_new);
         cambiar_a_ready(pcb_auxiliar);
         sem_post(&proceso_en_cola_ready);

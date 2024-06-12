@@ -24,10 +24,11 @@ typedef struct
     uint32_t DI;
 } t_registro_cpu;
 
-extern t_registro_cpu registro;
+
 
 int string_to_opcode(char* instruccion);
 uint8_t* string_to_register8(char* registroConvertir);
 uint32_t* string_to_register32(char* registroConvertir);
+int obtener_valor_registro(char* registro_chequear);
 
 #endif

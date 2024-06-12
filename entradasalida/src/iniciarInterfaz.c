@@ -4,7 +4,8 @@ extern t_log* logger;
 void iniciarInterfaz(char* nombreDeInterfaz,  t_config* config, int fd_conexion_kernel, int fd_conexion_memoria )// o hacerlo global? deberiamos agregar el fd de kernel, despues tambien habria que agregar el de la memoria
 {
     char* tipoYnombreDeInterfaz = string_new();
-    
+    int resultado_handshake_kernel;
+    int resultado_handshake_memoria;
     char* tipoDeInterfaz;
     //int* tiempoDeUnidadDeTrabajo;
     tipoDeInterfaz = config_get_string_value(config, "TIPO_INTERFAZ");
@@ -12,8 +13,14 @@ void iniciarInterfaz(char* nombreDeInterfaz,  t_config* config, int fd_conexion_
     string_append(&tipoYnombreDeInterfaz, tipoDeInterfaz);
     string_append(&tipoYnombreDeInterfaz, "-");
     string_append(&tipoYnombreDeInterfaz, nombreDeInterfaz);
-    mandarHandshake(logger,fd_conexion_kernel,"MODULO KERNEL",tipoYnombreDeInterfaz);
-    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA",tipoYnombreDeInterfaz);
+    resultado_handshake_kernel = mandarHandshake(logger,fd_conexion_kernel,"MODULO KERNEL",tipoYnombreDeInterfaz);
+    resultado_handshake_memoria = mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA",tipoYnombreDeInterfaz);
+
+    if(resultado_handshake_kernel == HANDSHAKE_DENEGADO || resultado_handshake_memoria == HANDSHAKE_DENEGADO)
+    {
+        return;
+    }
+    
     free(tipoYnombreDeInterfaz);
 
     if (!(strcmp(tipoDeInterfaz, "GENERICA")))

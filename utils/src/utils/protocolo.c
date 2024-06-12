@@ -1,42 +1,39 @@
 #include "../include/protocolo.h"
 
-void mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario, char* nombreOrigen)
+int mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario, char* nombreOrigen)
 {
     int bytes;
     int32_t result = 3;
-    /*cod_op handshake = HANDSHAKE;
-    int valorHandshake = handshake;*/
-    while(1)
-    {   
-        enviar_mensaje(nombreOrigen,fd_destinatario,HANDSHAKE);
+    
+    enviar_mensaje(nombreOrigen,fd_destinatario,HANDSHAKE);
         /*if(bytes == -1)
         {
             log_error(logger,"Error al enviar el handshake (funcion send)");
             perror("\nError en send de mandarHandshake");
             exit(1);
         }*/
-        bytes = recv(fd_destinatario,&result,sizeof(int32_t),MSG_WAITALL);
-        if(bytes == -1)
-        {
-            log_error(logger,"Error al enviar el handshake (funcion recv)");
-            perror("\nError en recv de mandarHandshake");
-            exit(1);
-        }
-        if(result==0)
-        {
-            log_info(logger,"HANDSHAKE ACEPTADO DE: %s!",nombreDestinatario);
-        }else{
-            log_error(logger,"HANDSHAKE DENEGADO DE: %s!",nombreDestinatario);
-        }
-        break;
+    bytes = recv(fd_destinatario,&result,sizeof(int32_t),MSG_WAITALL);
+    if(bytes == -1)
+    {
+        log_error(logger,"Error al enviar el handshake (funcion recv)");
+        perror("\nError en recv de mandarHandshake");
+        exit(1);
     }
-    
+    if(result==HANDSHAKE_ACEPTADO)
+    {
+        log_info(logger,"HANDSHAKE ACEPTADO DE: %s!",nombreDestinatario);
+        return HANDSHAKE_ACEPTADO;
+    }else{
+        log_error(logger,"HANDSHAKE DENEGADO DE: %s!",nombreDestinatario);
+        return HANDSHAKE_DENEGADO;
+    }
+
 }
+
 void enviar_handshake_ok(t_log* logger,int fd_origen, char* nombreOrigen)
 {
     int bytes;
-    int32_t resultOk = 0;
-    //int32_t resultError = -1;
+    int32_t resultOk = HANDSHAKE_ACEPTADO;
     log_info(logger,"HANDSHAKE ACEPTADO A: %s!", nombreOrigen);
     bytes = send(fd_origen, &resultOk, sizeof(int32_t), 0);
     if(bytes == -1)
@@ -46,6 +43,54 @@ void enviar_handshake_ok(t_log* logger,int fd_origen, char* nombreOrigen)
             exit(1);
         }
 }
+void enviar_handshake_error(t_log* logger,int fd_origen, char* nombreOrigen)
+{
+    int bytes;
+    int32_t resultError = HANDSHAKE_DENEGADO;
+    log_info(logger,"HANDSHAKE DENEGADO A: %s!", nombreOrigen);
+    bytes = send(fd_origen, &resultError, sizeof(int32_t), 0);
+    if(bytes == -1)
+    {
+        log_error(logger,"Error al enviar el resultado del handshake (funcion send)");
+        perror("\nError en send de recibir_handshake");
+        exit(1);
+    }
+}
+
+void enviar_datos_config_memoria_a_cpu(int tam_memoria, int tam_pagina, int fd_cpu)
+{   
+    t_paquete* nuevo_paquete = crear_paquete(DATOS_CONFIG);
+
+    agregar_a_paquete(nuevo_paquete,&tam_memoria,sizeof(int));
+    agregar_a_paquete(nuevo_paquete,&tam_pagina,sizeof(int));
+
+    enviar_paquete(nuevo_paquete,fd_cpu);
+    eliminar_paquete(nuevo_paquete);
+}
+
+void recibir_datos_config_memoria(int* tam_memoria, int* tam_pagina, int fd_memoria,t_log* logger)
+{
+    if(recibir_operacion(fd_memoria)==DATOS_CONFIG)
+    {
+        t_list* paquete_recibido = recibir_paquete(fd_memoria);
+
+        int* tam_memoria_recibido = list_get(paquete_recibido,0);
+        int* tam_pagina_recibido = list_get(paquete_recibido,1);
+
+        *tam_memoria = *tam_memoria_recibido;
+        *tam_pagina = *tam_pagina_recibido;
+
+        list_destroy_and_destroy_elements(paquete_recibido,(void*)liberar_elemento);
+    }
+    else
+    {
+        log_error(logger,"ERROR AL RECIBIR DATOS CONFIG DE MEMORIA");
+        abort();
+    }
+    
+}
+
+
 
 //SERIALIZACION DEL TP0
 int recibir_operacion(int socket_cliente)
@@ -332,6 +377,135 @@ int recibir_interrupcion(int* pid, int fd_interrupt)
     return interrupcion_recibida;
 }
 
+//PAQUETE ESCRITURA DE CPU-MEMORIA
+void enviar_paquete_escritura(int pid,void* dato,int tamanio_dato,int base,int tamanio_fragmento,int direccion_fisica, int fd_destino)
+{
+    t_paquete* paquete = crear_paquete(ESCRITURA);
+
+    agregar_a_paquete(paquete,&pid,sizeof(int));
+    agregar_a_paquete(paquete,dato,tamanio_dato);
+    agregar_a_paquete(paquete,&base,sizeof(int));
+    agregar_a_paquete(paquete,&tamanio_fragmento,sizeof(int));
+    agregar_a_paquete(paquete,&direccion_fisica,sizeof(int));
+
+    enviar_paquete(paquete,fd_destino);
+
+    eliminar_paquete(paquete);
+}
+//LECTURA 
+void enviar_paquete_lectura(int pid,int tamanio_fragmento,int direccion_fisica, int fd_destino)
+{
+    t_paquete* paquete = crear_paquete(LECTURA);
+
+    agregar_a_paquete(paquete,&pid,sizeof(int));
+    agregar_a_paquete(paquete,&tamanio_fragmento,sizeof(int));
+    agregar_a_paquete(paquete,&direccion_fisica,sizeof(int));
+
+    enviar_paquete(paquete,fd_destino);
+
+    eliminar_paquete(paquete);
+}
+void* recibir_dato_leido (int fd_destino, int tamanio_fragmento)
+{
+    void* dato_leido = malloc(tamanio_fragmento); //requiere free fuera funcion
+    recv(fd_destino,dato_leido,tamanio_fragmento,MSG_WAITALL);
+    return dato_leido;
+}
+
+//SOLICITUD MACRO
+void enviar_solicitud_macro(int pid, int pagina_solicitar,int fd_destino)
+{
+            
+    t_paquete* paquete = crear_paquete(ACCESO_TABLA_PAGINA);
+            
+    agregar_a_paquete(paquete,&pid,sizeof(int));
+    agregar_a_paquete(paquete,&pagina_solicitar,sizeof(int));
+
+    enviar_paquete(paquete,fd_destino);
+            
+    eliminar_paquete(paquete);
+}
+//SOLICITUD TODOS LOS MARCOS, DEVUELVE LISTA ORDENADA CON LOS MARCOS
+/*
+t_list* solicitar_macros(int pagina_inicial, int paginas_totales,int pid, int fd_destinatario)
+{
+    t_list* lista_marcos = list_create();
+    int* marco;
+    for(int i=0;i<paginas_totales;i++)
+    {
+        //BUSCAR MARCO EN TLB
+        *marco = 
+        marco = malloc(sizeof(int));
+        enviar_solicitud_macro(pid,pagina_inicial,fd_destinatario);
+        pagina_inicial++;
+        recv(fd_destinatario,marco,sizeof(int),MSG_WAITALL);
+        list_add(lista_marcos,marco);
+    }
+    return lista_marcos;
+}*/
+
+//DESERIALIZAR DATOS CREACION NUEVO PROCESO
+void recibir_creacion_proceso(int* pid, char** path_kernel,int fd_kernel)
+{
+    t_list* paquete = recibir_paquete(fd_kernel);
+    int* pid_recibido = list_get(paquete,0);
+    char* path_kernel_recibido = list_get(paquete,1);
+    *pid = *pid_recibido;
+    *path_kernel = string_duplicate(path_kernel_recibido);
+    list_destroy_and_destroy_elements(paquete,(void*) liberar_elemento);
+}
+// RECIBIR DESTRUCCION PROCESO
+void recibir_destruccion_proceso(int* pid, int fd_kernel)
+{
+    t_list* paquete = recibir_paquete(fd_kernel);
+    int* pid_recibido = list_get(paquete,0);
+    *pid = *pid_recibido;
+    list_destroy_and_destroy_elements(paquete,(void*)liberar_elemento);
+}
+
+void* recibir_peticion_escritura(int* pid,int* base,int* tamanio,int* direccion_fisica,int fd_cpu)
+{
+    t_list* porcion_escritura = recibir_paquete(fd_cpu);
+    //VIENE EN ORDEN: DATO, BASE, TAMANIO, DIRECCION FISICA
+    int* pid_recibido = list_get(porcion_escritura,0);
+    void* dato_escribir = list_get(porcion_escritura,1);
+    int* base_recibido = list_get(porcion_escritura,2);
+    int* tamanio_recibido = list_get(porcion_escritura,3);
+    int* direccion_fisica_recibido = list_get(porcion_escritura,4);
+
+    *pid = *pid_recibido;
+    *base = *base_recibido;
+    *tamanio = *tamanio_recibido;
+    *direccion_fisica = *direccion_fisica_recibido;
+
+    list_destroy(porcion_escritura);
+    free(pid_recibido);
+    free(base_recibido);
+    free(tamanio_recibido);
+    free(direccion_fisica_recibido);
+
+    return dato_escribir;
+}
+
+void* recibir_peticion_lectura(int* pid, int* tamanio,int* direccion_fisica,int fd_cpu)
+{
+    t_list* dato_leer = recibir_paquete(fd_cpu);
+            
+    int* pid_recibido = list_get(dato_leer,0);
+    int* tamanio_fragmento_recibido = list_get(dato_leer,1);
+    int* direccion_fisica_recibido = list_get(dato_leer,2);
+
+    void* dato_leido = malloc(*tamanio_fragmento_recibido);
+
+    *pid = *pid_recibido;
+    *tamanio = *tamanio_fragmento_recibido;
+    *direccion_fisica = *direccion_fisica_recibido;
+
+    list_destroy_and_destroy_elements(dato_leer,(void*) liberar_elemento);
+
+    return dato_leido;
+}
+
 void liberar_elemento(void* self)
 {
     free(self);
@@ -373,75 +547,3 @@ void liberar_elemento(void* self)
 
 
 
-
-/*
-//SERIALIZACION
-//EN size si se trabaja con un char* pasarle un caracter extra \0
-t_buffer *buffer_create(uint32_t size){
-    t_buffer* buffer = malloc(sizeof(t_buffer));
-    buffer->size = size;    
-    buffer->offset = 0;
-    buffer->stream = malloc(buffer->size);
-    return buffer;
-}
-void buffer_destroy(t_buffer *buffer){
-    free(buffer->stream);
-    free(buffer);
-}
-
-void buffer_add(t_buffer *buffer, void* data, uint32_t size){
-
-}
-
-
-// Agrega un uint8_t al buffer
-void buffer_add_uint32(t_buffer *buffer, uint32_t data){
-    void* stream = buffer->stream;
-    int offset = buffer->offset;
-    memcpy(stream + offset, &data, sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
-}
-// Agrega un uint8_t al buffer
-void buffer_add_uint8(t_buffer *buffer, uint8_t data){
-    void* stream = buffer->stream;
-    int offset = buffer->offset;
-    memcpy(stream + offset, &data, sizeof(uint8_t));
-    buffer->offset += sizeof(uint8_t);
-}
-// Agrega string al buffer con un uint32_t adelante indicando su longitud
-void buffer_add_string(t_buffer *buffer, uint32_t length, char* string)
-{
-    void* stream = buffer->stream;
-    int offset = buffer->offset;
-    memcpy(stream + offset, &length, sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
-    memcpy(stream + offset, string, length);
-    buffer->offset += length;
-}
-// Lee un uint32_t del buffer y avanza el offset
-uint32_t buffer_read_uint32(t_buffer *buffer){
-    void* stream = buffer->stream;
-    uint32_t dataRecibida;
-    memcpy(&dataRecibida, stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    return dataRecibida;
-}
-// Lee un uint8_t del buffer y avanza el offset
-uint8_t buffer_read_uint8(t_buffer *buffer){
-    void* stream = buffer->stream;
-    uint8_t dataRecibida;
-    memcpy(&dataRecibida, stream, sizeof(uint8_t));
-    stream += sizeof(uint8_t);
-    return dataRecibida;
-}
-// Lee un string y su longitud del buffer y avanza el offset
-
-char* buffer_read_string(t_buffer *buffer, uint32_t length){
-    void* stream = buffer->stream;
-    memcpy(&length, stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    char* stringRecibido = malloc(sizeof(length)); //falta free
-    memcpy(stringRecibido, stream, length);
-    stream += sizeof(length);
-    return stringRecibido;
-}*/

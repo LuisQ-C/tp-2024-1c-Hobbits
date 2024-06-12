@@ -44,6 +44,7 @@ void liberar_recursos_interfaz(t_list_io* interfaz);
 t_slist* slist_create();
 void slist_destroy(t_slist* slist);
 
+bool sinterfaz_name_already_took(char* nombre_interfaz);
 bool slist_comprobate_io(char* nombreInterfaz,int operacion_solicitada);
 t_list_io* slist_buscar_interfaz(char* nombre);
 bool admite_tipo(int operacion_solicitada,int tipo_interfaz);

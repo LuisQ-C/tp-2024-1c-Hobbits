@@ -20,14 +20,25 @@ extern sem_t planificacion_ready_iniciada;
 extern sem_t planificacion_exec_iniciada;
 
 extern int fd_dispatch;
+extern bool planificacion_iniciada;
 
 
 void planificacion_fifo(){
     while (1)
     {
-        sem_wait(&proceso_en_cola_ready);
-        sem_wait(&pasar_a_ejecucion);
         sem_wait(&planificacion_ready_iniciada);
+        sem_wait(&proceso_en_cola_ready);
+        if(!planificacion_iniciada){
+            sem_post(&proceso_en_cola_ready);
+            continue;
+        }
+
+        if(squeue_is_empty(lista_procesos_ready)){
+            sem_post(&planificacion_ready_iniciada);
+            continue;
+        }
+        sem_wait(&pasar_a_ejecucion);
+
         pasar_a_cola_exec();
     }
     

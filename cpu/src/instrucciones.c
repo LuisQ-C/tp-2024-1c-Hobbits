@@ -3,6 +3,7 @@
 extern t_registro_cpu registro;
 extern t_log* logger;
 extern t_config* config;
+extern config_memoria config_mem;
 
 // INSTRUCCIONES 
 // SET
@@ -19,29 +20,29 @@ void set_32(uint32_t* reg,uint32_t valor)
 }
 
 /* Ejecuta instruccion SET */
-int set(char** instruccion)
+int set(char* registro_setear, int numero_setear)
 {
-    if(strcmp(instruccion[1],"PC")==0)
+    if(strcmp(registro_setear,"PC")==0)
     {
-        uint32_t* registroRecibido = string_to_register32(instruccion[1]);
-        set_32(registroRecibido,atoi(instruccion[2]));
+        uint32_t* registroRecibido = string_to_register32(registro_setear);
+        set_32(registroRecibido,numero_setear);
         return PC_MODIFICADO;
     }
-    else if(strcmp(instruccion[1],"DI")==0 || strcmp(instruccion[1],"SI")==0)
+    else if(strcmp(registro_setear,"DI")==0 || strcmp(registro_setear,"SI")==0)
     {
-        uint32_t* registroRecibido = string_to_register32(instruccion[1]);
-        set_32(registroRecibido,atoi(instruccion[2]));
+        uint32_t* registroRecibido = string_to_register32(registro_setear);
+        set_32(registroRecibido,numero_setear);
         return PC_SIN_MODIFICAR;
     }
-    else if(instruccion[1][0] != 'E')
+    else if(registro_setear[0] != 'E')
     {
-        uint8_t* registroRecibido = string_to_register8(instruccion[1]);
-        set_8(registroRecibido,atoi(instruccion[2]));
+        uint8_t* registroRecibido = string_to_register8(registro_setear);
+        set_8(registroRecibido,numero_setear);
         return PC_SIN_MODIFICAR;
     }
     else {
-        uint32_t* registroRecibido = string_to_register32(instruccion[1]);
-        set_32(registroRecibido,atoi(instruccion[2]));
+        uint32_t* registroRecibido = string_to_register32(registro_setear);
+        set_32(registroRecibido,numero_setear);
         return PC_SIN_MODIFICAR;
     }
 }
@@ -214,19 +215,120 @@ void io_gen_sleep(t_pcb* pcb_a_enviar,char** instruccionDesarmada,int fd_dispatc
     eliminar_paquete(paquete);
 }
 
-// EXIT
-/* Envia al kernel la solicitud de pasar el pcb a exit (success) */
-void instruccion_exit(t_pcb* pcb_a_enviar,int fd_dispatch)
+void io_stdin_read(t_pcb* pcb_a_enviar,char* nombre_interfaz,int direccion_logica,int tamanio_dato,int fd_dispatch)
 {
-    int motivo_desalojado = EXIT;
+    int motivo_desalojo = IO_GEN_SLEEP;
+    int tam_pagina = config_mem.tam_pagina;
+    int tamanio_enviar;
+    //
+    int pagina_inicial = traducir_direccion_pagina(direccion_logica);
+    int offset = traducir_direccion_desplazamiento(direccion_logica,pagina_inicial);
+    int pag_necesarias = paginas_necesarias(offset,tamanio_dato);
+    //BASE, DIR FISICA Y TAMANIO
+    int base = 0;
+    int dir_fisica;
+    int restante = tamanio_dato;
+    int espacio_restante = tam_pagina - offset;
+    //PORCION EMPAQUETAR
+    t_porcion_dato porcion_empaquetar;
+    //EMPAQUETO PCB PRIMERO
+    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+    //LUEGO EL MOTIVO
+    agregar_a_paquete(paquete,&motivo_desalojo,sizeof(int));
+    //LUEGO EL NOMBRE DE LA INTERFAZ
+    agregar_a_paquete(paquete,nombre_interfaz,strlen(nombre_interfaz)+1);
+    //SOLICITO LOS MARCOS
+    t_list* marcos = solicitar_macros(pagina_inicial,pag_necesarias,pcb_a_enviar->pid,fd_dispatch);
+    //EMPIEZO A CALCULAR Y EMPAQUETAR LOS T_PORCION_DATO
+    int* ptro_nro_frame = list_get(marcos,0);
+    dir_fisica = calcular_direccion_fisica(*ptro_nro_frame,offset);
+    
+    tamanio_enviar = (espacio_restante > tamanio_dato) ? tamanio_dato : espacio_restante;
+
+    asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
+
+    agregar_a_paquete(paquete,&porcion_empaquetar,sizeof(t_porcion_dato));
+
+    avanzar_base_restante(&base,&restante,espacio_restante);
+
+    for(int i =1;i<pag_necesarias;i++)
+    {
+        ptro_nro_frame = list_get(marcos,i);
+        dir_fisica = calcular_direccion_fisica(*ptro_nro_frame,0);
+
+        tamanio_enviar = (restante<tam_pagina) ? restante : tam_pagina;
+
+        asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
+
+        agregar_a_paquete(paquete,&porcion_empaquetar,sizeof(t_porcion_dato));
+
+        avanzar_base_restante(&base,&restante,tam_pagina);
+
+    }
+
+    enviar_paquete(paquete,fd_dispatch);
+
+    list_destroy_and_destroy_elements(marcos,(void*) liberar_elemento);
+    
+    eliminar_paquete(paquete);
+}
+
+void asignar_porcion_dato(t_porcion_dato* porcion, int base, int dir_fisica, int tamanio)
+{
+    porcion->base = base;
+    porcion->direccion_fisica = dir_fisica;
+    porcion->tamanio = tamanio;
+}
+
+int resize(int pid,int new_size,int fd_memoria)
+{
+    t_paquete* paquete = crear_paquete(RESIZE);
+    agregar_a_paquete(paquete,&pid,sizeof(int));
+    agregar_a_paquete(paquete,&new_size,sizeof(int));
+    enviar_paquete(paquete,fd_memoria);
+    eliminar_paquete(paquete);
+
+    int respuesta;
+    recv(fd_memoria,&respuesta,sizeof(int),MSG_WAITALL);
+    return respuesta;
+}
+
+void instruccion_signal(t_pcb* pcb_a_enviar,char* nombre_recurso, int fd_dispatch)
+{
+    int motivo_desalojo = SIGNAL;
 
     t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
 
-    agregar_a_paquete(paquete,&motivo_desalojado,sizeof(int));
+    agregar_a_paquete(paquete,&motivo_desalojo,sizeof(int));
+    agregar_a_paquete(paquete,nombre_recurso,strlen(nombre_recurso)+1);
+
+    enviar_paquete(paquete,fd_dispatch);
+    eliminar_paquete(paquete);
+}
+
+void instruccion_wait(t_pcb* pcb_a_enviar, char* nombre_recurso, int fd_dispatch)
+{
+    int motivo_desalojo = WAIT;
+
+    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+
+    agregar_a_paquete(paquete,&motivo_desalojo,sizeof(int));
+    agregar_a_paquete(paquete,nombre_recurso,strlen(nombre_recurso)+1);
 
     enviar_paquete(paquete,fd_dispatch);
     eliminar_paquete(paquete);
 }
 
 
+void mov_out(int pagina,int desplazamiento, uint32_t* dato_a_escribir,int fd_memoria)
+{
+    t_paquete* paquete = crear_paquete(ESCRITURA);
+    agregar_a_paquete(paquete,&pagina,sizeof(pagina));
+    agregar_a_paquete(paquete,&desplazamiento,sizeof(desplazamiento));
+    agregar_a_paquete(paquete,dato_a_escribir,sizeof(dato_a_escribir));
+    enviar_paquete(paquete,fd_memoria);
+    printf("\n mov_out enviado \n");
+    eliminar_paquete(paquete);
+
+}
 

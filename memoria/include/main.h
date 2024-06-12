@@ -13,6 +13,12 @@
 #include "user_space.h"
 #include "tabla_paginas.h"
 #include <commons/collections/list.h>
+#include <commons/memory.h>
+#include "config.h"
+#include "bitmap.h"
+
+
+
 //#include"../include/conexionCPU.h"
 //#include"../include/conexionKernel.h"
 
@@ -20,6 +26,5 @@
 
 //extern t_log* logger;
 //void* atender_cliente(void*);
-
 
 #endif

@@ -1,37 +1,56 @@
 #include "../include/tabla_paginas.h"
 
 extern t_log* logger;
+extern t_list* instrucciones_procesos;
+extern pthread_mutex_t mutex_lista_procesos;
+extern t_bitarray* bitmap;
+extern pthread_mutex_t mutex_bitmap;
 
 
-t_tabla_pag* crear_tabla_paginas(int tam_memoria,int tam_pagina)
+t_list* crear_tabla_paginas()
 {
-    int cant_entradas = tam_memoria / tam_pagina;
-    t_tabla_pag* tabla_pagina = malloc(sizeof(t_tabla_pag) * cant_entradas);
-    for(int i=0;i<cant_entradas;i++)
-    {
-        tabla_pagina[i].marco= -1;
-        tabla_pagina[i].validez_marco = 0;
-        
-    }
-    for(int i=0;i<cant_entradas;i++)
-    {
-        printf("\nPAGINA: %d -> MARCO: %d,VALDEZ: %d\n" ,i,tabla_pagina[i].marco,tabla_pagina[i].validez_marco);
-        
-    }
-    return tabla_pagina;
+    t_list* lista = list_create();
+    return lista;
 }
 
-int consultar_marco(int num_pagina,t_tabla_pag* tabla_pag)
+int consultar_marco(int num_pagina,t_list* tabla_pag)
 {
-    // tendria q buscar segun PID
-    if(tabla_pag[num_pagina].validez_marco == 1)
+    t_entrada_pagina* entrada = list_get(tabla_pag,num_pagina); // MUTEAR TP?
+    if(entrada != NULL)
     {
-        int marco_buscado = tabla_pag[num_pagina].marco;
-        return marco_buscado;
+        return entrada->marco;
     }
-    else{
-        log_error(logger,"NO TE PERTENECE FLACO");
-        return MARCO_INVALIDO;
+    log_error(logger,"NO TE PERTENECE FLACO");
+    return MARCO_INVALIDO;
+}
+
+t_list* sbuscar_tabla_pid(int pid)
+{
+    int _es_el_proceso(t_proceso *p)
+    {
+        int encontrado = p->pid == pid;
+        return encontrado;
     }
-    
+
+    pthread_mutex_lock(&mutex_lista_procesos);
+    t_proceso* auxiliar = list_find(instrucciones_procesos, (void*) _es_el_proceso);
+    pthread_mutex_unlock(&mutex_lista_procesos);
+    return auxiliar->tabla_paginas;
+}
+
+void liberar_frames_tabla(t_list* tabla_paginas)
+{
+    pthread_mutex_lock(&mutex_bitmap);
+    list_iterate(tabla_paginas,(void*) liberar_frame);
+    pthread_mutex_unlock(&mutex_bitmap);
+}
+
+void liberar_frame(t_entrada_pagina* entrada)
+{
+    bitarray_clean_bit(bitmap,entrada->marco);
+}
+
+void destruir_tabla_paginas(t_list* tabla_paginas)
+{
+    list_destroy_and_destroy_elements(tabla_paginas,(void*) liberar_elemento);
 }

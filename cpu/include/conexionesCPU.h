@@ -12,6 +12,12 @@
 #include "../include/dispatch.h"
 #include "../include/interrupt.h"
 
+typedef struct{
+    int tam_memoria;
+    int tam_pagina;
+    int cant_marcos;
+} config_memoria;
+
 int iniciar_conexiones(int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt);
 void manejarConexionKernel(int* cliente_fd_conexion_dispatch,int* cliente_fd_conexion_interrupt);
 //void manejarConexionDispatch(int cliente_fd_conexion_dispatch);
@@ -20,6 +26,7 @@ void habilitar_dispatch_interrupt(int fd_dispatch, int fd_interrupt, int fd_memo
 //void inicializar_hilo_interrupt(int cliente_fd_conexion_interrupt);
 //void manejarConexionInterrupt(void* fd_interrupt);
 //void manejarConexionDispatch(int cliente_fd_conexion_dispatch);
+void calcular_marcos();
 void terminar_programa(int* fd_conexion_memoria,int* cliente_fd_conexion_dispatch,int*cliente_fd_conexion_interrupt);
 
 

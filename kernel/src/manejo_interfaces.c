@@ -85,6 +85,15 @@ void slist_destroy(t_slist* slist){
     free(slist);
 }
 
+bool sinterfaz_name_already_took(char* nombre_interfaz)
+{
+    pthread_mutex_lock(lista_procesos_blocked->mutex);
+    bool nombre_tomado = existe_interfaz(nombre_interfaz);
+    pthread_mutex_unlock(lista_procesos_blocked->mutex);
+    
+    return nombre_tomado;
+}
+
 bool lista_interfaces_is_empty(){
     bool isEmpty;
     pthread_mutex_lock(lista_procesos_blocked->mutex);

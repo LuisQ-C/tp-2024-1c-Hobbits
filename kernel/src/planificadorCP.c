@@ -20,7 +20,6 @@ extern sem_t pasar_a_ejecucion;
 extern sem_t planificacion_new_iniciada;
 extern sem_t planificacion_ready_iniciada;
 extern sem_t planificacion_exec_iniciada;
-
 extern bool planificacion_iniciada;
 
 extern int fd_dispatch;
@@ -201,7 +200,18 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             break;
         case SIGNAL:
 
+            sem_post(&grado_de_multiprogramacion);
             break;
+        case OUT_OF_MEMORY:
+        {
+            //pcb_a_actualizar->estado = OUT_OF_MEMORY;
+            squeue_push(lista_procesos_exit,pcb_a_actualizar);
+            log_debug(logger, "Finaliza el proceso %d - Motivo : OUT_OF_MEMORY", pcb_a_actualizar->pid);
+            log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
+            
+            sem_post(&grado_de_multiprogramacion);
+            break;
+        }
         default:
             log_warning(logger,"MOTIVO DE DESALOJO DESCONOCIDO");
             break;
@@ -223,13 +233,15 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         log_info(logger, "Finaliza el proceso %d - Motivo: INVALID INTERFACE", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
-    case OUT_OF_MEMORY:
+    case OUT_OF_MEMORY_FIN:
         break;
     case INTERRUPTED_BY_USER_READY:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXIT", pcb_a_finalizar->pid);
-        sem_wait(&proceso_en_cola_ready);
+        pthread_t hilo_fin_ready;
+        pthread_create(&hilo_fin_ready, NULL, (void*) fin_fin_ready, NULL);
+        pthread_detach(hilo_fin_ready);//Agregar un hilo para que no se bloquee
         sem_post(&grado_de_multiprogramacion);
         break;
     case INTERRUPTED_BY_USER_NEW:
@@ -239,7 +251,6 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         pthread_t hilo_fin;
         pthread_create(&hilo_fin, NULL, (void*)fin_fin, NULL);
         pthread_detach(hilo_fin);
-
         break;
     case INTERRUPTED_BY_USER_EXEC:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
@@ -253,12 +264,23 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
 
 }
 
-
+void fin_fin_ready(){
+    sem_wait(&proceso_en_cola_ready);
+    int hola;
+    sem_getvalue(&proceso_en_cola_ready, &hola);
+    printf("\n %d \n", hola);
+    if(hola <= 0)    
+        sem_post(&proceso_en_cola_ready);
+}
 
 void fin_fin(){
     sem_wait(&proceso_en_cola_new);
+    int hola;
+    sem_getvalue(&proceso_en_cola_new, &hola);
+    printf("\n %d \n", hola);
+    if(hola <= 0)    
+        sem_post(&proceso_en_cola_new);
 }
-
 void hilo_quantum(void* arg)
 {
     data* quantum_recibido = arg;

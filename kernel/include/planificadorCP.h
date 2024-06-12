@@ -29,7 +29,7 @@ typedef enum{
     SUCCESS = 777,
     INVALID_RESOURCE,
     INVALID_INTERFACE,
-    OUT_OF_MEMORY,
+    OUT_OF_MEMORY_FIN,
     INTERRUPTED_BY_USER_READY,
     INTERRUPTED_BY_USER_NEW,
     INTERRUPTED_BY_USER_EXEC
@@ -45,7 +45,7 @@ typedef struct
     int pid;
 }data;
 
-
+void fin_fin_ready();
 void hilo_quantum(void* arg);
 //void enviar_interrupcion(int interrupcion, int pid);
 

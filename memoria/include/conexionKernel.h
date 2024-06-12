@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include "../../utils/include/protocolo.h"
 #include "../include/archivos.h"
+#include "config.h"
 typedef struct
 {
     int fd;

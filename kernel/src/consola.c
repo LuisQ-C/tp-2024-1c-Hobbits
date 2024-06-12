@@ -223,7 +223,6 @@ void iniciar_proceso(char* path){
     squeue_push(lista_procesos_new, nuevo_pcb);
     log_info(logger, "Se crea el proceso %d en NEW", nuevo_pcb->pid);
     
-    
     sem_post(&proceso_en_cola_new);
 
 }
@@ -243,6 +242,7 @@ void crear_proceso(){
 void finalizar_proceso(int pid){
     detener_planificacion();
     //printf("finalizar_proceso \n");
+    
     t_pcb* pcb_auxiliar;
 
     bool _elemento_encontrado(t_pcb* pcb){
@@ -285,7 +285,7 @@ void detener_planificacion(){
     if(planificacion_iniciada)
     {
         planificacion_iniciada = false;
-        
+        /*
         pthread_t detener_new, detener_ready, detener_exec, detener_blocked;
         pthread_create(&detener_new,NULL,(void*) detener_cola_new,NULL);
         pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
@@ -295,7 +295,7 @@ void detener_planificacion(){
         pthread_detach(detener_ready);
         pthread_detach(detener_exec);
         pthread_detach(detener_blocked);
-        
+        */
         
         log_info(logger, "Se detuvo la planificacion");
     }else

@@ -2,6 +2,8 @@
 
 extern t_log* logger;
 extern t_config* config;
+extern t_datos_memoria datos_memoria;
+extern t_log* logger_obligatorio;
 
 void realizar_handshake_kernel(int fd_kernel)
 {
@@ -34,8 +36,9 @@ void conexionKernel(void* info_fd)
     int fd_kernel = fd_recibido->fd;
     free(fd_recibido);
 
+    int retardo = datos_memoria.retardo_respuesta;
     int codigoOperacion;
-    char* path_config = config_get_string_value(config,"PATH_INSTRUCCIONES");
+    char* path_config = datos_memoria.path_instrucciones;
     
     while(1)
     {
@@ -54,12 +57,14 @@ void conexionKernel(void* info_fd)
 
 		switch (codigoOperacion) {
         case INICIAR_PROCESO:
-            int archivo_existe = ARCHIVO_EXISTE;
-            int archivo_invalido = ARCHIVO_INVALIDO;
-            t_list* lista_aux = recibir_paquete(fd_kernel);
-            int* pid = list_get(lista_aux,0);
-            char* path_kernel = list_get(lista_aux,1);
+        {
+            int archivo_resultado;
+            int pid;
+            char* path_kernel;
+            
+            recibir_creacion_proceso(&pid,&path_kernel,fd_kernel);
             log_debug(logger,"ruta archivo: %s",path_kernel);
+
             char* path_archivo = string_new();
             string_append(&path_archivo,path_config);
             string_append(&path_archivo,path_kernel);
@@ -67,27 +72,47 @@ void conexionKernel(void* info_fd)
             //ver
             log_debug(logger,"ruta archivo: %s",path_archivo);
             FILE* archivo_pseudocodigo = fopen(path_archivo,"r");
+
+            //FALLA CUANDO SE ESPECIFICA EL DIRECTORIO SIN NADA, EJ PSEUDOS/ O PSEUDOS
             if(archivo_pseudocodigo != NULL)
             {
-                agregar_proceso_lista(*pid,archivo_pseudocodigo); //cambiar agregar_proceso_lista y todas las funciones que lo usan
-                send(fd_kernel,&archivo_existe,sizeof(int),0);
+                archivo_resultado = ARCHIVO_EXISTE;
+                agregar_proceso_lista(pid,archivo_pseudocodigo); //cambiar agregar_proceso_lista y todas las funciones que lo usan
+                log_info(logger_obligatorio,"Creación de Tabla de Páginas: \"PID: %d - Tamaño: 0\"",pid);
+                usleep(retardo*1000);
+                send(fd_kernel,&archivo_resultado,sizeof(int),0);
                 fclose(archivo_pseudocodigo);
             }
             else
             {
-                send(fd_kernel,&archivo_invalido,sizeof(int),0);
+                archivo_resultado = ARCHIVO_INVALIDO;
+                usleep(retardo*1000);
+                send(fd_kernel,&archivo_resultado,sizeof(int),0);
             }
-            list_destroy_and_destroy_elements(lista_aux,(void*) liberar_elemento);
+            free(path_kernel);
             free(path_archivo);
-             //por ahi solo es necesario si el archivo es valido, dentro del if
+            //por ahi solo es necesario si el archivo es valido, dentro del if
             break;
+        }
         case FINALIZAR_PROCESO:
-            /*HARIA FALTA MANDARL CONFIRMACION O ERROR A KERNEL??*/
-            char* pid_recibido = recibir_mensaje(fd_kernel,logger);
-            int pid_XD = atoi(pid_recibido);
-            quitar_proceso_lista(pid_XD);
-            /*MARCAR FRAMES COMO LIBRES SIN SOBREESCRIBIR*/
+        {
+            int pid;
+            int rta;
+            recibir_destruccion_proceso(&pid,fd_kernel);
+            int cant_pag_eliminadas = quitar_proceso_lista(pid);
+            usleep(retardo*1000);
+            if(cant_pag_eliminadas == -1)
+            {
+                rta = PROCESO_INEXISTENTE;
+                send(fd_kernel,&rta,sizeof(int),0);
+            }
+            else{
+                log_info(logger_obligatorio,"Destrucción de Tabla de Páginas: \"PID: %d - Tamaño: %d\"",pid,cant_pag_eliminadas);
+                rta = PROCESO_ELIMINADO;
+                send(fd_kernel,&rta,sizeof(int),0);
+            }
             break;
+        }
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
             return;

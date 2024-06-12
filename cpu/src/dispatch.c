@@ -40,9 +40,11 @@ void manejarConexionDispatch(int cliente_fd_conexion_dispatch,int fd_conexion_me
     
     realizarCicloInstruccion(fd_conexion_memoria,pcb_recibido,cliente_fd_conexion_dispatch);
     
+
     free(pcb_recibido);
     }
 }
+
 
 
 

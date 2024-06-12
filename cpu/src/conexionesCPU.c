@@ -2,6 +2,7 @@
 
 extern t_log* logger;
 extern t_config* config;
+extern config_memoria config_mem;
 typedef struct
 {
     int fd_conexion;
@@ -92,6 +93,11 @@ void manejarConexionKernel(int* cliente_fd_conexion_dispatch,int* cliente_fd_con
 		}
         
     }
+}
+
+void calcular_marcos()
+{
+    config_mem.cant_marcos = config_mem.tam_memoria / config_mem.tam_pagina;
 }
 
 void terminar_programa(int* fd_conexion_memoria,int* cliente_fd_conexion_dispatch,int*cliente_fd_conexion_interrupt)
