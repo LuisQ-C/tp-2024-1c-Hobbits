@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     }
 
     realizar_handshakes_cpu(fd_conexion_memoria,cliente_fd_conexion_dispatch,cliente_fd_conexion_interrupt);
-    recibir_datos_config_memoria(&config_mem.tam_memoria,&config_mem.tam_pagina,fd_conexion_memoria,logger);
+    recibir_datos_config_memoria(&config_mem.tam_memoria,&config_mem.tam_pagina,&config_mem.retardo_memoria,fd_conexion_memoria,logger);
 
 
     //PRUEBA 

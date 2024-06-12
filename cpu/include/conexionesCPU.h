@@ -16,6 +16,7 @@ typedef struct{
     int tam_memoria;
     int tam_pagina;
     int cant_marcos;
+    int retardo_memoria;
 } config_memoria;
 
 int iniciar_conexiones(int* fd_conexion_memoria,int* server_fd_escucha_dispatch, int* server_fd_escucha_interrupt, int* cliente_fd_conexion_dispatch, int* cliente_fd_conexion_interrupt);

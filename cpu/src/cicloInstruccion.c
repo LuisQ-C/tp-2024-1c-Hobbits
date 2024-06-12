@@ -94,6 +94,10 @@ void establecer_contexto(t_pcb* pcb_recibido)
     registro.EBX = pcb_recibido->registros_CPU.EBX;
     registro.ECX = pcb_recibido->registros_CPU.ECX;
     registro.EDX = pcb_recibido->registros_CPU.EDX;
+    registro.SI = pcb_recibido->registros_CPU.SI;
+    registro.DI = pcb_recibido->registros_CPU.DI;
+    //registro.SI = pcb_recibido->registros_CPU.
+    //registro.SI = pcb_recibido->registros_CPU.;
     /*pthread_mutex_lock(&mutex_pid);
     PID_ACTUAL = pcb_recibido->pid;
     pthread_mutex_unlock(&mutex_pid);*/
@@ -111,7 +115,10 @@ void actualizar_pcb(t_pcb* pcb_a_actualizar)
     pcb_a_actualizar->registros_CPU.EBX = registro.EBX;
     pcb_a_actualizar->registros_CPU.ECX = registro.ECX;
     pcb_a_actualizar->registros_CPU.EDX = registro.EDX;
+    pcb_a_actualizar->registros_CPU.SI = registro.SI;
+    pcb_a_actualizar->registros_CPU.DI = registro.DI;
     
+    pcb_a_actualizar->quantum -= config_mem.retardo_memoria;
 }
 
 /*Solicita la instruccion a memoria de acuerdo al pc indicado*/
@@ -312,6 +319,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             list_destroy_and_destroy_elements(marcos_si,(void*)liberar_elemento);
             list_destroy_and_destroy_elements(marcos_di,(void*)liberar_elemento);
             free(string_copiar);
+            free(copia_string_logear);
             
             registro.PC++;
             break;

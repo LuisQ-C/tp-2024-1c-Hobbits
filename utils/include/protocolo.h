@@ -102,6 +102,8 @@ typedef struct
     uint32_t EBX;
     uint32_t ECX;
     uint32_t EDX;
+    uint32_t SI;
+    uint32_t DI;
 }t_registros_generales;
 
 typedef struct
@@ -122,8 +124,8 @@ typedef struct {
 //void recibirHandshake(t_log* logger,int fd_origen, char* nombreOrigen,int32_t valorHandshake);
 int mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario, char* nombreOrigen);
 //PARA ENVIARLE A CPU EL TAM_MEMORIA Y TAM_PAGINA NECESARIOS PARA LA MMU
-void enviar_datos_config_memoria_a_cpu(int tam_memoria, int tam_pagina, int fd_cpu);
-void recibir_datos_config_memoria(int* tam_memoria, int* tam_pagina, int fd_memoria,t_log* logger);
+void enviar_datos_config_memoria_a_cpu(int tam_memoria, int tam_pagina,int retardo_memoria, int fd_cpu);
+void recibir_datos_config_memoria(int* tam_memoria, int* tam_pagina,int* retardo_memoria, int fd_memoria, t_log* logger);
 //
 //
 void enviar_handshake_ok(t_log* logger,int fd_origen, char* nombreOrigen);

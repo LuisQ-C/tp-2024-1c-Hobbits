@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     }
 
     realizar_handshakes_memoria(fd_cpu,fd_kernel);
-    enviar_datos_config_memoria_a_cpu(datos_memoria.tam_memoria,datos_memoria.tam_pagina,fd_cpu);
+    enviar_datos_config_memoria_a_cpu(datos_memoria.tam_memoria,datos_memoria.tam_pagina,datos_memoria.retardo_respuesta,fd_cpu);
 
     //PAQUETE PRUEBA
     /*
