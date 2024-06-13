@@ -244,7 +244,7 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 free(pid);
                 
                 if(recurso_usado->instancias_recurso >= 0){
-                    if(pcb_a_actualizar->quantum > 0){
+                    if(pcb_a_actualizar->quantum > 0 || (strcmp(algoritmo, "FIFO") == 0)){
                         pthread_mutex_lock(lista_procesos_ready->mutex);
                         list_add_in_index(lista_procesos_ready->cola->elements, 0, pcb_a_actualizar);
                         pthread_mutex_unlock(lista_procesos_ready->mutex);
@@ -252,6 +252,7 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                     else{
                         pcb_a_actualizar->quantum = quantum;
                         squeue_push(lista_procesos_ready, pcb_a_actualizar);
+                        //ACA BASICAMENTE SE REPITE LA LOGICA DE INTERRUPCION_QUANTUM
                     } 
                         sem_post(&proceso_en_cola_ready);
 
@@ -272,8 +273,64 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
         
             break;}
         case SIGNAL:
+            log_info(logger, "LLEGUE AL SIGNAL");
+            char* nombre_recurso = list_get(pcb_con_motivo, 6);
+            pthread_mutex_lock(lista_recursos_blocked->mutex);
+            bool esValido = existe_recurso(nombre_recurso);
+            pthread_mutex_unlock(lista_recursos_blocked->mutex);
+            log_trace(logger, "PASE LA FUNCION DE EXISTE RECURSO");
+            if(esValido){
+                pthread_mutex_lock(lista_recursos_blocked->mutex);
+                t_recurso* recurso_usado = buscar_recurso(nombre_recurso); //Utiliza lista_recursos_blocked->lista
+                recurso_usado->instancias_recurso += 1;
+                pthread_mutex_unlock(lista_recursos_blocked->mutex);
+                char* pid = string_itoa(pcb_a_actualizar->pid);
 
-            sem_post(&grado_de_multiprogramacion);
+             
+                if(pcb_a_actualizar->quantum > 0 || (strcmp(algoritmo, "FIFO") == 0)){
+                    pthread_mutex_lock(lista_procesos_ready->mutex);
+                    list_add_in_index(lista_procesos_ready->cola->elements, 0, pcb_a_actualizar);
+                    pthread_mutex_unlock(lista_procesos_ready->mutex);
+                }
+                else {
+                    pcb_a_actualizar->quantum = quantum;
+                    squeue_push(lista_procesos_ready, pcb_a_actualizar);
+                }
+                sem_post(&proceso_en_cola_ready);
+
+                //ESTA PARTE ES POR SI SE LIBERA EL RECURSO
+            
+                if(!squeue_is_empty(recurso_usado->cola_blocked)){
+                    t_pcb* pcb_en_cola_blocked = squeue_pop(recurso_usado->cola_blocked);
+                    pcb_en_cola_blocked->estado = READY;
+                    squeue_push(lista_procesos_ready, pcb_en_cola_blocked);
+                    sem_post(&proceso_en_cola_ready);
+                }
+
+                if(sdictionary_has_key(instancias_utilizadas, pid)){
+                    t_list* aux_lista = sdictionary_get(instancias_utilizadas, pid);
+
+                    bool _el_recurso_es_usado(t_instancias_usadas* iu){
+                        bool esUsado = strcmp(iu->nombre, nombre_recurso) == 0;
+                        return esUsado;
+                    }
+                    
+                    if(list_any_satisfy(aux_lista, (void*) _el_recurso_es_usado)){
+                        t_instancias_usadas* aux_inst = list_find(aux_lista, (void*) _el_recurso_es_usado);
+                        aux_inst->cantInstanciasUtil--;
+                        log_trace(logger, "HOLA DESDE LA LISTA DE RECURSOS USADA");
+                    }
+
+                }
+
+            }
+            else {
+                log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
+                manejar_fin_con_motivo(INVALID_RESOURCE, pcb_a_actualizar);
+                sem_post(&grado_de_multiprogramacion);
+            }
+
+
             break;
         case OUT_OF_MEMORY:
         {
