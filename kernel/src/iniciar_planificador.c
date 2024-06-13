@@ -8,7 +8,7 @@ t_squeue *lista_procesos_ready_plus;
 t_squeue *lista_procesos_exec;
 t_squeue *lista_procesos_exit;
 t_slist *lista_procesos_blocked;
-t_list *lista_recursos_blocked;
+t_slist *lista_recursos_blocked;
 t_sdictionary *instancias_utilizadas;
 
 sem_t grado_de_multiprogramacion;
@@ -32,7 +32,7 @@ void iniciar_cosas_necesarias_planificador(){
 
     multiprog = config_get_int_value(config, "GRADO_MULTIPROGRAMACION");
     //printf("multiprog, %d", multiprog);
-    lista_recursos_blocked = list_create();
+    lista_recursos_blocked = slist_create();
     iniciar_recursos();
     lista_procesos_new = squeue_create();
     lista_procesos_ready = squeue_create();

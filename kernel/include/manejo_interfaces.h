@@ -43,6 +43,9 @@ void quitar_interfaz_lista(t_list_io* interfaz);
 void liberar_recursos_interfaz(t_list_io* interfaz);
 t_slist* slist_create();
 void slist_destroy(t_slist* slist);
+void slist_add(t_slist* slist, void* element);
+void* slist_find(t_slist* slist, bool(*condition)(void*));
+bool slist_any_satisfy(t_slist* slist, bool(*condition)(void*));
 
 bool sinterfaz_name_already_took(char* nombre_interfaz);
 bool slist_comprobate_io(char* nombreInterfaz,int operacion_solicitada);

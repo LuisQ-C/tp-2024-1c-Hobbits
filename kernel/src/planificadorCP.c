@@ -8,7 +8,7 @@ extern t_squeue *lista_procesos_ready;
 extern t_squeue *lista_procesos_exec;
 extern t_squeue *lista_procesos_exit;
 extern t_slist *lista_procesos_blocked;
-extern t_list *lista_recursos_blocked;
+extern t_slist *lista_recursos_blocked;
 extern t_sdictionary *instancias_utilizadas;
 
 extern sem_t grado_de_multiprogramacion;
@@ -24,6 +24,7 @@ extern bool planificacion_iniciada;
 
 extern int fd_dispatch;
 extern int fd_interrupt;
+extern int fd_mem;
 
 extern bool interrupcion_usuario;
 
@@ -173,12 +174,54 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             manejar_fin_con_motivo(INTERRUPTED_BY_USER_EXEC, pcb_a_actualizar);
 
             break;
-        case WAIT:
+        case WAIT:{
+            
+            log_info(logger, "LLEGUE AL WAIT");
             char* nombre_recurso = list_get(pcb_con_motivo, 6);
-            bool esValido; //= validar_recurso(nombre_recurso);
-            t_instancias_usadas* auxiliar_asdasd = malloc(sizeof(t_instancias_usadas));
+            pthread_mutex_lock(lista_recursos_blocked->mutex);
+            bool esValido = existe_recurso(nombre_recurso);
+            pthread_mutex_unlock(lista_recursos_blocked->mutex);
+            log_trace(logger, "PASE LA FUNCION DE EXISTE RECURSO");
+            //t_instancias_usadas* auxiliar_asdasd = malloc(sizeof(t_instancias_usadas));
             if(esValido){
-                if(sdictionary_has_key(instancias_utilizadas, string_itoa(pcb_a_actualizar->pid))){
+                log_info(logger, "ES VALIDO EL RECURSO");
+                /*
+                int _es_el_recurso(t_recurso* r){
+                    int recurso_encontrado = strcmp(r->nombre, nombre_recurso);
+                    return recurso_encontrado;
+                }
+                t_recurso* recurso_usado = list_find(lista_recursos_blocked, (void*) _es_el_recurso);
+                */
+                pthread_mutex_lock(lista_recursos_blocked->mutex);
+                t_recurso* recurso_usado = buscar_recurso(nombre_recurso); //Utiliza lista_recursos_blocked->lista
+                recurso_usado->instancias_recurso -= 1;
+                pthread_mutex_unlock(lista_recursos_blocked->mutex);
+                char* pid = string_itoa(pcb_a_actualizar->pid);
+
+                if(sdictionary_has_key(instancias_utilizadas, pid)){
+                    t_list* aux_lista = sdictionary_get(instancias_utilizadas, pid);
+                    
+                    bool _el_recurso_es_usado(t_instancias_usadas* iu){
+                        bool esUsado = strcmp(iu->nombre, nombre_recurso) == 0;
+                        return esUsado;
+                    }
+                    
+                    if(list_any_satisfy(aux_lista, (void*) _el_recurso_es_usado)){
+                        t_instancias_usadas* aux_inst = list_find(aux_lista, (void*) _el_recurso_es_usado);
+                        aux_inst->cantInstanciasUtil++;
+
+                    }
+                    else{
+                        t_instancias_usadas* nueva_instancia_usada = malloc(sizeof(t_instancias_usadas));
+                        nueva_instancia_usada->nombre = string_duplicate(nombre_recurso);
+                        nueva_instancia_usada->cantInstanciasUtil = 1;
+                        list_add(aux_lista, nueva_instancia_usada);
+                    } 
+
+                    sdictionary_put(instancias_utilizadas, pid, aux_lista);
+
+
+                    //usar list_any_satisfy
                     //SI EXISTE LA KEY ES PORQUE YA USO UN RECURSO ALGUNA VEZ
                     //DEBO EXTRAER LA LISTA ASOCIADA A ESA KEY CON UN T_LIST AUX?
                     //ACCEDO AL INDEX DONDE ESTA EL NOMBRE DE RECURSO
@@ -186,29 +229,55 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                     //Y A LA CANTIDAD ASOCIADA A ESE NOMBRE DE RECURSO LE SUMO UNO
                     //AL TERMINAR DE MODIFICARLO UTILIZO SD_PUT Y SOBREESCRIBO LA POSICION DE LA KEY
                 }else{
+                    t_list* nueva_lista_para_dicc = list_create();
+                    t_instancias_usadas* nueva_instancia_usada = malloc(sizeof(t_instancias_usadas));
+                    nueva_instancia_usada->nombre = string_duplicate(nombre_recurso);
+                    nueva_instancia_usada->cantInstanciasUtil = 1;
+                    list_add(nueva_lista_para_dicc, nueva_instancia_usada);
+                    sdictionary_put(instancias_utilizadas, pid, nueva_lista_para_dicc);
                     //SI NUNCA ESTUVO EN EL DICC ENTONCES LE TENGO QUE CREAR UNA LISTA
                     //Y LUEGO VUELVO A CREAR UN 
                     //T_INSTANCIAS_USADAS* AUXILIAR Y LE HAGO MALLOC
                     //LUEGO HAGO LIST_ADD AUXILIAR Y ESA LISTA LA METO EN EL DICCIONARIO
                     //CON SD_PUT Y LA KEY EN ESTE CASO PID
                 }
-                //t_instancias_usadas* auxiliar = malloc(t_instancias_usadas);
+                free(pid);
+                
+                if(recurso_usado->instancias_recurso >= 0){
+                    if(pcb_a_actualizar->quantum > 0){
+                        pthread_mutex_lock(lista_procesos_ready->mutex);
+                        list_add_in_index(lista_procesos_ready->cola->elements, 0, pcb_a_actualizar);
+                        pthread_mutex_unlock(lista_procesos_ready->mutex);
+                    }
+                    else{
+                        pcb_a_actualizar->quantum = quantum;
+                        squeue_push(lista_procesos_ready, pcb_a_actualizar);
+                    } 
+                        sem_post(&proceso_en_cola_ready);
+
+                }
+                else if(recurso_usado->instancias_recurso < 0){
+                    pcb_a_actualizar->quantum = quantum;
+                    log_debug(logger, "ME FUI A LA COLA DE BLOCKED POR EL RECURSO");
+                    squeue_push(recurso_usado->cola_blocked, pcb_a_actualizar);
+                }
+
             }
             else{
+                log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
                 manejar_fin_con_motivo(INVALID_RESOURCE, pcb_a_actualizar);
+                sem_post(&grado_de_multiprogramacion);
+
             }
-            break;
+        
+            break;}
         case SIGNAL:
 
             sem_post(&grado_de_multiprogramacion);
             break;
         case OUT_OF_MEMORY:
         {
-            //pcb_a_actualizar->estado = OUT_OF_MEMORY;
-            squeue_push(lista_procesos_exit,pcb_a_actualizar);
-            log_debug(logger, "Finaliza el proceso %d - Motivo : OUT_OF_MEMORY", pcb_a_actualizar->pid);
-            log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
-            
+            manejar_fin_con_motivo(OUT_OF_MEMORY_FIN, pcb_a_actualizar);
             sem_post(&grado_de_multiprogramacion);
             break;
         }
@@ -220,23 +289,35 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 
 void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
     pcb_a_finalizar->estado = EXIT;
+    int pid = pcb_a_finalizar->pid;
     switch (motivo_interrupcion){
     case SUCCESS:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: SUCCESS", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
     case INVALID_RESOURCE:
+        squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        send(fd_mem, &pid, sizeof(int), 0);
+        log_info(logger, "Finaliza el proceso %d - Motivo: INVALID RESOURCE", pcb_a_finalizar->pid);
+        log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
     case INVALID_INTERFACE:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: INVALID INTERFACE", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
     case OUT_OF_MEMORY_FIN:
+        squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        send(fd_mem, &pid, sizeof(int), 0);
+        log_debug(logger, "Finaliza el proceso %d - Motivo : OUT_OF_MEMORY", pcb_a_finalizar->pid);
+        log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
     case INTERRUPTED_BY_USER_READY:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXIT", pcb_a_finalizar->pid);
         /*pthread_t hilo_fin_ready;
@@ -246,6 +327,7 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         break;
     case INTERRUPTED_BY_USER_NEW:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: NEW - Estado Actual: EXIT", pcb_a_finalizar->pid);
         /*pthread_t hilo_fin;
@@ -254,6 +336,7 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         break;
     case INTERRUPTED_BY_USER_EXEC:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXEC - Estado Actual: EXIT", pcb_a_finalizar->pid);
         sem_post(&grado_de_multiprogramacion);
@@ -264,6 +347,8 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
 
 }
 
+
+/*
 void fin_fin_ready(){
     sem_wait(&proceso_en_cola_ready);
     int hola;
@@ -281,6 +366,8 @@ void fin_fin(){
     if(hola <= 0)    
         sem_post(&proceso_en_cola_new);
 }
+*/
+
 void hilo_quantum(void* arg)
 {
     data* quantum_recibido = arg;

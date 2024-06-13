@@ -85,6 +85,36 @@ void slist_destroy(t_slist* slist){
     free(slist);
 }
 
+/********************
+ * Funciones lista con mutex
+ *********************/
+
+void slist_add(t_slist* slist, void* element){
+    pthread_mutex_lock(slist->mutex);
+    list_add(slist->lista, element);
+    pthread_mutex_unlock(slist->mutex);
+}
+
+void* slist_find(t_slist* slist, bool(*closure)(void*)){
+    void* element;
+    pthread_mutex_lock(slist->mutex);
+    element = list_find(slist->lista, (void*) closure);
+    pthread_mutex_unlock(slist->mutex);
+
+    return element;
+}
+
+bool slist_any_satisfy(t_slist* slist, bool(*condition)(void*)){
+    bool found;
+    pthread_mutex_lock(slist->mutex);
+    found = list_any_satisfy(slist->lista, (void*) condition);
+    pthread_mutex_unlock(slist->mutex);
+
+    return found;
+}
+
+/*******************/
+
 bool sinterfaz_name_already_took(char* nombre_interfaz)
 {
     pthread_mutex_lock(lista_procesos_blocked->mutex);

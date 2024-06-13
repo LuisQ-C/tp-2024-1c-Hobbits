@@ -9,7 +9,7 @@ extern t_squeue *lista_procesos_ready;
 extern t_squeue *lista_procesos_exec;
 extern t_squeue *lista_procesos_exit;
 extern t_slist *lista_procesos_blocked;
-extern t_list *lista_recursos_blocked;
+extern t_slist *lista_recursos_blocked;
 extern t_sdictionary *instancias_utilizadas;
 
 void iniciar_recursos(){
@@ -18,7 +18,7 @@ void iniciar_recursos(){
     for (int i = 0; instancia_por_recurso[i] != NULL; i++)
     {
         t_recurso* nuevo_recurso = crear_recurso(lista_recursos[i], atoi(instancia_por_recurso[i]));
-        list_add(lista_recursos_blocked, nuevo_recurso);
+        slist_add(lista_recursos_blocked, nuevo_recurso);
     }
 
     string_array_destroy(lista_recursos);
@@ -34,4 +34,21 @@ t_recurso* crear_recurso(char* nombre, int cantInstancias){
     recurso->cola_blocked = squeue_create();
 
     return recurso;
+}
+
+bool existe_recurso(char* nombre){
+    bool _es_el_recurso(t_recurso* r)
+    {
+        bool encontrado = strcmp(r->nombre, nombre) == 0;
+        return encontrado;
+    }
+    return list_any_satisfy(lista_recursos_blocked->lista, (void*) _es_el_recurso);
+}
+
+t_recurso* buscar_recurso(char* nombre){
+    bool _es_el_recurso(t_recurso* r){
+        bool encontrado = strcmp(r->nombre, nombre) == 0;
+        return encontrado;
+    }
+    return list_find(lista_recursos_blocked->lista, (void*) _es_el_recurso);
 }
