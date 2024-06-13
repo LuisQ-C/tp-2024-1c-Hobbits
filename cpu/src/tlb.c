@@ -16,8 +16,6 @@ void iniciar_tlb()
         tlb_scheduler.algoritmo_reemplazo = TLB_LRU;
     }
     tlb_scheduler.tlb = queue_create();
-    //printf("\n ALGORITMO : %d \n",tlb_scheduler.algoritmo_reemplazo);
-   // tlb_scheduler.algoritmo_reemplazo = TLB_LRU; // VIENE DEL COSO DE DATOS
 }
 
 void agregar_entrada_tlb(int pid,int pagina,int marco)

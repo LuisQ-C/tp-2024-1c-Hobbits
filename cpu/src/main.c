@@ -1,6 +1,7 @@
 #include "../include/main.h"
 
 t_log* logger;
+t_log* logger_obligatorio;
 t_config* config;
 t_registro_cpu registro = {0,0,0,0,0,0,0,0,0,0,0};
 pthread_mutex_t mutex_interrupcion;
@@ -29,6 +30,7 @@ int main(int argc, char* argv[])
     int cliente_fd_conexion_interrupt = 0;
     int cliente_fd_conexion_dispatch = 0;
     logger = iniciar_logger("cpu.log", "MODULO CPU", 1, LOG_LEVEL_DEBUG); //QUEDA PARA SIEMPRE
+    logger_obligatorio = iniciar_logger("memoria_oblig.log","MODULO CPU-OBL",1,LOG_LEVEL_DEBUG);
     config = iniciar_config("cpu.config",logger); //DESTRUIRLO CUANDO TERMINEMOS DE LEER LOS DATOS
     iniciar_tlb();
     //INICIALIZO EL MUTEX Y EL SEMAFORO
@@ -44,13 +46,13 @@ int main(int argc, char* argv[])
 
     realizar_handshakes_cpu(fd_conexion_memoria,cliente_fd_conexion_dispatch,cliente_fd_conexion_interrupt);
     recibir_datos_config_memoria(&config_mem.tam_memoria,&config_mem.tam_pagina,&config_mem.retardo_memoria,fd_conexion_memoria,logger);
+    calcular_marcos();
 
 
     //PRUEBA 
 
     
 
-    calcular_marcos();
 
    // printf("\nTAM_MEMORIA: %d\n",parametros_mem.tam_memoria);
     //printf("\nTAM_PAGINA: %d\n",parametros_mem.tam_pagina);

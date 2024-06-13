@@ -477,6 +477,8 @@ t_registros_generales iniciar_registros_vacios(){
     registro_auxiliar.EBX = 0;
     registro_auxiliar.ECX = 0;
     registro_auxiliar.EDX = 0;
+    registro_auxiliar.SI = 0;
+    registro_auxiliar.DI = 0;
 
     return registro_auxiliar;
 }

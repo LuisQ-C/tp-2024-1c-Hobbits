@@ -2,6 +2,7 @@
 
 extern t_registro_cpu registro;
 extern t_log* logger;
+extern t_log* logger_obligatorio;
 extern int MOTIVO_INTERRUPCION;
 extern int PID_ACTUAL;
 extern int MOTIVO_DESALOJO;
@@ -18,7 +19,7 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
     //sem_post(&semaforo_pcb_recibido);
     int i = 1;
     while(1){
-    //imprimir_registros(pcb_recibido); //PARA PRUEBAS
+    imprimir_registros(pcb_recibido); //PARA PRUEBAS
 
     t_instruccion instruccion = fetch(registro.PC,fd_conexion_memoria,pcb_recibido->pid); //FETCH (SOLICITA Y RECIBE LA INSTRUCCION)
     
@@ -126,7 +127,7 @@ t_instruccion fetch(uint32_t pc, int fd_conexion_memoria,int pid)
 {
     pedir_instruccion(pc,pid,fd_conexion_memoria);
     t_instruccion instruccion = recibirInstruccion(fd_conexion_memoria);
-    log_info(logger,"Fetch Instruccion: \"PID: %d - FETCH - Program Counter: %u\".",pid,pc);
+    log_info(logger_obligatorio,"Fetch Instruccion: \"PID: %d - FETCH - Program Counter: %u\".",pid,pc);
     return instruccion;
 }
 
@@ -427,10 +428,10 @@ void logear_instruccion_ejecutada(int pid,char* instruccion)
     char** instruccionLogear = string_n_split(instruccion,1," ");
     if(instruccionLogear[1]!=NULL)
     {
-        log_info(logger,"Instruccion Ejecutada: \"PID: %d - Ejecutando: %s - %s\".",pid,instruccionLogear[0],instruccionLogear[1]);
+        log_info(logger_obligatorio,"Instruccion Ejecutada: \"PID: %d - Ejecutando: %s - %s\".",pid,instruccionLogear[0],instruccionLogear[1]);
     }
     else{
-        log_info(logger,"Instruccion Ejecutada: \"PID: %d - Ejecutando: %s\".",pid,instruccionLogear[0]);
+        log_info(logger_obligatorio,"Instruccion Ejecutada: \"PID: %d - Ejecutando: %s\".",pid,instruccionLogear[0]);
     }
     string_array_destroy(instruccionLogear);
 }
@@ -523,6 +524,8 @@ void imprimir_registros(t_pcb* pcb)
     printf("\nREGISTRO EBX: %d\n",pcb->registros_CPU.EBX);
     printf("\nREGISTRO ECX: %d\n",pcb->registros_CPU.ECX);
     printf("\nREGISTRO EDX: %d\n",pcb->registros_CPU.EDX);
+    printf("\nREGISTRO SI: %d\n",pcb->registros_CPU.SI);
+    printf("\nREGISTRO DI: %d\n",pcb->registros_CPU.DI);
 }
 
 void solicitar_lectura(int pid,void** ptro_dato,int tam_dato_leer, int fd_destino, int offset, t_list* marcos)

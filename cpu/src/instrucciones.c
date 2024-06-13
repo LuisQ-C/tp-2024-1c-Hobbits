@@ -76,13 +76,15 @@ void sum_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 /* Ejecuta instruccion SUM */
 void sum(char** instruccion)
 {
-    if(instruccion[1][0] != 'E')
+
+    if(instruccion[1][0] != 'E' && strcmp(instruccion[1],"DI") == 1 &&  strcmp(instruccion[1],"SI") == 1 )
     {
-        if(instruccion[2][0] != 'E')
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") == 1 &&  strcmp(instruccion[2],"SI") == 1 )
         {
             uint8_t* registroDestino = string_to_register8(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
             sum_8_8(registroDestino,registroOrigen);
+            
         }
         else{
             uint8_t* registroDestino = string_to_register8(instruccion[1]);
@@ -91,7 +93,7 @@ void sum(char** instruccion)
         }
     }
     else{
-        if(instruccion[2][0] != 'E')
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") == 1 &&  strcmp(instruccion[2],"SI") == 1)
         {
             uint32_t* registroDestino = string_to_register32(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
