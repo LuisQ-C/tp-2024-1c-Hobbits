@@ -80,9 +80,12 @@ void recibir_contexto_actualizado(int fd_dispatch)
     
     t_pcb* pcb_a_actualizar = squeue_pop(lista_procesos_exec);
     actualizar_pcb_ejecutado(pcb_a_actualizar,pcb_con_motivo);
-    manejar_motivo_interrupcion(pcb_a_actualizar,pcb_con_motivo);
+    bool hay_que_replanificar = manejar_motivo_interrupcion(pcb_a_actualizar,pcb_con_motivo);
     sem_post(&planificacion_exec_iniciada);
     list_destroy_and_destroy_elements(pcb_con_motivo,(void*) liberar_elemento);
+    if(hay_que_replanificar){
+        recibir_contexto_actualizado(fd_dispatch);
+    }
 }
 
 void actualizar_pcb_ejecutado(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
@@ -98,7 +101,7 @@ void actualizar_pcb_ejecutado(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
     pcb_a_actualizar->estado = *estado;
     pcb_a_actualizar->registros_CPU = *registros_generales;
 }
-void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
+bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 {
     int* motivo_interrupcion = list_get(pcb_con_motivo,5);
     switch(*motivo_interrupcion)
@@ -106,6 +109,7 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
         case EXIT:
             manejar_fin_con_motivo(SUCCESS, pcb_a_actualizar);
             sem_post(&grado_de_multiprogramacion);
+            return false;
             break;
         case IO_GEN_SLEEP:
             char* nombre_interfaz = list_get(pcb_con_motivo,6);
@@ -131,6 +135,7 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 */
                 log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
                 sem_post(interfaz_buscada->hay_proceso_cola);
+                return false;
             }
             else
             {
@@ -144,21 +149,29 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 printf("\ninterfaz invalida\n");
 
                 sem_post(&grado_de_multiprogramacion);
+                return false;
             }
             break;
         case IO_STDIN_READ:
+                return false;
             break;
         case IO_STDOUT_WRITE:
+                return false;
             break;
         case IO_FS_CREATE:
+                return false;
             break;
         case IO_FS_DELETE:
+                return false;
             break;
         case IO_FS_TRUNCATE:
+                return false;
             break;
         case IO_FS_WRITE:
+                return false;
             break;
         case IO_FS_READ:
+                return false;
             break;
         case INTERRUPCION_QUANTUM:
             log_warning(logger, "PID: %d Fue desalojado por fin de Q", pcb_a_actualizar->pid);
@@ -168,10 +181,13 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: READY", pcb_a_actualizar->pid);
             mostrar_cola_ready();
             sem_post(&proceso_en_cola_ready);
+            return false;
+
             break;
         case USER_INTERRUPT:
             log_warning(logger, "PID: %d Fue desalojado por interrupcion de usuario", pcb_a_actualizar->pid);
             manejar_fin_con_motivo(INTERRUPTED_BY_USER_EXEC, pcb_a_actualizar);
+            return false;
 
             break;
         case WAIT:{
@@ -244,6 +260,7 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 free(pid);
                 
                 if(recurso_usado->instancias_recurso >= 0){
+                    /*
                     if(pcb_a_actualizar->quantum > 0 || (strcmp(algoritmo, "FIFO") == 0)){
                         pthread_mutex_lock(lista_procesos_ready->mutex);
                         list_add_in_index(lista_procesos_ready->cola->elements, 0, pcb_a_actualizar);
@@ -255,12 +272,15 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                         //ACA BASICAMENTE SE REPITE LA LOGICA DE INTERRUPCION_QUANTUM
                     } 
                         sem_post(&proceso_en_cola_ready);
-
+                    */
+                    enviar_pcb(pcb_a_actualizar, fd_dispatch);
+                    return true;
                 }
                 else if(recurso_usado->instancias_recurso < 0){
                     pcb_a_actualizar->quantum = quantum;
                     log_debug(logger, "ME FUI A LA COLA DE BLOCKED POR EL RECURSO");
                     squeue_push(recurso_usado->cola_blocked, pcb_a_actualizar);
+                    return false;
                 }
 
             }
@@ -268,7 +288,7 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
                 manejar_fin_con_motivo(INVALID_RESOURCE, pcb_a_actualizar);
                 sem_post(&grado_de_multiprogramacion);
-
+                return false;
             }
         
             break;}
@@ -287,16 +307,7 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 char* pid = string_itoa(pcb_a_actualizar->pid);
 
              
-                if(pcb_a_actualizar->quantum > 0 || (strcmp(algoritmo, "FIFO") == 0)){
-                    pthread_mutex_lock(lista_procesos_ready->mutex);
-                    list_add_in_index(lista_procesos_ready->cola->elements, 0, pcb_a_actualizar);
-                    pthread_mutex_unlock(lista_procesos_ready->mutex);
-                }
-                else {
-                    pcb_a_actualizar->quantum = quantum;
-                    squeue_push(lista_procesos_ready, pcb_a_actualizar);
-                }
-                sem_post(&proceso_en_cola_ready);
+                
 
                 //ESTA PARTE ES POR SI SE LIBERA EL RECURSO
             
@@ -323,11 +334,27 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 
                 }
 
+                /*
+                if(pcb_a_actualizar->quantum > 0 || (strcmp(algoritmo, "FIFO") == 0)){
+                    pthread_mutex_lock(lista_procesos_ready->mutex);
+                    list_add_in_index(lista_procesos_ready->cola->elements, 0, pcb_a_actualizar);
+                    pthread_mutex_unlock(lista_procesos_ready->mutex);
+                }
+                else {
+                    pcb_a_actualizar->quantum = quantum;
+                    squeue_push(lista_procesos_ready, pcb_a_actualizar);
+                }
+                sem_post(&proceso_en_cola_ready);
+                */
+                enviar_pcb(pcb_a_actualizar, fd_dispatch);
+                return true;
+
             }
             else {
                 log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
                 manejar_fin_con_motivo(INVALID_RESOURCE, pcb_a_actualizar);
                 sem_post(&grado_de_multiprogramacion);
+                return false;
             }
 
 
@@ -336,45 +363,45 @@ void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
         {
             manejar_fin_con_motivo(OUT_OF_MEMORY_FIN, pcb_a_actualizar);
             sem_post(&grado_de_multiprogramacion);
+            return false;
             break;
         }
         default:
             log_warning(logger,"MOTIVO DE DESALOJO DESCONOCIDO");
+            return false;
             break;
     }
+    return false;
 }
 
 void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
     pcb_a_finalizar->estado = EXIT;
     int pid = pcb_a_finalizar->pid;
+    liberar_recursos(pid);
+    enviar_destruccion_proceso(pid, fd_mem);
     switch (motivo_interrupcion){
     case SUCCESS:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
-        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: SUCCESS", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
     case INVALID_RESOURCE:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
-        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: INVALID RESOURCE", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
     case INVALID_INTERFACE:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
-        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: INVALID INTERFACE", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
     case OUT_OF_MEMORY_FIN:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
-        send(fd_mem, &pid, sizeof(int), 0);
         log_debug(logger, "Finaliza el proceso %d - Motivo : OUT_OF_MEMORY", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
     case INTERRUPTED_BY_USER_READY:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
-        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXIT", pcb_a_finalizar->pid);
         /*pthread_t hilo_fin_ready;
@@ -384,7 +411,6 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         break;
     case INTERRUPTED_BY_USER_NEW:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
-        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: NEW - Estado Actual: EXIT", pcb_a_finalizar->pid);
         /*pthread_t hilo_fin;
@@ -393,7 +419,6 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         break;
     case INTERRUPTED_BY_USER_EXEC:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
-        send(fd_mem, &pid, sizeof(int), 0);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXEC - Estado Actual: EXIT", pcb_a_finalizar->pid);
         sem_post(&grado_de_multiprogramacion);
@@ -403,6 +428,14 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
     }
 
 }
+
+void enviar_destruccion_proceso(int pid, int fd_memoria){
+    t_paquete* paquete = crear_paquete(FINALIZAR_PROCESO);
+    agregar_a_paquete(paquete, &pid, sizeof(int));
+    enviar_paquete(paquete, fd_memoria);
+    eliminar_paquete(paquete);
+}
+
 
 
 /*

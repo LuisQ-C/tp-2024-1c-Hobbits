@@ -27,4 +27,6 @@ t_recurso* crear_recurso(char* nombre, int cantInstancias);
 bool existe_recurso(char* nombre);
 t_recurso* buscar_recurso(char* nombre);
 
+void liberar_recursos(int pid);
+
 #endif

@@ -12,6 +12,12 @@ extern t_slist *lista_procesos_blocked;
 extern t_slist *lista_recursos_blocked;
 extern t_sdictionary *instancias_utilizadas;
 
+extern sem_t grado_de_multiprogramacion;
+extern sem_t proceso_en_cola_new;
+extern sem_t proceso_en_cola_ready;
+extern sem_t ejecutar_proceso;
+extern sem_t pasar_a_ejecucion;
+
 void iniciar_recursos(){
     char** lista_recursos = config_get_array_value(config, "RECURSOS");
     char** instancia_por_recurso = config_get_array_value(config, "INSTANCIAS_RECURSOS");
@@ -51,4 +57,31 @@ t_recurso* buscar_recurso(char* nombre){
         return encontrado;
     }
     return list_find(lista_recursos_blocked->lista, (void*) _es_el_recurso);
+}
+
+void liberar_recursos(int pid){
+    char* pid_c = string_itoa(pid);
+    if(sdictionary_has_key(instancias_utilizadas, pid_c)){
+        t_list* lista_rec = sdictionary_get(instancias_utilizadas, pid_c);
+
+        void _liberar_recurso(t_instancias_usadas* iu){
+            pthread_mutex_lock(lista_recursos_blocked->mutex);
+            t_recurso* recurso_a_liberar = buscar_recurso(iu->nombre);
+            pthread_mutex_unlock(lista_recursos_blocked->mutex);
+            for (int i = 0; i < iu->cantInstanciasUtil; i++)
+            {
+                recurso_a_liberar->instancias_recurso++;
+                if(!squeue_is_empty(recurso_a_liberar->cola_blocked)){
+                    t_pcb* pcb_aux = squeue_pop(recurso_a_liberar->cola_blocked); //como se esta liberando una instancia tengo que sacar un pcb de bloqueado
+                    pcb_aux->estado = READY;
+                    squeue_push(lista_procesos_ready, pcb_aux);
+                    sem_post(&proceso_en_cola_ready);
+                }
+            }
+            
+        }
+
+        list_iterate(lista_rec, (void*) _liberar_recurso);
+        //aca deberia ir un sdicc_remove_and_destroy
+    }
 }

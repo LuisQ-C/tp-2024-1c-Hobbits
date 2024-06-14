@@ -23,7 +23,7 @@ void recibir_contexto_actualizado(int fd_dispatch);
 
 void actualizar_pcb_ejecutado(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo);
 
-void manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo);
+bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo);
 
 typedef enum{
     SUCCESS = 777,
@@ -47,6 +47,7 @@ typedef struct
 
 void fin_fin_ready();
 void hilo_quantum(void* arg);
+void enviar_destruccion_proceso(int pid, int fd_memoria);
 //void enviar_interrupcion(int interrupcion, int pid);
 
 //void interrupcion_quantum(t_pcb* pcb_auxiliar);
