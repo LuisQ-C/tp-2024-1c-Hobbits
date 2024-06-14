@@ -80,7 +80,9 @@ enum{
     PROCESO_INEXISTENTE,
     PROCESO_ELIMINADO,
     NUEVO_PID,
-    MISMO_PID
+    MISMO_PID,
+    TIPO_DATO_STRING,
+    TIPO_DATO_INT
 };
 /*
 typedef struct {

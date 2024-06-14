@@ -20,7 +20,7 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
     //sem_post(&semaforo_pcb_recibido);
     int i = 1;
     while(1){
-    imprimir_registros(pcb_recibido); //PARA PRUEBAS
+    //imprimir_registros(pcb_recibido); //PARA PRUEBAS
 
     t_instruccion instruccion = fetch(registro.PC,fd_conexion_memoria,pcb_recibido->pid); //FETCH (SOLICITA Y RECIBE LA INSTRUCCION)
     
@@ -221,12 +221,12 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             int pag_necesarias = paginas_necesarias(offset,tam_dato_escribir);
             //ACA VERIA SI CADA UNA ESTA EN LA TLB, SI ESTA TLB HIT SINO MISS
             t_list* marcos = solicitar_macros(pagina,pag_necesarias,pcb_a_enviar->pid,fd_memoria);
-            int* primer_marco = list_get(marcos,0);
-            int dir_fisica_principal = calcular_direccion_fisica(*primer_marco,offset);
+            //int* primer_marco = list_get(marcos,0);
+            //int dir_fisica_principal = calcular_direccion_fisica(*primer_marco,offset);
 
-            solicitar_escritura(pcb_a_enviar->pid,ptro_dato,tam_dato_escribir,fd_memoria,offset,marcos);
+            solicitar_escritura(pcb_a_enviar->pid,ptro_dato,tam_dato_escribir,fd_memoria,offset,marcos,TIPO_DATO_INT);
 
-            logear_escritura_int(pcb_a_enviar->pid,dir_fisica_principal,contenido_escribir);
+            //logear_escritura_int(pcb_a_enviar->pid,dir_fisica_principal,contenido_escribir);
 
             list_destroy_and_destroy_elements(marcos,(void*)liberar_elemento);
            
@@ -250,13 +250,13 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             int pag_necesarias = paginas_necesarias(offset,tam_dato_leer);
             //ACA VERIA SI CADA UNA ESTA EN LA TLB, SI ESTA TLB HIT SINO MISS
             t_list* marcos = solicitar_macros(pagina,pag_necesarias,pcb_a_enviar->pid,fd_memoria);
-            int* primer_marco = list_get(marcos,0);
-            int dir_fisica_principal = calcular_direccion_fisica(*primer_marco,offset);
+            //int* primer_marco = list_get(marcos,0);
+            //int dir_fisica_principal = calcular_direccion_fisica(*primer_marco,offset);
 
 
-            solicitar_lectura(pcb_a_enviar->pid,&ptro_dato,tam_dato_leer,fd_memoria,offset,marcos);
+            solicitar_lectura(pcb_a_enviar->pid,&ptro_dato,tam_dato_leer,fd_memoria,offset,marcos,TIPO_DATO_INT);
 
-            logear_lectura_int(pcb_a_enviar->pid,dir_fisica_principal,contenido_leer);
+            //logear_lectura_int(pcb_a_enviar->pid,dir_fisica_principal,contenido_leer);
 
             set(instruccionDesarmada[1],contenido_leer);
 
@@ -297,27 +297,27 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             int offset_si = traducir_direccion_desplazamiento(direccion_logica_si,pagina_si);
             int pag_necesarias_si = paginas_necesarias(offset_si,tamanio);
             t_list* marcos_si = solicitar_macros(pagina_si,pag_necesarias_si,pcb_a_enviar->pid,fd_memoria);
-            int* primer_marco_si = list_get(marcos_si,0);
-            int dir_fisica_principal_si = calcular_direccion_fisica(*primer_marco_si,offset_si);
+            //int* primer_marco_si = list_get(marcos_si,0);
+            //int dir_fisica_principal_si = calcular_direccion_fisica(*primer_marco_si,offset_si);
             //CALCULO NRO PAGINA, DESPLAZAMIENTO, PAG.NECESARIAS Y MARCOS PARA DI
             int pagina_di = traducir_direccion_pagina(direccion_logica_di); //MANEJAR ERROR DE DIRECCION ERRONEO
             int offset_di = traducir_direccion_desplazamiento(direccion_logica_di,pagina_di);
             int pag_necesarias_di = paginas_necesarias(offset_di,tamanio);
             t_list* marcos_di = solicitar_macros(pagina_di,pag_necesarias_di,pcb_a_enviar->pid,fd_memoria);
-            int* primer_marco_di = list_get(marcos_di,0);
-            int dir_fisica_principal_di = calcular_direccion_fisica(*primer_marco_di,offset_di);
+            //int* primer_marco_di = list_get(marcos_di,0);
+            //int dir_fisica_principal_di = calcular_direccion_fisica(*primer_marco_di,offset_di);
             //ACA VERIA SI CADA UNA ESTA EN LA TLB, SI ESTA TLB HIT SINO MISS, SUPONGAMOS TODOS MISS
-            solicitar_lectura(pcb_a_enviar->pid,&string_copiar,tamanio,fd_memoria,offset_si,marcos_si);
+            solicitar_lectura(pcb_a_enviar->pid,&string_copiar,tamanio,fd_memoria,offset_si,marcos_si,TIPO_DATO_STRING);
             //AGREGO EL \0 al string leido
             char* copia_string_logear = malloc(tamanio+1); //+1 por el caracter centinela
             memcpy(copia_string_logear,string_copiar,tamanio);
             copia_string_logear[tamanio] = '\0';
 
-            logear_lectura_string(pcb_a_enviar->pid,dir_fisica_principal_si,copia_string_logear);
+            //logear_lectura_string(pcb_a_enviar->pid,dir_fisica_principal_si,copia_string_logear);
 
-            solicitar_escritura(pcb_a_enviar->pid,string_copiar,tamanio,fd_memoria,offset_di,marcos_di);
+            solicitar_escritura(pcb_a_enviar->pid,string_copiar,tamanio,fd_memoria,offset_di,marcos_di,TIPO_DATO_STRING);
 
-            logear_escritura_string(pcb_a_enviar->pid,dir_fisica_principal_di,copia_string_logear);
+            //logear_escritura_string(pcb_a_enviar->pid,dir_fisica_principal_di,copia_string_logear);
 
             list_destroy_and_destroy_elements(marcos_si,(void*)liberar_elemento);
             list_destroy_and_destroy_elements(marcos_di,(void*)liberar_elemento);
@@ -516,7 +516,7 @@ void imprimir_registros(t_pcb* pcb)
     printf("\nREGISTRO DI: %d\n",pcb->registros_CPU.DI);
 }
 
-void solicitar_lectura(int pid,void** ptro_dato,int tam_dato_leer, int fd_destino, int offset, t_list* marcos)
+void solicitar_lectura(int pid,void** ptro_dato,int tam_dato_leer, int fd_destino, int offset, t_list* marcos, int tipo_dato)
 {
     //DATOS ADMINISTRATIVOS
     int tam_pagina = config_mem.tam_pagina;
@@ -537,7 +537,11 @@ void solicitar_lectura(int pid,void** ptro_dato,int tam_dato_leer, int fd_destin
     enviar_paquete_lectura(pid,tamanio_fragmento,dir_fis,fd_destino);
     fragmento = recibir_dato_leido(fd_destino,tamanio_fragmento);
     memcpy_fragmento_void(*ptro_dato,base,fragmento,tamanio_fragmento);
-    
+
+    (tipo_dato==TIPO_DATO_STRING)
+        ? logear_lectura_string(pid,dir_fis,fragmento,tamanio_fragmento)
+        : logear_lectura_int(pid,dir_fis,fragmento,tamanio_fragmento);
+
     free(fragmento);
     //AVANZO LA BASE Y LO RESTANTE
     avanzar_base_restante(&base,&restante,espacio_restante);
@@ -552,13 +556,17 @@ void solicitar_lectura(int pid,void** ptro_dato,int tam_dato_leer, int fd_destin
         fragmento = recibir_dato_leido(fd_destino,tamanio_fragmento);
         memcpy_fragmento_void(*ptro_dato,base,fragmento,tamanio_fragmento);
 
+        (tipo_dato==TIPO_DATO_STRING)
+            ? logear_lectura_string(pid,dir_fis,fragmento,tamanio_fragmento)
+            : logear_lectura_int(pid,dir_fis,fragmento,tamanio_fragmento);
+        
         free(fragmento);
 
         avanzar_base_restante(&base,&restante,tam_pagina);
     }
 }
 
-void solicitar_escritura(int pid,void* ptro_dato,int tam_dato_escribir, int fd_destino, int offset, t_list* marcos)
+void solicitar_escritura(int pid,void* ptro_dato,int tam_dato_escribir, int fd_destino, int offset, t_list* marcos, int tipo_dato)
 {
     //DATOS ADMINISTRATIVOS
     int tam_pagina = config_mem.tam_pagina;
@@ -566,6 +574,7 @@ void solicitar_escritura(int pid,void* ptro_dato,int tam_dato_escribir, int fd_d
     int restante = tam_dato_escribir;
     int espacio_restante = tam_pagina - offset;
     int pag_necesarias = paginas_necesarias(offset,tam_dato_escribir);
+    void* fragmento;
     //RTA DE MEMORIA
     int rta;
     //CALCULO EN BASE AL PRIMER MARCO LA DIRECCION FISICA
@@ -577,6 +586,16 @@ void solicitar_escritura(int pid,void* ptro_dato,int tam_dato_escribir, int fd_d
     tamanio_enviar = (espacio_restante > tam_dato_escribir) ? tam_dato_escribir : espacio_restante;
     
     enviar_paquete_escritura(pid,ptro_dato,tam_dato_escribir,base,tamanio_enviar,dir_fis,fd_destino);
+
+    fragmento = malloc(tamanio_enviar);
+
+    memcpy(fragmento,ptro_dato+base,tamanio_enviar);
+
+    (tipo_dato==TIPO_DATO_STRING)
+        ? logear_escritura_string(pid,dir_fis,fragmento,tamanio_enviar)
+        : logear_escritura_int(pid,dir_fis,fragmento,tamanio_enviar);
+
+    free(fragmento);
     
     avanzar_base_restante(&base,&restante,espacio_restante);
 
@@ -590,6 +609,16 @@ void solicitar_escritura(int pid,void* ptro_dato,int tam_dato_escribir, int fd_d
         tamanio_enviar = (restante<tam_pagina) ? restante : tam_pagina;
         
         enviar_paquete_escritura(pid,ptro_dato,tam_dato_escribir,base,tamanio_enviar,dir_fis,fd_destino);
+
+        fragmento = malloc(tamanio_enviar);
+
+        memcpy(fragmento,ptro_dato+base,tamanio_enviar);
+
+        (tipo_dato==TIPO_DATO_STRING)
+            ? logear_escritura_string(pid,dir_fis,fragmento,tamanio_enviar)
+            : logear_escritura_int(pid,dir_fis,fragmento,tamanio_enviar);
+
+        free(fragmento);
         
         avanzar_base_restante(&base,&restante,tam_pagina);
 
