@@ -26,19 +26,20 @@ extern bool planificacion_iniciada;
 void planificacion_fifo(){
     while (1)
     {
-        int valor;
-        sem_getvalue(&planificacion_ready_iniciada,&valor);
+        //int valor;
+        //sem_getvalue(&planificacion_ready_iniciada,&valor);
         //printf("\nVALOR: %d\n",valor);
-        sem_wait(&planificacion_ready_iniciada);
         sem_wait(&proceso_en_cola_ready);
+        sem_wait(&planificacion_ready_iniciada);
         
-        if(!planificacion_iniciada){
+        
+        /*if(!planificacion_iniciada){
             sem_getvalue(&planificacion_ready_iniciada,&valor);
             //printf("\nVALOR DEL IF: %d\n",valor);
             sem_post(&proceso_en_cola_ready);
             log_info(logger,"ENTRE AL IF DE LA PLANI PAUSADA");
             continue;
-        }
+        }*/
 
 
         if(squeue_is_empty(lista_procesos_ready) == false)

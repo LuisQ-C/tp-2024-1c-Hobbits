@@ -85,6 +85,7 @@ void slist_destroy(t_slist* slist){
     free(slist);
 }
 
+
 bool sinterfaz_name_already_took(char* nombre_interfaz)
 {
     pthread_mutex_lock(lista_procesos_blocked->mutex);

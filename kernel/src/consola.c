@@ -20,7 +20,10 @@ extern sem_t planificacion_exec_iniciada;
 extern sem_t planificacion_blocked_iniciada;
 extern sem_t hay_una_peticion_de_proceso;
 
+sem_t planificacion_detenida;
+
 extern bool planificacion_iniciada;
+pthread_mutex_t mutex_plani_iniciada;
 
 t_squeue* squeue_path;
 
@@ -237,14 +240,79 @@ void crear_proceso(){
     }
 
 }
+/***************
 
+FINALIZAR PROCESO
 
-void finalizar_proceso(int pid){
-    detener_planificacion();
-    //printf("finalizar_proceso \n");
-    
+-SE LE DELEGA A UN HILO LA RESPONSABILIDAD DE FINALIZAR EL PROCESO PARA NO TRABAR LA CONSOLA
+-SI LA PLANIFICACION ESTABA DETENIDA AL MOMENTO DE DIGITAR EL COMANDO, SE BUSCA EL PCB POR PID Y SE LO SACA, NADA MAS
+-SI LA PLANIFICACION ESTABA INICIADA, SE DEBE DETENERLA, BUSCAR EL PID, Y VOLVERLA A INICIAR
+-PONER UN ELSE EN DONDE EL PID NO EXISTA
+
+*****************/
+void finalizar_proceso(int pid_eliminar){
+    int* arg_pid = malloc(sizeof(int));
+    *arg_pid = pid_eliminar;
+    pthread_t fin_proceso;
+    pthread_create(&fin_proceso,NULL,(void*)hilo_elimina_proceso,arg_pid);
+
+}
+
+//HILO ENCARGADO DE ELIMINAR EL PROCESO, RECIBE COMO ARGUMENTO EL PID DEL PCB A ELIMINAR
+void hilo_elimina_proceso(int* arg)
+{
+    int pid = *arg;
+    free(arg);
+    //SI LA PLANIFICACION ESTA DETENIDA, SOLO LO BUSCO
+    if(!get_plani_iniciada())
+    {
+        buscar_proceso_finalizar(pid);
+    }
+    //SINO DEBO DETENERLA PRIMERO, ASEGURARME DE QUE SE DETUVO CORRECTAMENTE, SACAR EL PCB DE DONDE ESTE E INICIAR LA PLANI
+    else
+    {
+        set_plani_iniciada(false);
+        pthread_t detener_new, detener_ready, detener_exec, detener_blocked;
+        pthread_create(&detener_new,NULL,(void*) detener_cola_new_confirmacion,NULL);
+        //pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
+        pthread_create(&detener_exec,NULL,(void*) detener_cola_exec_confirmacion,NULL);
+        //pthread_create(&detener_blocked,NULL,(void*) detener_cola_blocked,NULL);
+        pthread_detach(detener_new);
+        //pthread_detach(detener_ready);
+        pthread_detach(detener_exec);
+        //pthread_detach(detener_blocked);
+        sem_wait(&planificacion_detenida);
+        sem_wait(&planificacion_detenida);
+        //sem_wait(&planificacion_detenida);
+        //sem_wait(&planificacion_detenida);
+        buscar_proceso_finalizar(pid);
+        iniciar_planificacion();
+    }
+}
+
+//GETTER DE PLANI INICIADA CON MUTEX
+bool get_plani_iniciada()
+{
+    bool estado_planificacion;
+    pthread_mutex_lock(&mutex_plani_iniciada);
+    estado_planificacion = planificacion_iniciada;
+    pthread_mutex_unlock(&mutex_plani_iniciada);
+
+    return estado_planificacion;
+}
+
+//SETTER PLANI INICIADA CON MUTEX
+void set_plani_iniciada(bool valor)
+{
+    pthread_mutex_lock(&mutex_plani_iniciada);
+    planificacion_iniciada = valor;
+    pthread_mutex_unlock(&mutex_plani_iniciada);
+}
+
+//FUNCION QUE BUSCA POR TODAS LAS COLAS HASTA ENCONTRAR EL PCB BUSCADO POR PID
+void buscar_proceso_finalizar(int pid)
+{
     t_pcb* pcb_auxiliar;
-
     bool _elemento_encontrado(t_pcb* pcb){
         bool coincide = pcb->pid == pid;
         return coincide;
@@ -269,38 +337,39 @@ void finalizar_proceso(int pid){
     else if(squeue_any_satisfy(lista_procesos_exit, (void*) _elemento_encontrado)){
         log_error(logger, "QUE HACES, SI YA ESTA EN EXIT");
     }
-
-    iniciar_planificacion();
-
+    //FALTA ELSE SI NO LO ENCUENTRA
 }
 
 
 
-//sem_post(&proceso_en_cola_new);
-        //sem_post(&proceso_en_cola_ready);
-        //sem_post(&pasar_a_ejecucion);
+
+
+
+
+
+/******************
+ DETENER PLANIFICACION
+
+-SE CREA UN HILO POR CADA COLA, CADA UNO TIENE LA TAREA DE HACER UN WAIT SOBRE SU SEMAFORO
+-AL HACER WAIT SOBRE TODOS LAS COLAS, LA PLANIFICACION QUEDA DETENIDA
+
+**************************/
         
 void detener_planificacion(){
     //printf("detener_planificador \n");
-    if(planificacion_iniciada)
+    
+    if(get_plani_iniciada())
     {
-        planificacion_iniciada = false;
-
-        pthread_t detener_exec;
-        pthread_create(&detener_exec,NULL,(void*) detener_cola_exec,NULL);
-        pthread_detach(detener_exec);
-        /*
+        set_plani_iniciada(false);
         pthread_t detener_new, detener_ready, detener_exec, detener_blocked;
         pthread_create(&detener_new,NULL,(void*) detener_cola_new,NULL);
-        pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
+        //pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
         pthread_create(&detener_exec,NULL,(void*) detener_cola_exec,NULL);
-        pthread_create(&detener_blocked,NULL,(void*) detener_cola_blocked,NULL);
+        //pthread_create(&detener_blocked,NULL,(void*) detener_cola_blocked,NULL);
         pthread_detach(detener_new);
-        pthread_detach(detener_ready);
+        //pthread_detach(detener_ready);
         pthread_detach(detener_exec);
-        pthread_detach(detener_blocked);
-        */
-        
+        //pthread_detach(detener_blocked);
         log_info(logger, "Se detuvo la planificacion");
     }
     else
@@ -309,6 +378,10 @@ void detener_planificacion(){
     }
     
 }
+
+/******
+FUNCIONES QUE SOLO HACEN WAIT AL SEMAFORO CORRESPONDIENTE
+****/
 void detener_cola_new(void* arg)
 {
     sem_wait(&planificacion_new_iniciada);
@@ -325,7 +398,35 @@ void detener_cola_blocked(void* arg)
 {
     sem_wait(&planificacion_blocked_iniciada);
 }
+/******
+FUNCIONES QUE HACEN WAIT Y CONFIRMAN CON UN POST A UN SEMAFORO ADICIONAL, UTIL PARA FINALIZAR UN PROCESO
+********/
+void detener_cola_new_confirmacion(void* arg)
+{
+    sem_wait(&planificacion_new_iniciada);
+    sem_post(&planificacion_detenida);
+}
+void detener_cola_ready_confirmacion(void* arg)
+{
+    sem_wait(&planificacion_ready_iniciada);
+    sem_post(&planificacion_detenida);
+}
+void detener_cola_exec_confirmacion(void* arg)
+{
+    sem_wait(&planificacion_exec_iniciada);
+    sem_post(&planificacion_detenida);
+}
+void detener_cola_blocked_confirmacion(void* arg)
+{
+    sem_wait(&planificacion_blocked_iniciada);
+    sem_post(&planificacion_detenida);
+}
 
+/***************
+
+INICIAR_PLANIFICACION
+
+****************/
 void iniciar_planificacion(){
     if(planificacion_iniciada == false){
     //printf("iniciar_planificacion \n");
