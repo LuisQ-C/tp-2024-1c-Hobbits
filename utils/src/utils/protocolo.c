@@ -280,6 +280,14 @@ t_pcb* recibir_pcb(int fd_dispatch)
     return pcb_recibido;
 }
 
+int recibir_aviso(int fd_dispatch)
+{
+    int rta;
+    recv(fd_dispatch,&rta,sizeof(int),MSG_WAITALL);
+
+    return rta; //PUEDE DEVOLVER NUEVO_PID O MISMO_PID
+}
+
 
 
 void enviar_pcb(t_pcb* pcb_a_enviar, int fd_dispatch){

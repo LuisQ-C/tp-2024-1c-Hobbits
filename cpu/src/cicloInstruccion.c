@@ -333,9 +333,9 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             pcb_a_enviar->pc = registro.PC+1;
             instruccion_wait(pcb_a_enviar,instruccionDesarmada[1],fd_dispatch);
             
-            (recibir_aviso(fd_dispatch)==NUEVO_PID)
-                ? MOTIVO_DESALOJO = WAIT
-                : MOTIVO_DESALOJO = -1;
+            MOTIVO_DESALOJO = (recibir_aviso(fd_dispatch)==NUEVO_PID)
+                ? WAIT
+                : -1;
             
             break;
         }
@@ -344,9 +344,9 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             pcb_a_enviar->pc = registro.PC+1;
             instruccion_signal(pcb_a_enviar,instruccionDesarmada[1],fd_dispatch);
 
-            (recibir_aviso(fd_dispatch)==NUEVO_PID)
-                ? MOTIVO_DESALOJO = SIGNAL
-                : MOTIVO_DESALOJO = -1;
+            MOTIVO_DESALOJO = (recibir_aviso(fd_dispatch)==NUEVO_PID)
+                ? SIGNAL
+                : -1;
 
             break;
         }

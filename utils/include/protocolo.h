@@ -79,7 +79,8 @@ enum{
     MARCOS_CONSULTADOS,
     PROCESO_INEXISTENTE,
     PROCESO_ELIMINADO,
-    NUEVO_PID
+    NUEVO_PID,
+    MISMO_PID
 };
 /*
 typedef struct {
@@ -184,5 +185,9 @@ void* recibir_peticion_lectura(int* pid, int* tamanio,int* direccion_fisica,int 
 //RECIBIR CREACION PROCESO Y DESTRUCCION
 void recibir_creacion_proceso(int* pid, char** path_kernel,int fd_kernel);
 void recibir_destruccion_proceso(int* pid, int fd_kernel);
+
+
+//AVISO DESDE KERNEL A CPU NOTIFICANDOLE SI VUELVE A EXEC EL MISMO PID U OTRO
+int recibir_aviso(int fd_dispatch);
 
 #endif

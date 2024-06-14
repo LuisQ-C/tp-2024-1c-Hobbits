@@ -77,9 +77,9 @@ void sum_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 void sum(char** instruccion)
 {
 
-    if(instruccion[1][0] != 'E' && strcmp(instruccion[1],"DI") == 1 &&  strcmp(instruccion[1],"SI") == 1 )
+    if(instruccion[1][0] != 'E' && strcmp(instruccion[1],"DI") != 0 &&  strcmp(instruccion[1],"SI") != 0)
     {
-        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") == 1 &&  strcmp(instruccion[2],"SI") == 1 )
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") != 0 &&  strcmp(instruccion[2],"SI") != 0)
         {
             uint8_t* registroDestino = string_to_register8(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
@@ -93,7 +93,7 @@ void sum(char** instruccion)
         }
     }
     else{
-        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") == 1 &&  strcmp(instruccion[2],"SI") == 1)
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") != 0 &&  strcmp(instruccion[2],"SI") != 0)
         {
             uint32_t* registroDestino = string_to_register32(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
@@ -136,9 +136,9 @@ void sub_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 /* Ejecuta instruccion SUB */
 void sub(char** instruccion)
 {
-    if(instruccion[1][0] != 'E')
+    if(instruccion[1][0] != 'E'  && strcmp(instruccion[1],"DI") != 0 &&  strcmp(instruccion[1],"SI") != 0)
     {
-        if(instruccion[2][0] != 'E')
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") != 0 &&  strcmp(instruccion[2],"SI") != 0)
         {
             uint8_t* registroDestino = string_to_register8(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
@@ -151,7 +151,7 @@ void sub(char** instruccion)
         }
     }
     else{
-        if(instruccion[2][0] != 'E')
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") != 0 &&  strcmp(instruccion[2],"SI") != 0)
         {
             uint32_t* registroDestino = string_to_register32(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
@@ -185,7 +185,7 @@ void jnz_32(uint32_t* reg,uint32_t instruccion_proxima){
 /* Ejecuta instruccion JNZ */
 void jnz(char** instruccion)
 {
-    if(instruccion[1][0] != 'E')
+    if(instruccion[1][0] != 'E' && strcmp(instruccion[1],"DI") != 0 &&  strcmp(instruccion[1],"SI") != 0)
     {
         uint8_t* registro_a_chequear = string_to_register8(instruccion[1]);
         uint32_t instruccion_a_saltar = atoi(instruccion[2]);

@@ -246,13 +246,13 @@ int cant_paginas_necesarias(int tamanio)
 int tam_registro(char* registro_chequear)
 {
     int tam_dato;
-    if(registro_chequear[0] == 'E')
+    if(registro_chequear[0] == 'E' || strcmp(registro_chequear,"DI") == 0 || strcmp(registro_chequear,"SI") == 0) //se puede aniadir PC
     {
-        tam_dato = 4;
+        tam_dato = sizeof(uint32_t);
     }
     else
     {
-        tam_dato = 1;
+        tam_dato = sizeof(uint8_t);
     }
     return tam_dato;
 }

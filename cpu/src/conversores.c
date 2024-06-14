@@ -115,6 +115,8 @@ int obtener_valor_registro(char* registro_chequear)
         return registro.SI;
     } else if(strcmp(registro_chequear, "DI") == 0) {
         return registro.DI;
+    } else if(strcmp(registro_chequear, "PC") == 0) {
+        return registro.PC;
     } else {
         // Retorna -1 si el registro no es encontrado
         return -1;
