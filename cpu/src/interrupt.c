@@ -3,6 +3,7 @@
 extern t_log* logger;
 extern int MOTIVO_INTERRUPCION;
 extern int PID_ACTUAL;
+extern int PID_INTERRUMPIR;
 extern pthread_mutex_t mutex_interrupcion;
 extern pthread_mutex_t mutex_pid;
 extern sem_t semaforo_pcb_recibido;
@@ -54,7 +55,7 @@ void manejarConexionInterrupt(void* fd_interrupt)
 
 
         pthread_mutex_lock(&mutex_interrupcion);
-        PID_ACTUAL = pid;
+        PID_INTERRUMPIR = pid;
         MOTIVO_INTERRUPCION = codigo_op;
         pthread_mutex_unlock(&mutex_interrupcion);
 

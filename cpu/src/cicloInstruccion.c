@@ -10,6 +10,7 @@ extern pthread_mutex_t mutex_interrupcion;
 extern pthread_mutex_t mutex_pid;
 extern sem_t semaforo_pcb_recibido;
 extern config_memoria config_mem;
+extern int PID_INTERRUMPIR;
 
 void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int cliente_fd_conexion_dispatch)
 {
@@ -97,6 +98,7 @@ void establecer_contexto(t_pcb* pcb_recibido)
     registro.EDX = pcb_recibido->registros_CPU.EDX;
     registro.SI = pcb_recibido->registros_CPU.SI;
     registro.DI = pcb_recibido->registros_CPU.DI;
+    PID_ACTUAL = pcb_recibido->pid;
     //registro.SI = pcb_recibido->registros_CPU.
     //registro.SI = pcb_recibido->registros_CPU.;
     /*pthread_mutex_lock(&mutex_pid);
@@ -327,16 +329,25 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
         }
         case WAIT:
         {
-            MOTIVO_DESALOJO = WAIT;
+            
             pcb_a_enviar->pc = registro.PC+1;
             instruccion_wait(pcb_a_enviar,instruccionDesarmada[1],fd_dispatch);
+            
+            (recibir_aviso(fd_dispatch)==NUEVO_PID)
+                ? MOTIVO_DESALOJO = WAIT
+                : MOTIVO_DESALOJO = -1;
+            
             break;
         }
         case SIGNAL:
         {
-            MOTIVO_DESALOJO = SIGNAL;
             pcb_a_enviar->pc = registro.PC+1;
             instruccion_signal(pcb_a_enviar,instruccionDesarmada[1],fd_dispatch);
+
+            (recibir_aviso(fd_dispatch)==NUEVO_PID)
+                ? MOTIVO_DESALOJO = SIGNAL
+                : MOTIVO_DESALOJO = -1;
+
             break;
         }
         case IO_STDIN_READ:
@@ -468,10 +479,10 @@ int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
     int coincide_pid = 0;
     int pid_interrupcion = -1;
     pthread_mutex_lock(&mutex_interrupcion);
-    coincide_pid = pcb_a_chequear->pid ==  PID_ACTUAL;
-    pid_interrupcion = PID_ACTUAL;
+    coincide_pid = pcb_a_chequear->pid ==  PID_INTERRUMPIR;
+    pid_interrupcion = PID_INTERRUMPIR;
     motivo_interrupcion = MOTIVO_INTERRUPCION;
-    PID_ACTUAL = -1;
+    PID_INTERRUMPIR = -1;
     MOTIVO_INTERRUPCION = -1;
     pthread_mutex_unlock(&mutex_interrupcion);
     if(coincide_pid)
@@ -485,31 +496,8 @@ int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch)
     }
     else
     {
-        log_error(logger,"INTERRUPCION RECHAZADA PID PCB: %d Y PID INTERRUPCION: %d",pcb_a_chequear->pid,pid_interrupcion);
+        log_trace(logger,"INTERRUPCION RECHAZADA PID PCB: %d Y PID INTERRUPCION: %d",pcb_a_chequear->pid,pid_interrupcion);
     }
-
-
-
-    
-
-    //pthread_mutex_lock(&mutex_interrupcion);
-
-    //if(HAY_INTERRUPCION)
-    //{
-     //   int motivo_interrupcion = INTERRUPCION;
-     //   //resetear_pid_actual();
-     //   t_paquete* paquete = armar_paquete_pcb(pcb_a_chequear);
-     //   agregar_a_paquete(paquete, &motivo_interrupcion, sizeof(int));
-     //   enviar_paquete(paquete, fd_dispatch);
-     //   eliminar_paquete(paquete);
-      //  //enviar_pcb(pcb_a_chequear,fd_dispatch); //ACA SE DEBERIA DEVOLVER CONTEXTO CON MOTIVO "INTERRUPCION"
-     //   HAY_INTERRUPCION = 0;
-     //   ocurrio_interrupcion = 1;
-    //}
-
-    //pthread_mutex_unlock(&mutex_interrupcion);
-
-    
 
     return ocurrio_interrupcion;
 }

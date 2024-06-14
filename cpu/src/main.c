@@ -15,6 +15,7 @@ int MOTIVO_INTERRUPCION = -1;
 int PID_ACTUAL = -1;
 int MOTIVO_DESALOJO = -1;
 int INSTANTE_REFERENCIA = 0;
+int PID_INTERRUMPIR;
 
 // NO BORRAR NUNCA
 
@@ -29,7 +30,7 @@ int main(int argc, char* argv[])
 
     int cliente_fd_conexion_interrupt = 0;
     int cliente_fd_conexion_dispatch = 0;
-    logger = iniciar_logger("cpu.log", "MODULO CPU", 1, LOG_LEVEL_DEBUG); //QUEDA PARA SIEMPRE
+    logger = iniciar_logger("cpu.log", "MODULO CPU", 1, LOG_LEVEL_TRACE); //QUEDA PARA SIEMPRE
     logger_obligatorio = iniciar_logger("memoria_oblig.log","MODULO CPU-OBL",1,LOG_LEVEL_DEBUG);
     config = iniciar_config("cpu.config",logger); //DESTRUIRLO CUANDO TERMINEMOS DE LEER LOS DATOS
     iniciar_tlb();
