@@ -5,9 +5,11 @@ extern t_config* config;
 
 extern t_squeue *lista_procesos_new;
 extern t_squeue *lista_procesos_ready;
+extern t_squeue *lista_procesos_ready_plus;
 extern t_squeue *lista_procesos_exec;
 extern t_squeue *lista_procesos_exit;
 extern t_slist *lista_procesos_blocked;
+extern t_slist *lista_recursos_blocked;
 
 extern sem_t grado_de_multiprogramacion;
 extern sem_t proceso_en_cola_new;
@@ -240,7 +242,7 @@ void crear_proceso(){
 
 
 void finalizar_proceso(int pid){
-    detener_planificacion();
+    //detener_planificacion();
     //printf("finalizar_proceso \n");
     
     t_pcb* pcb_auxiliar;
@@ -257,6 +259,10 @@ void finalizar_proceso(int pid){
         pcb_auxiliar = squeue_remove_by_condition(lista_procesos_ready, (void*) _elemento_encontrado);
         manejar_fin_con_motivo(INTERRUPTED_BY_USER_READY, pcb_auxiliar);
     }
+    else if(squeue_any_satisfy(lista_procesos_ready_plus, (void*) _elemento_encontrado)){
+        pcb_auxiliar = squeue_remove_by_condition(lista_procesos_ready_plus, (void*) _elemento_encontrado);
+        manejar_fin_con_motivo(INTERRUPTED_BY_USER_READY, pcb_auxiliar);
+    }
     else if(squeue_any_satisfy(lista_procesos_exec, (void*) _elemento_encontrado)){
         pcb_auxiliar = squeue_peek(lista_procesos_exec);
         int pid_auxiliar = pcb_auxiliar->pid;
@@ -269,8 +275,23 @@ void finalizar_proceso(int pid){
     else if(squeue_any_satisfy(lista_procesos_exit, (void*) _elemento_encontrado)){
         log_error(logger, "QUE HACES, SI YA ESTA EN EXIT");
     }
+    else if(!lista_recursos_is_empty()){
+        bool fueEncontrado = false;
+        void _eliminar_proceso(t_recurso* recurso){
+            if(squeue_any_satisfy(recurso->cola_blocked, (void*) _elemento_encontrado)){
+                pcb_auxiliar = squeue_remove_by_condition(recurso->cola_blocked, (void*) _elemento_encontrado);
+                fueEncontrado = true;
+            }
+        }
 
-    iniciar_planificacion();
+        pthread_mutex_lock(lista_recursos_blocked->mutex);
+        list_iterate(lista_recursos_blocked->lista, (void*) _eliminar_proceso);
+        pthread_mutex_unlock(lista_recursos_blocked->mutex);
+        if(fueEncontrado)
+            manejar_fin_con_motivo(INTERRUPTED_BY_USER_BLOCKED_REC, pcb_auxiliar);
+    }
+
+    //iniciar_planificacion();
 
 }
 
@@ -367,6 +388,14 @@ void proceso_estado(){
     else 
         log_info(logger, "La cola ready esta vacia");
 
+    if(strcmp(algoritmo, "VRR") == 0 && !squeue_is_empty(lista_procesos_ready_plus)){
+        char* pids_listar = listar_pids(lista_procesos_ready_plus);
+        log_info(logger, "Procesos cola ready: %s", pids_listar);
+        free(pids_listar);
+    }
+    else if(strcmp(algoritmo, "VRR") == 0)
+        log_info(logger, "La cola ready plus esta vacia");
+
     if(!squeue_is_empty(lista_procesos_exec))
     {
         char* pids_listar = listar_pids(lista_procesos_exec);
@@ -390,7 +419,7 @@ void proceso_estado(){
         void listar_pids_blocked(t_list_io* interfaz){
             if(!cola_io_is_empty(interfaz)){
             char* auxiliar_pids = pids_blocked(interfaz);
-            string_append_with_format(&pids, "%s, ", auxiliar_pids);    
+            string_append_with_format(&pids, "%s,", auxiliar_pids);    
             }
         }
 
@@ -403,10 +432,36 @@ void proceso_estado(){
             free(pids);
         }
         else
-            log_info(logger, "La cola blocked esta vacia");
+            log_info(logger, "La cola blocked (interfaces) esta vacia");
     }
     else
         log_info(logger, "No hay interfaz conectada");
+    
+    if(!lista_recursos_is_empty()){
+        char* pids = string_new();
+
+        void listar_pids_blocked(t_recurso* recurso){
+            if(!squeue_is_empty(recurso->cola_blocked)){
+                char* auxiliar_pids = listar_pids(recurso->cola_blocked);
+                string_append_with_format(&pids, "%s", auxiliar_pids);
+                free(auxiliar_pids);
+            }
+        }
+
+        pthread_mutex_lock(lista_recursos_blocked->mutex);
+        list_iterate(lista_recursos_blocked->lista, (void*) listar_pids_blocked);
+        pthread_mutex_unlock(lista_recursos_blocked->mutex);
+        
+        if(!string_is_empty(pids)){
+            log_info(logger, "Procesos cola blocked (recursos): %s", pids);
+            free(pids);
+        }
+        else
+            log_info(logger, "La cola blocked (recursos) esta vacia");
+
+    }
+    else 
+        log_info(logger, "No hay recursos para usar");
     //FALTA IMPRIMIR BLOCKED, TODAS SUS COLAS
 }
 
@@ -416,7 +471,7 @@ char* pids_blocked(t_list_io* interfaz){
     void obtener_pids_blocked(t_elemento_iogenerica* elemento_iogenerico){
         char* pid = string_itoa(elemento_iogenerico->pcb->pid);
         if(!(strcmp(pid, " ") == 0)){
-            string_append_with_format(&pids, "%s", pid);
+            string_append_with_format(&pids, "%s, ", pid);
             log_warning(logger, "%s", pid);
         }
         free(pid);

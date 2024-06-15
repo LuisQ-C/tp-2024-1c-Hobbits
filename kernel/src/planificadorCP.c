@@ -423,6 +423,12 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         log_info(logger, "PID: %d - Estado Anterior: EXEC - Estado Actual: EXIT", pcb_a_finalizar->pid);
         sem_post(&grado_de_multiprogramacion);
         break;
+    case INTERRUPTED_BY_USER_BLOCKED_REC:
+        squeue_push(lista_procesos_exit, pcb_a_finalizar);
+        log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
+        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: EXIT", pcb_a_finalizar->pid);
+        sem_post(&grado_de_multiprogramacion);
+        break;
     default:
         break;
     }

@@ -85,3 +85,12 @@ void liberar_recursos(int pid){
         //aca deberia ir un sdicc_remove_and_destroy
     }
 }
+
+bool lista_recursos_is_empty(){
+    bool isEmpty;
+    pthread_mutex_lock(lista_recursos_blocked->mutex);
+    isEmpty = list_is_empty(lista_recursos_blocked->lista);
+    pthread_mutex_unlock(lista_recursos_blocked->mutex);
+    return isEmpty;
+}
+

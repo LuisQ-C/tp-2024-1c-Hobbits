@@ -29,4 +29,6 @@ t_recurso* buscar_recurso(char* nombre);
 
 void liberar_recursos(int pid);
 
+bool lista_recursos_is_empty();
+
 #endif
