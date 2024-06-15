@@ -5,14 +5,29 @@
 #include <stdlib.h>
 #include "../include/sockets.h"
 #include "commons/string.h"
+#include <semaphore.h>
+#include <pthread.h>
+#include <commons/collections/queue.h>
 
 typedef enum{
     NEW = 100,
     READY,
     EXEC,
     BLOCKED,
-    COLA_EXIT
+    COLA_EXIT,
+    READYPLUS,
+    COLA_EXIT_USUARIO
 }asd;
+
+typedef struct 
+{
+    char* nombre_interfaz;
+    int tipo_interfaz;
+    int fd_interfaz;
+    sem_t* hay_proceso_cola;
+    pthread_mutex_t* mutex_cola;
+    t_queue* cola_procesos_blocked;
+} t_list_io;
 
 typedef struct{
     int base;
@@ -161,7 +176,7 @@ void recibir_nuevo_proceso(int fd_kernel);
 
 // FUNCIONES PARA MANEJO DE INTERFACES
 
-void enviar_solicitud_io_generico(int pid, int tiempo, int fd_interfaz);
+int enviar_solicitud_io_generico(int pid, int tiempo, int fd_interfaz);
 void recibir_solicitud_io_generico(int* pid,int* tiempo, int fd_kernel);
 
 // INTERRUPCIONES
@@ -191,5 +206,8 @@ void recibir_destruccion_proceso(int* pid, int fd_kernel);
 
 //AVISO DESDE KERNEL A CPU NOTIFICANDOLE SI VUELVE A EXEC EL MISMO PID U OTRO
 int recibir_aviso(int fd_dispatch);
+
+
+int enviar_paquete_io(t_paquete* paquete, int socket_cliente);
 
 #endif

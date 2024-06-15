@@ -5,6 +5,7 @@ extern sem_t planificacion_blocked_iniciada;
 extern sem_t proceso_en_cola_ready;
 
 extern t_squeue *lista_procesos_ready;
+extern t_squeue *lista_procesos_exit;
 typedef struct
 {
     int fd_conexion_IO;
@@ -153,49 +154,76 @@ int string_to_type(char* tipo)
 
 void atender_interfaz_generica(t_list_io* interfaz)
 {
+    int respuesta, err_recv, err_send;
+    t_elemento_iogenerica* solicitud_io;
     while(1)
     {
         sem_wait(interfaz->hay_proceso_cola);
         
-        t_elemento_iogenerica* solicitud_io = peek_elemento_cola_io(interfaz);
-        int a = 10;
-        int respuesta;
-        int tiempo_dormicion = solicitud_io->tiempo;
-
-        enviar_solicitud_io_generico(solicitud_io->pcb->pid,tiempo_dormicion,interfaz->fd_interfaz);
-        //int err = send(interfaz->fd_interfaz,&tiempo_dormicion,sizeof(int),SIGPIPE); //mandarle el pid y el tiempo a la interfaz
-
-        // MANEJAR DESCONEXION ACA tmb
-
-        int err = recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
-
-
-        if(err == 0)
+        if(!cola_io_is_empty(interfaz))
         {
+            solicitud_io = peek_elemento_cola_io(interfaz);
+            int tiempo_dormicion = solicitud_io->tiempo;
+            err_send = enviar_solicitud_io_generico(solicitud_io->pcb->pid,tiempo_dormicion,interfaz->fd_interfaz);
+            if(err_send == -1){break;}
+            err_recv = recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
+            
+            if(err_recv == 0)
+            {
             printf("\nLA %s SE DESCONECTO \n",interfaz->nombre_interfaz);
+            break;
+            }
+
+            if(respuesta==INTERFAZ_LISTA) 
+            {
+            printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
+            }
         }
 
-        if(respuesta==INTERFAZ_LISTA) 
-        {
-            printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
-        }
+        
         
         sem_wait(&planificacion_blocked_iniciada);
 
-        pop_elemento_cola_io(interfaz);
-
-        cambiar_a_ready(solicitud_io->pcb);
-
-        sem_post(&proceso_en_cola_ready);
-
-        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", solicitud_io->pcb->pid);
-
-        free(solicitud_io);
+        if(!cola_io_is_empty(interfaz))
+        {
+            pop_elemento_cola_io(interfaz);
+            mandar_pcb_cola_correspondiente(solicitud_io->pcb,solicitud_io->cola_destino);
+            free(solicitud_io);
+        }
 
         sem_post(&planificacion_blocked_iniciada);
         
     }
-    //DESTRUIRSE A SI MISMO, SACARSE DE LA LISTA
+    //DESTRUIRSE A SI MISMO, SACARSE DE LA LISTA, ENVIAR TODOS A WAIT
+}
+
+void mandar_pcb_cola_correspondiente(t_pcb* pcb, int cola_destino)
+{
+    if(cola_destino == READY)
+    {
+        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", pcb->pid);
+        cambiar_a_ready(pcb);
+        sem_post(&proceso_en_cola_ready);
+    }
+    else if(cola_destino == READYPLUS)
+    {
+        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY+", pcb->pid);
+        sem_post(&proceso_en_cola_ready);
+    }
+    else if(cola_destino == COLA_EXIT)
+    {
+        squeue_push(lista_procesos_exit,pcb);
+        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: EXIT", pcb->pid);
+    }
+    else if(cola_destino == COLA_EXIT_USUARIO)
+    {
+        manejar_fin_con_motivo(INTERRUPTED_BY_USER_BLOCKED,pcb);
+        //ACA IRIA LA FUNCION MANEJAR MOTIVO QUE HIZO LUIS
+    }
+    else
+    {
+        log_warning(logger,"COLA DESTINO INVALIDA");
+    }
 }
 
 

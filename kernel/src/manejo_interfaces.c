@@ -3,6 +3,8 @@
 extern t_slist *lista_procesos_blocked;
 extern t_squeue* lista_procesos_exit;
 
+extern t_log* logger; //NO HACE FALTA QUE ESTE ACA
+
 t_list_io* agregar_interfaz_lista(char* nombre,int tipo, int fd_interfaz)
 {
     t_list_io* nueva_interfaz = malloc(sizeof(t_list_io));
@@ -127,16 +129,14 @@ bool verificar_pid_de_solicitud(void* solicitud_io,int tipo_interfaz, int pid_bu
             es_el_pid_buscado = true;
             if(indice == 0)
             {
-                solicitud_generica->cola_destino=COLA_EXIT;
+                solicitud_generica->cola_destino=COLA_EXIT_USUARIO;
             }
             else
             {
                 list_iterator_remove(bloqueados_interfaz);
-                //manejar_fin_con_motivo(INTERRUPTED_BY_USER_BLOCKED, solicitud_generica->pcb);
-                squeue_push(lista_procesos_exit,solicitud_generica->pcb);
+                manejar_fin_con_motivo(INTERRUPTED_BY_USER_BLOCKED, solicitud_generica->pcb);
                 free(solicitud_generica);
             }
-            
         }
         es_el_pid_buscado = false;
     }

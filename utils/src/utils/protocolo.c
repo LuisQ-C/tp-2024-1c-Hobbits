@@ -232,6 +232,18 @@ void enviar_paquete(t_paquete* paquete, int socket_cliente)
 	free(a_enviar);
 }
 
+int enviar_paquete_io(t_paquete* paquete, int socket_cliente)
+{
+    int bytes = paquete->buffer->size + 2*sizeof(int);
+    void* a_enviar = serializar_paquete(paquete, bytes);
+
+    int err = send(socket_cliente, a_enviar, bytes, MSG_NOSIGNAL);
+
+    free(a_enviar);
+
+    return err;
+}
+
 /*Eliminar paquete del lado del cliente*/
 void eliminar_paquete(t_paquete* paquete)
 {
@@ -304,16 +316,17 @@ void enviar_pcb(t_pcb* pcb_a_enviar, int fd_dispatch){
     eliminar_paquete(paquete);
 }
 
-void enviar_solicitud_io_generico(int pid, int tiempo, int fd_interfaz)
+int enviar_solicitud_io_generico(int pid, int tiempo, int fd_interfaz)
 {
     t_paquete* paquete = crear_paquete(IO_GEN_SLEEP);
     
     agregar_a_paquete(paquete, &pid, sizeof(int));
     agregar_a_paquete(paquete, &tiempo, sizeof(int));
     
-    enviar_paquete(paquete, fd_interfaz); // EL SEND NECESITA EL SIGPIPE PQ VA A TIRAR ERROR
+    int err = enviar_paquete_io(paquete, fd_interfaz);//DEVUELVE -1 SI HUBO ERROR
     
     eliminar_paquete(paquete);
+    return err;
 }
 
 void recibir_solicitud_io_generico(int* pid,int* tiempo, int fd_kernel)

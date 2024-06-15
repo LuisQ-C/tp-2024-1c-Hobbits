@@ -12,6 +12,7 @@
 #include <commons/collections/queue.h>
 #include <commons/collections/list.h>
 #include "../../utils/include/listas.h"
+#include "manejar_fin.h"
 //#include "planificadorCP.h"
 
 
@@ -22,15 +23,7 @@ typedef struct
     pthread_mutex_t* mutex;
 }t_slist;
 
-typedef struct 
-{
-    char* nombre_interfaz;
-    int tipo_interfaz;
-    int fd_interfaz;
-    sem_t* hay_proceso_cola;
-    pthread_mutex_t* mutex_cola;
-    t_queue* cola_procesos_blocked;
-} t_list_io;
+
 
 typedef struct
 {

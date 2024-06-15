@@ -11,6 +11,7 @@
 #include "consola.h"
 #include "manejo_interfaces.h"
 #include <stdbool.h>
+#include "manejar_fin.h"
 
 void ejecutar_procesos_exec(void);
 //void pasar_a_cola_exec(void);
@@ -36,7 +37,7 @@ typedef enum{
     INTERRUPTED_BY_USER_BLOCKED
 }motivos_fin;
 
-void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar);
+//void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar);
 
 void fin_fin();
 
@@ -48,8 +49,8 @@ typedef struct
 
 void fin_fin_ready();
 void hilo_quantum(void* arg);
-void enviar_destruccion_proceso(int pid, int fd_memoria);
-//void enviar_interrupcion(int interrupcion, int pid);
+//void enviar_destruccion_proceso(int pid, int fd_memoria);
+
 
 //void interrupcion_quantum(t_pcb* pcb_auxiliar);
 

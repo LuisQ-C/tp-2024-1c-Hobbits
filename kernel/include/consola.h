@@ -11,6 +11,7 @@
 #include "main.h"
 #include "planificadorLP.h"
 #include "planificadorCP.h"
+#include "manejar_fin.h"
 
 void iniciar_consola(void* fd_info);
 bool validar_instrucciones_leidas(char* leido);

@@ -366,6 +366,9 @@ void buscar_proceso_finalizar(int pid)
     {
         log_error(logger, "QUE HACES, SI YA ESTA EN EXIT");
     }
+    else if (slist_find_pcb_iterating_each_queue(lista_procesos_blocked, pid))
+    {
+    }
     else if (!lista_recursos_is_empty())
     {
         bool fueEncontrado = false;
@@ -382,9 +385,6 @@ void buscar_proceso_finalizar(int pid)
         pthread_mutex_unlock(lista_recursos_blocked->mutex);
         if (fueEncontrado)
             manejar_fin_con_motivo(INTERRUPTED_BY_USER_BLOCKED, pcb_auxiliar);
-    }
-    else if (slist_find_pcb_iterating_each_queue(lista_procesos_blocked, pid))
-    {
     }
     else
     {
@@ -557,7 +557,7 @@ void proceso_estado()
             if (!cola_io_is_empty(interfaz))
             {
                 char *auxiliar_pids = pids_blocked(interfaz);
-                string_append_with_format(&pids, "%s,", auxiliar_pids);
+                string_append_with_format(&pids, "%s", auxiliar_pids);
             }
         }
 
@@ -617,7 +617,7 @@ char *pids_blocked(t_list_io *interfaz)
         if (!(strcmp(pid, " ") == 0))
         {
             string_append_with_format(&pids, "%s, ", pid);
-            log_warning(logger, "%s", pid);
+            //log_warning(logger, "%s", pid);
         }
         free(pid);
     }

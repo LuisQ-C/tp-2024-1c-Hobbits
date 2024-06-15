@@ -9,7 +9,7 @@
 #include <pthread.h>
 #include <commons/collections/queue.h>
 #include <commons/collections/list.h>
-#include "../include/manejo_interfaces.h"
+#include "manejo_interfaces.h"
 #include "planificadorLP.h"
 
 
@@ -24,6 +24,8 @@ int string_to_type(char* tipo);
 void atender_interfaz_generica(t_list_io* interfaz);
 void terminar_programa(t_log* logger,t_config* config,int* fd_memoria,int* fd_cpu_dispatch,int* fd_cpu_interrupt);
 //void escucharConexionesIO(void* datosServerInterfaces);
+
+void mandar_pcb_cola_correspondiente(t_pcb* pcb, int cola_destino);
 
 
 #endif 

@@ -104,12 +104,12 @@ void conexionKernel(void* info_fd)
             if(cant_pag_eliminadas == -1)
             {
                 rta = PROCESO_INEXISTENTE;
-                send(fd_kernel,&rta,sizeof(int),0);
+                //send(fd_kernel,&rta,sizeof(int),0);
             }
             else{
                 log_info(logger_obligatorio,"Destrucción de Tabla de Páginas: \"PID: %d - Tamaño: %d\"",pid,cant_pag_eliminadas);
                 rta = PROCESO_ELIMINADO;
-                send(fd_kernel,&rta,sizeof(int),0);
+                //send(fd_kernel,&rta,sizeof(int),0);
             }
             break;
         }
