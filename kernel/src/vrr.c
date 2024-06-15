@@ -60,9 +60,9 @@ void planificacion_vrr(){
         new_data->pid = pcb_auxiliar->pid;
         pthread_create(&hilo_q, NULL, (void *)hilo_quantum, (void*) new_data);
         pthread_detach(hilo_q);
+        sem_post(&planificacion_ready_iniciada);
         recibir_contexto_actualizado(fd_dispatch);
         pthread_cancel(hilo_q);
-        sem_post(&planificacion_ready_iniciada);
 
 
     }

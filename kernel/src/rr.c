@@ -50,9 +50,9 @@ void planificacion_rr(){
         new_data->pid = pcb_auxiliar->pid;
         pthread_create(&hilo_q,NULL,(void*)hilo_quantum,(void*) new_data);
         pthread_detach(hilo_q);
+        sem_post(&planificacion_ready_iniciada);
         recibir_contexto_actualizado(fd_dispatch);
         pthread_cancel(hilo_q); //PODRIA IR DENTRO DE RECIBIR CONTEXTO ACTUALIZADO LUEGO DE RECIBIR OPERACION PARA QUE LO CANCELE LO ANTES POSIBLE
-        sem_post(&planificacion_ready_iniciada);
     }
     
 }

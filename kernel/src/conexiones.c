@@ -260,6 +260,7 @@ void mandar_pcb_cola_correspondiente(t_pcb* pcb, int cola_destino)
     else if(cola_destino == READYPLUS)
     {
         log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY+", pcb->pid);
+        cambiar_a_ready_plus(pcb);
         sem_post(&proceso_en_cola_ready);
     }
     else if(cola_destino == COLA_EXIT)

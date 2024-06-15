@@ -54,7 +54,7 @@ void planificacion_fifo(){
             //sem_post(&ejecutar_proceso);
         }
         else{
-            log_info(logger,"ENTRE AL ELSE DE COLA VACIA");
+            //log_info(logger,"ENTRE AL ELSE DE COLA VACIA");
             sem_post(&planificacion_ready_iniciada);
         }
 

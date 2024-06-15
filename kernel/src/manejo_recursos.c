@@ -84,6 +84,7 @@ void liberar_recursos(int pid){
         list_iterate(lista_rec, (void*) _liberar_recurso);
         //aca deberia ir un sdicc_remove_and_destroy
     }
+    free(pid_c);
 }
 
 bool lista_recursos_is_empty(){

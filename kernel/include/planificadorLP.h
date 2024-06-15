@@ -14,5 +14,7 @@ void cambiar_a_ready(t_pcb* pcb);
 void mostrar_cola_ready(void);
 void atender_estados_new(void);
 char* listar_pids(t_squeue* squeue);
+void cambiar_a_ready_plus(t_pcb* pcb);
+void mostrar_cola_ready_plus(void);
 
 #endif

@@ -6,6 +6,7 @@ extern t_config* config;
 
 extern t_squeue *lista_procesos_new;
 extern t_squeue *lista_procesos_ready;
+extern t_squeue *lista_procesos_ready_plus;
 
 extern sem_t grado_de_multiprogramacion;
 extern sem_t proceso_en_cola_new;
@@ -115,3 +116,16 @@ void mostrar_cola_ready(){
 
 }
 
+void cambiar_a_ready_plus(t_pcb* pcb){
+    //uint32_t estado_anterior = pcb->estado;
+    pcb->estado = READY;
+    squeue_push(lista_procesos_ready_plus, pcb);
+
+    mostrar_cola_ready_plus();
+}
+
+void mostrar_cola_ready_plus(){
+    char* lista_pids = listar_pids(lista_procesos_ready_plus);
+    log_info(logger, "Cola ready prioridad: %s", lista_pids);
+    free(lista_pids);
+}

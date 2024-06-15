@@ -123,7 +123,17 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); //habria que juntarlo con validez
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_iogenerica* nueva_solicitud_gen = malloc(sizeof(t_elemento_iogenerica));
-                nueva_solicitud_gen->cola_destino = READY; //ACA DEFINIRIAS LO DE VRR
+                //nueva_solicitud_gen->cola_destino = READY; //ACA DEFINIRIAS LO DE VRR
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                    pcb_a_actualizar->quantum = quantum;
+                    nueva_solicitud_gen->cola_destino = READY;
+                }
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                    nueva_solicitud_gen->cola_destino = READYPLUS;
+                }
+                else 
+                    nueva_solicitud_gen->cola_destino = READY;
+
                 nueva_solicitud_gen->pcb= pcb_a_actualizar;
                 nueva_solicitud_gen->tiempo = *tiempo_dormicion;
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_gen);
@@ -161,20 +171,30 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             char* nombre_interfaz = list_get(pcb_con_motivo,6);
             int tam_lista = list_size(pcb_con_motivo);
             int cant_direcciones = tam_lista - 7; //los primeros 8 son necesarios para todos los ios
-            t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 7, cant_direcciones);
             
             bool validez = slist_comprobate_io(nombre_interfaz,IO_STDIN_READ);
             if(validez)
             {
+                t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 7, cant_direcciones);
                 t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); //habria que juntarlo con validez
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_io_in_out* nueva_solicitud_stdin= malloc(sizeof(t_elemento_io_in_out));
-                nueva_solicitud_stdin->cola_destino=READY;
+               // nueva_solicitud_stdin->cola_destino=READY;
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                    pcb_a_actualizar->quantum = quantum;
+                    nueva_solicitud_stdin->cola_destino = READY;
+                }
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                    nueva_solicitud_stdin->cola_destino = READYPLUS;
+                }
+                else 
+                    nueva_solicitud_stdin->cola_destino = READY;
+
                 nueva_solicitud_stdin->pcb = pcb_a_actualizar;
                 nueva_solicitud_stdin->direcciones_fisicas = direcciones;
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_stdin);
 
-                log_warning(logger, "PID: %d Fue desalojado por IO_STDIN_READ ", pcb_a_actualizar->pid);
+                //log_warning(logger, "PID: %d Fue desalojado por IO_STDIN_READ ", pcb_a_actualizar->pid);
 
                 sem_post(interfaz_buscada->hay_proceso_cola);
 
@@ -209,20 +229,31 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             char* nombre_interfaz = list_get(pcb_con_motivo,6);
             int tam_lista = list_size(pcb_con_motivo);
             int cant_direcciones = tam_lista - 7; //los primeros 8 son necesarios para todos los ios
-            t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 7, cant_direcciones);
             
             bool validez = slist_comprobate_io(nombre_interfaz,IO_STDOUT_WRITE);
             if(validez)
             {
+                t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 7, cant_direcciones);
                 t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); //habria que juntarlo con validez
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_io_in_out* nueva_solicitud_stdin= malloc(sizeof(t_elemento_io_in_out));
-                nueva_solicitud_stdin->cola_destino=READY;
+                //nueva_solicitud_stdin->cola_destino=READY;
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                    pcb_a_actualizar->quantum = quantum;
+                    nueva_solicitud_stdin->cola_destino = READY;
+                }
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                    nueva_solicitud_stdin->cola_destino = READYPLUS;
+                }
+                else 
+                    nueva_solicitud_stdin->cola_destino = READY;
+
+
                 nueva_solicitud_stdin->pcb = pcb_a_actualizar;
                 nueva_solicitud_stdin->direcciones_fisicas = direcciones;
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_stdin);
 
-                log_warning(logger, "PID: %d Fue desalojado por IO_STDOUT_WRITE ", pcb_a_actualizar->pid);
+                //log_warning(logger, "PID: %d Fue desalojado por IO_STDOUT_WRITE ", pcb_a_actualizar->pid);
 
                 sem_post(interfaz_buscada->hay_proceso_cola);
 
@@ -267,7 +298,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 return false;
             break;
         case INTERRUPCION_QUANTUM:
-            log_warning(logger, "PID: %d Fue desalojado por fin de Q", pcb_a_actualizar->pid);
+            //log_warning(logger, "PID: %d Fue desalojado por fin de Q", pcb_a_actualizar->pid);
             pcb_a_actualizar->estado = READY;
             pcb_a_actualizar->quantum = quantum; //PARA VRR
             squeue_push(lista_procesos_ready, pcb_a_actualizar);
@@ -278,7 +309,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 
             break;
         case USER_INTERRUPT:
-            log_warning(logger, "PID: %d Fue desalojado por interrupcion de usuario", pcb_a_actualizar->pid);
+            //log_warning(logger, "PID: %d Fue desalojado por interrupcion de usuario", pcb_a_actualizar->pid);
             manejar_fin_con_motivo(INTERRUPTED_BY_USER_EXEC, pcb_a_actualizar);
             return false;
 
@@ -286,15 +317,15 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
         case WAIT:
         {
             
-            log_info(logger, "LLEGUE AL WAIT");
+            //log_info(logger, "LLEGUE AL WAIT");
             char* nombre_recurso = list_get(pcb_con_motivo, 6);
             pthread_mutex_lock(lista_recursos_blocked->mutex);
             bool esValido = existe_recurso(nombre_recurso);
             pthread_mutex_unlock(lista_recursos_blocked->mutex);
-            log_trace(logger, "PASE LA FUNCION DE EXISTE RECURSO");
+            //log_trace(logger, "PASE LA FUNCION DE EXISTE RECURSO");
             //t_instancias_usadas* auxiliar_asdasd = malloc(sizeof(t_instancias_usadas));
             if(esValido){
-                log_info(logger, "ES VALIDO EL RECURSO");
+                //log_info(logger, "ES VALIDO EL RECURSO");
                 /*
                 int _es_el_recurso(t_recurso* r){
                     int recurso_encontrado = strcmp(r->nombre, nombre_recurso);
@@ -375,7 +406,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 }
                 else if(recurso_usado->instancias_recurso < 0){
                     pcb_a_actualizar->quantum = quantum;
-                    log_debug(logger, "ME FUI A LA COLA DE BLOCKED POR EL RECURSO");
+                    //log_debug(logger, "ME FUI A LA COLA DE BLOCKED POR EL RECURSO");
                     squeue_push(recurso_usado->cola_blocked, pcb_a_actualizar);
                     int ok = NUEVO_PID;
                     send(fd_dispatch, &ok, sizeof(int), 0);
@@ -384,7 +415,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 
             }
             else{
-                log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
+                //log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
                 manejar_fin_con_motivo(INVALID_RESOURCE, pcb_a_actualizar);
                 int ok = NUEVO_PID;
                 send(fd_dispatch, &ok, sizeof(int), 0);
@@ -394,12 +425,12 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
         
             break;}
         case SIGNAL:
-            log_info(logger, "LLEGUE AL SIGNAL");
+            //log_info(logger, "LLEGUE AL SIGNAL");
             char* nombre_recurso = list_get(pcb_con_motivo, 6);
             pthread_mutex_lock(lista_recursos_blocked->mutex);
             bool esValido = existe_recurso(nombre_recurso);
             pthread_mutex_unlock(lista_recursos_blocked->mutex);
-            log_trace(logger, "PASE LA FUNCION DE EXISTE RECURSO");
+            //log_trace(logger, "PASE LA FUNCION DE EXISTE RECURSO");
             if(esValido){
                 pthread_mutex_lock(lista_recursos_blocked->mutex);
                 t_recurso* recurso_usado = buscar_recurso(nombre_recurso); //Utiliza lista_recursos_blocked->lista
@@ -430,7 +461,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                     if(list_any_satisfy(aux_lista, (void*) _el_recurso_es_usado)){
                         t_instancias_usadas* aux_inst = list_find(aux_lista, (void*) _el_recurso_es_usado);
                         aux_inst->cantInstanciasUtil--;
-                        log_trace(logger, "HOLA DESDE LA LISTA DE RECURSOS USADA");
+                        //log_trace(logger, "HOLA DESDE LA LISTA DE RECURSOS USADA");
                     }
 
                 }
@@ -454,7 +485,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 
             }
             else {
-                log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
+                //log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
                 manejar_fin_con_motivo(INVALID_RESOURCE, pcb_a_actualizar);
                 int ok = NUEVO_PID;
                 send(fd_dispatch, &ok, sizeof(int), 0);

@@ -448,28 +448,21 @@ FUNCIONES QUE HACEN WAIT Y CONFIRMAN CON UN POST A UN SEMAFORO ADICIONAL, UTIL P
 void detener_cola_new_confirmacion(void *arg)
 {
     sem_wait(&planificacion_new_iniciada);
-    log_trace(logger, "HOLA DESDE NEW");
     sem_post(&planificacion_detenida);
 }
 void detener_cola_ready_confirmacion(void *arg)
 {
     sem_wait(&planificacion_ready_iniciada);
-    log_trace(logger, "HOLA DESDE READY");
-
     sem_post(&planificacion_detenida);
 }
 void detener_cola_exec_confirmacion(void *arg)
 {
     sem_wait(&planificacion_exec_iniciada);
-    log_trace(logger, "HOLA DESDE EXEC");
-
     sem_post(&planificacion_detenida);
 }
 void detener_cola_blocked_confirmacion(void *arg)
 {
     sem_wait(&planificacion_blocked_iniciada);
-    log_trace(logger, "HOLA DESDE BLOCKED");
-
     sem_post(&planificacion_detenida);
 }
 
@@ -487,7 +480,7 @@ void iniciar_planificacion()
         int valor;
         sem_post(&planificacion_new_iniciada);
         sem_getvalue(&planificacion_new_iniciada, &valor);
-        printf("\nESTO EN CONSOLA, VALOR NEW INICIADA: %d \n", valor);
+        //printf("\nESTO EN CONSOLA, VALOR NEW INICIADA: %d \n", valor);
         sem_post(&planificacion_ready_iniciada);
         sem_post(&planificacion_exec_iniciada);
         sem_post(&planificacion_blocked_iniciada);
@@ -611,18 +604,34 @@ char *pids_blocked(t_list_io *interfaz)
 {
     char *pids = string_new();
 
-    void obtener_pids_blocked(t_elemento_iogenerica * elemento_iogenerico)
-    {
-        char *pid = string_itoa(elemento_iogenerico->pcb->pid);
-        if (!(strcmp(pid, " ") == 0))
+        void obtener_pids_blocked_gen(t_elemento_iogenerica * elemento_iogenerico)
         {
-            string_append_with_format(&pids, "%s, ", pid);
-            //log_warning(logger, "%s", pid);
+            char *pid = string_itoa(elemento_iogenerico->pcb->pid);
+            if (!(strcmp(pid, " ") == 0))
+            {
+                string_append_with_format(&pids, "%s, ", pid);
+                //log_warning(logger, "%s", pid);
+            }
+            free(pid);
         }
-        free(pid);
+        void obtener_pids_blocked_in_out(t_elemento_io_in_out * elemento_io)
+        {
+            char *pid = string_itoa(elemento_io->pcb->pid);
+            if (!(strcmp(pid, " ") == 0))
+            {
+                string_append_with_format(&pids, "%s, ", pid);
+                //log_warning(logger, "%s", pid);
+            }
+            free(pid);
+        }
+    
+    if(interfaz->tipo_interfaz == 16){
+        cola_io_iterate(interfaz, (void *) obtener_pids_blocked_gen);
     }
+    else if(interfaz->tipo_interfaz == 17 || interfaz->tipo_interfaz == 18){
+        cola_io_iterate(interfaz, (void *)obtener_pids_blocked_in_out);
 
-    cola_io_iterate(interfaz, (void *)obtener_pids_blocked);
+    }
     return pids;
 }
 
