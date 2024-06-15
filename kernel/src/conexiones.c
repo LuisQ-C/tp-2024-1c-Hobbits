@@ -169,7 +169,6 @@ void atender_interfaz_generica(t_list_io* interfaz)
 
         int err = recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
 
-        
 
         if(err == 0)
         {

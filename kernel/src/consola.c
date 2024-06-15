@@ -274,17 +274,17 @@ void hilo_elimina_proceso(int* arg)
         set_plani_iniciada(false);
         pthread_t detener_new, detener_ready, detener_exec, detener_blocked;
         pthread_create(&detener_new,NULL,(void*) detener_cola_new_confirmacion,NULL);
-        //pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
+        pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
         pthread_create(&detener_exec,NULL,(void*) detener_cola_exec_confirmacion,NULL);
-        //pthread_create(&detener_blocked,NULL,(void*) detener_cola_blocked,NULL);
+        pthread_create(&detener_blocked,NULL,(void*) detener_cola_blocked,NULL);
         pthread_detach(detener_new);
-        //pthread_detach(detener_ready);
+        pthread_detach(detener_ready);
         pthread_detach(detener_exec);
-        //pthread_detach(detener_blocked);
+        pthread_detach(detener_blocked);
         sem_wait(&planificacion_detenida);
         sem_wait(&planificacion_detenida);
-        //sem_wait(&planificacion_detenida);
-        //sem_wait(&planificacion_detenida);
+        sem_wait(&planificacion_detenida);
+        sem_wait(&planificacion_detenida);
         buscar_proceso_finalizar(pid);
         iniciar_planificacion();
     }
@@ -337,11 +337,11 @@ void buscar_proceso_finalizar(int pid)
     else if(squeue_any_satisfy(lista_procesos_exit, (void*) _elemento_encontrado)){
         log_error(logger, "QUE HACES, SI YA ESTA EN EXIT");
     }
+    else if(slist_find_pcb_iterating_each_queue(lista_procesos_blocked,pid))
+    {
+    }
     //FALTA ELSE SI NO LO ENCUENTRA
 }
-
-
-
 
 
 
@@ -357,19 +357,18 @@ void buscar_proceso_finalizar(int pid)
         
 void detener_planificacion(){
     //printf("detener_planificador \n");
-    
     if(get_plani_iniciada())
     {
         set_plani_iniciada(false);
         pthread_t detener_new, detener_ready, detener_exec, detener_blocked;
         pthread_create(&detener_new,NULL,(void*) detener_cola_new,NULL);
-        //pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
+        pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
         pthread_create(&detener_exec,NULL,(void*) detener_cola_exec,NULL);
-        //pthread_create(&detener_blocked,NULL,(void*) detener_cola_blocked,NULL);
+        pthread_create(&detener_blocked,NULL,(void*) detener_cola_blocked,NULL);
         pthread_detach(detener_new);
-        //pthread_detach(detener_ready);
+        pthread_detach(detener_ready);
         pthread_detach(detener_exec);
-        //pthread_detach(detener_blocked);
+        pthread_detach(detener_blocked);
         log_info(logger, "Se detuvo la planificacion");
     }
     else

@@ -12,6 +12,8 @@
 #include <commons/collections/queue.h>
 #include <commons/collections/list.h>
 #include "../../utils/include/listas.h"
+//#include "planificadorCP.h"
+
 
 
 typedef struct
@@ -32,9 +34,18 @@ typedef struct
 
 typedef struct
 {
+    int cola_destino;
     int tiempo;
     t_pcb* pcb;
 } t_elemento_iogenerica;
+
+typedef struct
+{
+    int cola_destino;
+    t_list* direcciones_fisicas;
+    t_pcb* pcb;
+} t_elemento_io_in_out;
+
 
 
 
@@ -57,5 +68,8 @@ void push_elemento_cola_io(t_list_io* interfaz_lista,void* elemento_agregar);
 bool cola_io_is_empty(t_list_io* interfaz_lista);
 bool lista_interfaces_is_empty();
 void cola_io_iterate(t_list_io* interfaz_lista, void(*closure)(void*));
+
+bool slist_find_pcb_iterating_each_queue(t_slist* slist, int pid);
+bool verificar_pid_de_solicitud(void* solicitud_io,int tipo_interfaz, int pid_buscado, int indice, t_list_iterator* bloqueados_interfaz);
 
 #endif

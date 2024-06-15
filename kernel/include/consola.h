@@ -7,6 +7,7 @@
 #include <readline/history.h>
 #include <pthread.h>
 #include "../../utils/include/protocolo.h"
+//#include "../../utils/include/listas.h" //se aniadio solo para los pruebas
 #include "main.h"
 #include "planificadorLP.h"
 #include "planificadorCP.h"
