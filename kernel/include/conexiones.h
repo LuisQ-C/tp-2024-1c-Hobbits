@@ -23,6 +23,7 @@ void procesarConexionesIO(void* datosServerInterfaces);
 int string_to_type(char* tipo);
 void atender_interfaz_generica(t_list_io* interfaz);
 void terminar_programa(t_log* logger,t_config* config,int* fd_memoria,int* fd_cpu_dispatch,int* fd_cpu_interrupt);
+void atender_interfaz_stdin_stdout(t_list_io* interfaz, int tipo_interfaz);
 //void escucharConexionesIO(void* datosServerInterfaces);
 
 void mandar_pcb_cola_correspondiente(t_pcb* pcb, int cola_destino);

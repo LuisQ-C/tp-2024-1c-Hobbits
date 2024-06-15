@@ -5,13 +5,15 @@ extern t_log* logger;
 //Kernel que mediante la interfaz ingresada se lea desde el STDIN (Teclado) un valor cuyo 
 //tamaño está delimitado por el valor del Registro Tamaño y el mismo se guarde a partir de la 
 //Dirección Lógica almacenada en el Registro Dirección.
+/*
 typedef struct{
     int base;
     int tamanio;
     int direccion_fisica;
-}t_porcion_dato_in;
+}t_porcion_dato_in;*/
 
 void stDin(t_config* config, int fd_conexion_kernel,int fd_conexion_memoria){
+
 int base=-99999;
 int direccionFisica=-8888;
 int tamanio=-3;
@@ -19,19 +21,20 @@ int pid;
 char* cadenaDeCaracteres;
 int resultado;
 
-//while(1){
-    //recibir_operacion(fd_conexion_kernel);
-    //t_list* listaRecibida= recibir_paquete(fd_conexion_kernel); //recibo lista 
-    t_list* listaRecibida = lista_pruebas();
+while(1){
+    recibir_operacion(fd_conexion_kernel);
+    t_list* listaRecibida= recibir_paquete(fd_conexion_kernel); //recibo lista 
+    //t_list* listaRecibida = lista_pruebas();
     int* lista_PID = list_get(listaRecibida,0);
     pid  = *lista_PID;
+    log_info(logger,"STDIN - Operación: \"PID: %d - Operacion: IO_STDIN_READ\"",pid);
     
     cadenaDeCaracteres = readline(">");
     
     void * cadenaAenviar = (void*) cadenaDeCaracteres;
 
     for(int i=1; i<list_size(listaRecibida); i++){
-        t_porcion_dato_in* datoAenviar = list_get(listaRecibida,i);
+        t_porcion_dato* datoAenviar = list_get(listaRecibida,i);
         //cadenaDeCaracteres+base+tamanio+direccionfisica
         t_paquete* infoAenviar = crear_paquete(ESCRITURA);
         base= datoAenviar->base;
@@ -46,10 +49,13 @@ int resultado;
         eliminar_paquete(infoAenviar);
         recv(fd_conexion_memoria,&resultado,sizeof(int),MSG_WAITALL);
     }
-//}
+    int respuesta = INTERFAZ_LISTA;
+    send(fd_conexion_kernel,&respuesta,sizeof(int),0);
 
 }
 
+}
+/*
 t_list* lista_pruebas()
 {
     t_list* lista = list_create();
@@ -70,4 +76,4 @@ void aniadir_porcion(t_list* lista,int base,int tamanio,int dir_fisica)
     nueva_porcion->tamanio= tamanio;
     nueva_porcion->direccion_fisica = dir_fisica;
     list_add(lista,nueva_porcion);
-}
+}*/

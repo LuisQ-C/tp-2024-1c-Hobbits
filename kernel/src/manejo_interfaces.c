@@ -117,6 +117,7 @@ bool slist_find_pcb_iterating_each_queue(t_slist* interfaces, int pid)
     list_iterator_destroy(interfaces_iterar);
     return pcb_encontrado;
 }
+
 //DEVUELVE EL PID, -1 SI NO ES LA SOLICITUD DE ESE PID
 bool verificar_pid_de_solicitud(void* solicitud_io,int tipo_interfaz, int pid_buscado, int indice, t_list_iterator* bloqueados_interfaz)
 {
@@ -139,12 +140,26 @@ bool verificar_pid_de_solicitud(void* solicitud_io,int tipo_interfaz, int pid_bu
             }
         }
         es_el_pid_buscado = false;
-    }
-    return es_el_pid_buscado;
-    /*else if(tipo_interfaz==IO_STDIN_READ || tipo_interfaz==IO_STDOUT_WRITE)
+    }else if(tipo_interfaz==IO_STDIN_READ || tipo_interfaz==IO_STDOUT_WRITE)
     {
-
-    }*/
+        t_elemento_io_in_out * solicitud_generica = (t_elemento_io_in_out*) solicitud_io;
+        if(solicitud_generica->pcb->pid == pid_buscado)
+        {
+            es_el_pid_buscado = true;
+            if(indice == 0)
+            {
+                solicitud_generica->cola_destino=COLA_EXIT_USUARIO;
+            }
+            else
+            {
+                list_iterator_remove(bloqueados_interfaz);
+                manejar_fin_con_motivo(INTERRUPTED_BY_USER_BLOCKED, solicitud_generica->pcb);
+                free(solicitud_generica);
+            }
+        }
+        es_el_pid_buscado = false;
+    } //FALTA IO_FS
+    return es_el_pid_buscado;
 }
 
 /*

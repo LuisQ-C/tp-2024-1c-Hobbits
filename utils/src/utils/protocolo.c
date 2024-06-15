@@ -339,6 +339,27 @@ void recibir_solicitud_io_generico(int* pid,int* tiempo, int fd_kernel)
     list_destroy_and_destroy_elements(lista,(void*) liberar_elemento);
 }
 
+int enviar_solicitud_stdin_stdout(int pid, t_list* direcciones_fisicas , int fd_interfaz , int cant_direcciones, int tipo_interfaz)
+{
+    t_paquete* paquete = crear_paquete(tipo_interfaz);
+    t_porcion_dato auxiliar;
+    agregar_a_paquete(paquete,&pid,sizeof(int));
+
+    for(int i=0;i<cant_direcciones;i++)
+    {
+        t_porcion_dato* direccion = list_get(direcciones_fisicas,i);
+        auxiliar.base=direccion->base;
+        auxiliar.direccion_fisica=direccion->direccion_fisica;
+        auxiliar.tamanio=direccion->tamanio;
+        agregar_a_paquete(paquete,&auxiliar,sizeof(t_porcion_dato));
+    }
+    int err = enviar_paquete_io(paquete, fd_interfaz);//DEVUELVE -1 SI HUBO ERROR
+
+    eliminar_paquete(paquete);
+
+    return err;
+}
+
 void enviar_nuevo_proceso(int* pid, char* nombre_archivo, int fd_memoria){
     t_paquete* paquete = crear_paquete(INICIAR_PROCESO);
 

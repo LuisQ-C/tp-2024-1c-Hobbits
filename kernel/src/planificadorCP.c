@@ -112,6 +112,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             return false;
             break;
         case IO_GEN_SLEEP:
+        {
             char* nombre_interfaz = list_get(pcb_con_motivo,6);
             int* tiempo_dormicion = list_get(pcb_con_motivo,7);
             //t_list_io* prueba = list_get(lista_procesos_blocked->lista,0);
@@ -145,20 +146,111 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 manejar_fin_con_motivo(INVALID_INTERFACE, pcb_a_actualizar);
 
                 //log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_actualizar->pid);
+                /*
                 int tamanio= strlen(nombre_interfaz);
                 printf("\ntamanio string: %d, contenido: %s\n",tamanio,nombre_interfaz);
-                printf("\ninterfaz invalida\n");
+                printf("\ninterfaz invalida\n");*/
 
                 sem_post(&grado_de_multiprogramacion);
                 return false;
             }
             break;
+        }
         case IO_STDIN_READ:
-                return false;
+        {
+            char* nombre_interfaz = list_get(pcb_con_motivo,6);
+            int tam_lista = list_size(pcb_con_motivo);
+            int cant_direcciones = tam_lista - 7; //los primeros 8 son necesarios para todos los ios
+            t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 7, cant_direcciones);
+            
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_STDIN_READ);
+            if(validez)
+            {
+                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); //habria que juntarlo con validez
+                pcb_a_actualizar->estado = BLOCKED;
+                t_elemento_io_in_out* nueva_solicitud_stdin= malloc(sizeof(t_elemento_io_in_out));
+                nueva_solicitud_stdin->cola_destino=READY;
+                nueva_solicitud_stdin->pcb = pcb_a_actualizar;
+                nueva_solicitud_stdin->direcciones_fisicas = direcciones;
+                push_elemento_cola_io(interfaz_buscada,nueva_solicitud_stdin);
+
+                log_warning(logger, "PID: %d Fue desalojado por IO_STDIN_READ ", pcb_a_actualizar->pid);
+
+                sem_post(interfaz_buscada->hay_proceso_cola);
+
+                log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
+                /*
+                if(pcb_a_actualizar->quantum>0){
+                    squeue_push(lista_procesos_ready_plus, pcb_a_actualizar);
+                    log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY PLUS", solicitud_io->pcb->pid);
+                    sem_post(&proceso_en_cola_ready_plus)
+                }
+                else{
+                    squeue_push(lista_procesos_ready, pcb_a_actualizar);
+                    log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", solicitud_io->pcb->pid);
+                    sem_post(&proceso_en_cola_ready);
+                }*/
+            }
+            else
+            {
+                manejar_fin_con_motivo(INVALID_INTERFACE, pcb_a_actualizar);
+                /*
+                int tamanio= strlen(nombre_interfaz);
+                printf("\ntamanio string: %d, contenido: %s\n",tamanio,nombre_interfaz);
+                printf("\ninterfaz invalida\n");*/
+
+                sem_post(&grado_de_multiprogramacion);
+            }
+            return false;
             break;
+        }
         case IO_STDOUT_WRITE:
-                return false;
+        {
+            char* nombre_interfaz = list_get(pcb_con_motivo,6);
+            int tam_lista = list_size(pcb_con_motivo);
+            int cant_direcciones = tam_lista - 7; //los primeros 8 son necesarios para todos los ios
+            t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 7, cant_direcciones);
+            
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_STDOUT_WRITE);
+            if(validez)
+            {
+                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); //habria que juntarlo con validez
+                pcb_a_actualizar->estado = BLOCKED;
+                t_elemento_io_in_out* nueva_solicitud_stdin= malloc(sizeof(t_elemento_io_in_out));
+                nueva_solicitud_stdin->cola_destino=READY;
+                nueva_solicitud_stdin->pcb = pcb_a_actualizar;
+                nueva_solicitud_stdin->direcciones_fisicas = direcciones;
+                push_elemento_cola_io(interfaz_buscada,nueva_solicitud_stdin);
+
+                log_warning(logger, "PID: %d Fue desalojado por IO_STDOUT_WRITE ", pcb_a_actualizar->pid);
+
+                sem_post(interfaz_buscada->hay_proceso_cola);
+
+                /*
+                if(pcb_a_actualizar->quantum>0){
+                    squeue_push(lista_procesos_ready_plus, pcb_a_actualizar);
+                    log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY PLUS", solicitud_io->pcb->pid);
+                    sem_post(&proceso_en_cola_ready_plus)
+                }
+                else{
+                    squeue_push(lista_procesos_ready, pcb_a_actualizar);
+                    log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", solicitud_io->pcb->pid);
+                    sem_post(&proceso_en_cola_ready);
+                }*/
+            }
+            else
+            {
+                manejar_fin_con_motivo(INVALID_INTERFACE, pcb_a_actualizar);
+                /*
+                int tamanio= strlen(nombre_interfaz);
+                printf("\ntamanio string: %d, contenido: %s\n",tamanio,nombre_interfaz);
+                printf("\ninterfaz invalida\n");*/
+
+                sem_post(&grado_de_multiprogramacion);
+            }
+            return false;
             break;
+        }
         case IO_FS_CREATE:
                 return false;
             break;
@@ -191,7 +283,8 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             return false;
 
             break;
-        case WAIT:{
+        case WAIT:
+        {
             
             log_info(logger, "LLEGUE AL WAIT");
             char* nombre_recurso = list_get(pcb_con_motivo, 6);

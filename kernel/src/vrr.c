@@ -35,7 +35,12 @@ void planificacion_vrr(){
         sem_wait(&proceso_en_cola_ready);
         sem_wait(&planificacion_ready_iniciada);
         t_pcb* pcb_auxiliar;
-
+        if(squeue_is_empty(lista_procesos_ready_plus) && squeue_is_empty(lista_procesos_ready))
+        {
+            sem_post(&planificacion_ready_iniciada);
+            continue;
+        }
+        
         if(!squeue_is_empty(lista_procesos_ready_plus)){
             pcb_auxiliar = squeue_pop(lista_procesos_ready_plus);    
         }

@@ -210,4 +210,6 @@ int recibir_aviso(int fd_dispatch);
 
 int enviar_paquete_io(t_paquete* paquete, int socket_cliente);
 
+int enviar_solicitud_stdin_stdout(int pid, t_list* direcciones_fisicas , int fd_interfaz , int cant_direcciones, int tipo_interfaz);
+
 #endif

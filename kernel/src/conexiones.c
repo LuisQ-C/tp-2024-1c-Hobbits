@@ -117,8 +117,10 @@ void procesarConexionesIO(void* datosServerInterfaces){
             atender_interfaz_generica(interfaz_agregada);
             break;
         case IO_STDIN_READ:
+            atender_interfaz_stdin_stdout(interfaz_agregada,IO_STDIN_READ);
             break;
         case IO_STDOUT_WRITE:
+            atender_interfaz_stdin_stdout(interfaz_agregada,IO_STDOUT_WRITE);
             break;
         case IO_FS:
             break;
@@ -188,6 +190,56 @@ void atender_interfaz_generica(t_list_io* interfaz)
         {
             pop_elemento_cola_io(interfaz);
             mandar_pcb_cola_correspondiente(solicitud_io->pcb,solicitud_io->cola_destino);
+            free(solicitud_io);
+        }
+
+        sem_post(&planificacion_blocked_iniciada);
+        
+    }
+    //DESTRUIRSE A SI MISMO, SACARSE DE LA LISTA, ENVIAR TODOS A WAIT
+}
+
+void atender_interfaz_stdin_stdout(t_list_io* interfaz, int tipo_interfaz)
+{
+    int respuesta, err_recv, err_send;
+    t_elemento_io_in_out* solicitud_io;
+    while(1)
+    {
+        sem_wait(interfaz->hay_proceso_cola);
+        
+        if(!cola_io_is_empty(interfaz))
+        {
+            solicitud_io = peek_elemento_cola_io(interfaz);
+            
+            int cant_direcciones = list_size(solicitud_io->direcciones_fisicas);
+
+            err_send = enviar_solicitud_stdin_stdout(solicitud_io->pcb->pid,solicitud_io->direcciones_fisicas,interfaz->fd_interfaz,cant_direcciones,tipo_interfaz);
+            
+            if(err_send == -1){break;}
+
+            err_recv = recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
+            
+            if(err_recv == 0)
+            {
+            printf("\nLA %s SE DESCONECTO \n",interfaz->nombre_interfaz);
+            break;
+            }
+
+            if(respuesta==INTERFAZ_LISTA)
+            {
+            printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
+            }
+        }
+
+        
+        
+        sem_wait(&planificacion_blocked_iniciada);
+
+        if(!cola_io_is_empty(interfaz))
+        {
+            pop_elemento_cola_io(interfaz);
+            mandar_pcb_cola_correspondiente(solicitud_io->pcb,solicitud_io->cola_destino);
+            list_destroy_and_destroy_elements(solicitud_io->direcciones_fisicas,(void*) liberar_elemento);
             free(solicitud_io);
         }
 

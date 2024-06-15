@@ -1,12 +1,12 @@
 #include "../include/interfazStdout.h"
 
 extern t_log* logger;
-
+/*
 typedef struct{
     int base;
     int tamanio;
     int direccion_fisica;
-}t_porcion_dato_out;
+}t_porcion_dato_out;*/
 
 void stdOut(t_config* config, int fd_conexion_kernel,int fd_conexion_memoria){
 
@@ -16,20 +16,22 @@ void stdOut(t_config* config, int fd_conexion_kernel,int fd_conexion_memoria){
     int pid;
     void* cadenaEntera;
 
-    //while(1){
+while(1){
 
-    //recibir_operacion(fd_conexion_kernel);
-    //t_list* listaRecibida= recibir_paquete(fd_conexion_kernel); //recibo lista 
-    t_list* listaRecibida = lista_pruebas_out();
+    recibir_operacion(fd_conexion_kernel);
+    
+    t_list* listaRecibida= recibir_paquete(fd_conexion_kernel); //recibo lista 
+    //t_list* listaRecibida = lista_pruebas_out();
 
     int* lista_PID = list_get(listaRecibida,0);
     pid  = *lista_PID;
+    log_info(logger,"STDOUT - Operación: \"PID: %d - Operacion: IO_STDOUT_WRITE\"",pid);
     //PID+TAMANIOFRAGMENTO+DIRECCIONFISICA
     int tamanio_total = 0;
 
     for(int i=1;i<list_size(listaRecibida);i++)
     {
-        t_porcion_dato_out* dato = list_get(listaRecibida,i);
+        t_porcion_dato* dato = list_get(listaRecibida,i);
         tamanio_total += dato->tamanio;
     }
 
@@ -37,7 +39,7 @@ void stdOut(t_config* config, int fd_conexion_kernel,int fd_conexion_memoria){
 
     for(int i=1; i<list_size(listaRecibida); i++)
     {
-    t_porcion_dato_out* datoAenviar = list_get(listaRecibida,i);
+    t_porcion_dato* datoAenviar = list_get(listaRecibida,i);
     //cadenaDeCaracteres+base+tamanio+direccionfisica
     t_paquete* infoAenviar = crear_paquete(LECTURA);
     base= datoAenviar->base;
@@ -59,6 +61,7 @@ void stdOut(t_config* config, int fd_conexion_kernel,int fd_conexion_memoria){
     recv(fd_conexion_memoria, datoRecibido, tamanio,MSG_WAITALL);//reci bloqueante
     //char* fragmentoRecibido = (char*) datoRecibido;
     memcpy(cadenaEntera+base,datoRecibido,tamanio);
+    free(datoRecibido);
     //string_append(&cadenaEntera, fragmentoRecibido);
 
     }
@@ -69,10 +72,15 @@ void stdOut(t_config* config, int fd_conexion_kernel,int fd_conexion_memoria){
     //char* copia_string = malloc(tamanio_total+1);
     //memcpy(copia_string,cadenaEntera,tamanio_total);
     casteo_string[tamanio_total] = '\0';
-    printf("La cadena recibida es: %s", casteo_string);
+    log_info(logger,"La cadena recibida es: %s",casteo_string); //HACERLO CON UN LOGGER APARTE
+    int respuesta = INTERFAZ_LISTA;
+
+    send(fd_conexion_kernel,&respuesta,sizeof(int),0);
 
 }
 
+}
+/*
 t_list* lista_pruebas_out()
 {
     t_list* lista = list_create();
@@ -93,4 +101,4 @@ void aniadir_porcion_out(t_list* lista,int base,int tamanio,int dir_fisica)
     nueva_porcion->tamanio= tamanio;
     nueva_porcion->direccion_fisica = dir_fisica;
     list_add(lista,nueva_porcion);
-}
+}*/
