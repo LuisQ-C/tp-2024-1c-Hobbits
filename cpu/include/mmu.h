@@ -50,12 +50,12 @@ t_list* solicitar_marcos_con_tlb(int pagina_inicial, int paginas_totales,int pid
 
 void logear_consulta_marco(int pid, int pagina, int marco);
 
-void logear_lectura_string(int pid, int dir_fis,char* valor_leido);
+void logear_lectura_string(int pid, int dir_fis,void* fragmento_logear, int tamanio_fragmento);
 
-void logear_lectura_int(int pid, int dir_fis,int valor_leido);
+void logear_lectura_int(int pid, int dir_fis,void* fragmento_logear,int tamanio_fragmento);
 
-void logear_escritura_string(int pid, int dir_fis,char* valor_escrito);
+void logear_escritura_string(int pid, int dir_fis,void* fragmento_logear, int tamanio_fragmento);
 
-void logear_escritura_int(int pid, int dir_fis,int valor_escrito);
+void logear_escritura_int(int pid, int dir_fis,void* fragmento_logear,int tamanio_fragmento);
 
 #endif

@@ -273,13 +273,18 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                     } 
                         sem_post(&proceso_en_cola_ready);
                     */
-                    enviar_pcb(pcb_a_actualizar, fd_dispatch);
+                    squeue_push(lista_procesos_exec, pcb_a_actualizar);
+        
+                    int ok = MISMO_PID;
+                    send(fd_dispatch, &ok, sizeof(int), 0);        
                     return true;
                 }
                 else if(recurso_usado->instancias_recurso < 0){
                     pcb_a_actualizar->quantum = quantum;
                     log_debug(logger, "ME FUI A LA COLA DE BLOCKED POR EL RECURSO");
                     squeue_push(recurso_usado->cola_blocked, pcb_a_actualizar);
+                    int ok = NUEVO_PID;
+                    send(fd_dispatch, &ok, sizeof(int), 0);
                     return false;
                 }
 
@@ -287,6 +292,8 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             else{
                 log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
                 manejar_fin_con_motivo(INVALID_RESOURCE, pcb_a_actualizar);
+                int ok = NUEVO_PID;
+                send(fd_dispatch, &ok, sizeof(int), 0);
                 sem_post(&grado_de_multiprogramacion);
                 return false;
             }
@@ -346,13 +353,17 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 }
                 sem_post(&proceso_en_cola_ready);
                 */
-                enviar_pcb(pcb_a_actualizar, fd_dispatch);
+                squeue_push(lista_procesos_exec, pcb_a_actualizar);
+                int ok = MISMO_PID;
+                send(fd_dispatch, &ok, sizeof(int), 0);
                 return true;
 
             }
             else {
                 log_info(logger, "NO ES VALIDO EL NOMBRE DEL RECURSO");
                 manejar_fin_con_motivo(INVALID_RESOURCE, pcb_a_actualizar);
+                int ok = NUEVO_PID;
+                send(fd_dispatch, &ok, sizeof(int), 0);
                 sem_post(&grado_de_multiprogramacion);
                 return false;
             }
@@ -423,7 +434,7 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         log_info(logger, "PID: %d - Estado Anterior: EXEC - Estado Actual: EXIT", pcb_a_finalizar->pid);
         sem_post(&grado_de_multiprogramacion);
         break;
-    case INTERRUPTED_BY_USER_BLOCKED_REC:
+    case INTERRUPTED_BY_USER_BLOCKED:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
         log_info(logger, "Finaliza el proceso %d - Motivo: INTERRUPTED BY USER", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: EXIT", pcb_a_finalizar->pid);

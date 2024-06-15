@@ -39,9 +39,9 @@ void desalojar_proceso(t_pcb* pcb_a_desalojar,int motivo_desalojo,int fd_dispatc
 int check_interrupt(t_pcb* pcb_a_chequear,int fd_dispatch);
 
 //SOLICITAR ESCRITURA A MEMORIA
-void solicitar_lectura(int pid,void** ptro_dato,int tam_dato_leer, int fd_destino, int offset, t_list* marcos);
+void solicitar_lectura(int pid,void** ptro_dato,int tam_dato_leer, int fd_destino, int offset, t_list* marcos, int tipo_dato);
 
-void solicitar_escritura(int pid,void* ptro_dato,int tam_dato_escribir, int fd_destino, int offset, t_list* marcos);
+void solicitar_escritura(int pid,void* ptro_dato,int tam_dato_escribir, int fd_destino, int offset, t_list* marcos, int tipo_dato);
 
 void memcpy_fragmento_void(void* ptro_dato,int base,void* fragmento,int tamanio_fragmento);
 

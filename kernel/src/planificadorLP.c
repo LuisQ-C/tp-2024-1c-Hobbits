@@ -21,13 +21,15 @@ void atender_estados_new(){
 
     
     while(1){
-        int valor1, valor2;
-        sem_getvalue(&planificacion_new_iniciada,&valor2);
-        log_info(logger,"VALOR NEW INICIADA: %d",valor2);
-        sem_wait(&planificacion_new_iniciada);
-        printf("PASE PLANI NEEW INICIADA");
+        //int valor1, valor2;
+        //sem_getvalue(&planificacion_new_iniciada,&valor2);
+        //log_info(logger,"VALOR NEW INICIADA: %d",valor2);
         sem_wait(&proceso_en_cola_new);
-        printf("PASE PROCESO COLA NEW");
+        sem_wait(&grado_de_multiprogramacion);
+        sem_wait(&planificacion_new_iniciada);
+        //printf("PASE PLANI NEEW INICIADA");
+        
+        //printf("PASE PROCESO COLA NEW");
         /*
             printf("\nPLANIFICACION NEW INICIADA \n");
             int hola;
@@ -45,19 +47,19 @@ void atender_estados_new(){
         /*if(!planificacion_iniciada){
             break;
         }*/
-        if(!planificacion_iniciada){
+        /*if(!planificacion_iniciada){
             printf("\nESTA VACIA ? \n");
             sem_post(&proceso_en_cola_new);
             continue;
-        }
-        sem_wait(&grado_de_multiprogramacion);
+        }*/
+        
         if (squeue_is_empty(lista_procesos_new) == false){
             t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_new);
             cambiar_a_ready(pcb_auxiliar);
-            sem_getvalue(&proceso_en_cola_ready,&valor1);
-            sem_getvalue(&planificacion_new_iniciada,&valor2);
-            printf("\nVALOR PROCESO READY: %d \n",valor1);
-            printf("\nVALOR PLANIFICACION NEW: %d \n",valor2);
+            //sem_getvalue(&proceso_en_cola_ready,&valor1);
+            //sem_getvalue(&planificacion_new_iniciada,&valor2);
+            //printf("\nVALOR PROCESO READY: %d \n",valor1);
+            //printf("\nVALOR PLANIFICACION NEW: %d \n",valor2);
             sem_post(&proceso_en_cola_ready);
             sem_post(&planificacion_new_iniciada);
             //Una vez que pasa los estados de new a ready

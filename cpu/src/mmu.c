@@ -1,6 +1,7 @@
 #include "../include/mmu.h"
 
 extern t_log* logger;
+extern t_log* logger_obligatorio;
 extern config_memoria config_mem;
 extern t_tlb tlb_scheduler;
 
@@ -245,13 +246,13 @@ int cant_paginas_necesarias(int tamanio)
 int tam_registro(char* registro_chequear)
 {
     int tam_dato;
-    if(registro_chequear[0] == 'E')
+    if(registro_chequear[0] == 'E' || strcmp(registro_chequear,"DI") == 0 || strcmp(registro_chequear,"SI") == 0) //se puede aniadir PC
     {
-        tam_dato = 4;
+        tam_dato = sizeof(uint32_t);
     }
     else
     {
-        tam_dato = 1;
+        tam_dato = sizeof(uint8_t);
     }
     return tam_dato;
 }
@@ -297,7 +298,7 @@ t_list* solicitar_marcos_con_tlb(int pagina_inicial, int paginas_totales,int pid
         if(*marco == -1)
         {
             //TLB MISS
-            log_info(logger,"TLB Miss: \"PID: %d- TLB MISS - Pagina: %d\"",pid,pagina_inicial);
+            log_info(logger_obligatorio,"TLB Miss: \"PID: %d- TLB MISS - Pagina: %d\"",pid,pagina_inicial);
             enviar_solicitud_macro(pid,pagina_inicial,fd_destinatario);
             recv(fd_destinatario,marco,sizeof(int),MSG_WAITALL);
             logear_consulta_marco(pid,pagina_inicial,*marco);
@@ -307,7 +308,7 @@ t_list* solicitar_marcos_con_tlb(int pagina_inicial, int paginas_totales,int pid
         else
         {
             //TLB HIT
-            log_info(logger,"TLB Hit: \"PID: %d- TLB HIT - Pagina: %d\"",pid,pagina_inicial);
+            log_info(logger_obligatorio,"TLB Hit: \"PID: %d- TLB HIT - Pagina: %d\"",pid,pagina_inicial);
             list_add(lista_marcos,marco);
         }
 
@@ -326,25 +327,39 @@ t_list* solicitar_marcos_con_tlb(int pagina_inicial, int paginas_totales,int pid
 void logear_consulta_marco(int pid, int pagina, int marco)
 {
     //falta log obligatorio
-    log_info(logger,"Obtener Marco: \"PID: %d - OBTENER MARCO - Página: %d - Marco: %d\".", pid, pagina, marco);
+    log_info(logger_obligatorio,"Obtener Marco: \"PID: %d - OBTENER MARCO - Página: %d - Marco: %d\".", pid, pagina, marco);
 }
 
-void logear_lectura_string(int pid, int dir_fis,char* valor_leido)
+void logear_lectura_string(int pid, int dir_fis,void* fragmento_logear,int tamanio_fragmento)
 {
-    log_info(logger,"Lectura Memoria: \"PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s\".",pid,dir_fis,valor_leido);
+    char* string_logear = malloc(tamanio_fragmento+1);//+1 para el contrabarra 0
+    memcpy(string_logear,fragmento_logear,tamanio_fragmento);
+    string_logear[tamanio_fragmento] = '\0';
+    log_info(logger_obligatorio,"Lectura Memoria: \"PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s\".",pid,dir_fis,string_logear);
+    free(string_logear);
 }
 
-void logear_lectura_int(int pid, int dir_fis,int valor_leido)
+void logear_lectura_int(int pid, int dir_fis,void* fragmento_logear, int tamanio_fragmento)
 {
-    log_info(logger,"Lectura Memoria: \"PID: %d - Acción: LEER - Dirección Física: %d - Valor: %d\".",pid,dir_fis,valor_leido);
+    int numero_logear = 0;
+    int* ptro_numero_logear = &numero_logear;
+    memcpy(ptro_numero_logear,fragmento_logear,tamanio_fragmento);
+    log_info(logger_obligatorio,"Lectura Memoria: \"PID: %d - Acción: LEER - Dirección Física: %d - Valor: %d\".",pid,dir_fis,numero_logear);
 }
 
-void logear_escritura_string(int pid, int dir_fis,char* valor_escrito)
+void logear_escritura_string(int pid, int dir_fis,void* fragmento_logear,int tamanio_fragmento)
 {
-    log_info(logger,"Escritura Memoria: \"PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s\".",pid,dir_fis,valor_escrito);
+    char* string_logear = malloc(tamanio_fragmento+1);//+1 para el contrabarra 0
+    memcpy(string_logear,fragmento_logear,tamanio_fragmento);
+    string_logear[tamanio_fragmento] = '\0';
+    log_info(logger_obligatorio,"Escritura Memoria: \"PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s\".",pid,dir_fis,string_logear);
+    free(string_logear);
 }
 
-void logear_escritura_int(int pid, int dir_fis,int valor_escrito)
+void logear_escritura_int(int pid, int dir_fis,void* fragmento_logear, int tamanio_fragmento)
 {
-    log_info(logger,"Escritura Memoria: \"PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %d\".",pid,dir_fis,valor_escrito);
+    int numero_logear = 0;
+    int* ptro_numero_logear = &numero_logear;
+    memcpy(ptro_numero_logear,fragmento_logear,tamanio_fragmento);
+    log_info(logger_obligatorio,"Escritura Memoria: \"PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %d\".",pid,dir_fis,numero_logear);
 }

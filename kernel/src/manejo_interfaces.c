@@ -1,6 +1,7 @@
 #include "../include/manejo_interfaces.h"
 
 extern t_slist *lista_procesos_blocked;
+extern t_squeue* lista_procesos_exit;
 
 t_list_io* agregar_interfaz_lista(char* nombre,int tipo, int fd_interfaz)
 {
@@ -84,6 +85,102 @@ void slist_destroy(t_slist* slist){
     list_destroy(slist->lista);
     free(slist);
 }
+//SI DEVUELVE NULL NO LO ENCUENTRO
+bool slist_find_pcb_iterating_each_queue(t_slist* interfaces, int pid)
+{
+    //BUSCO PRIMERO EL ELEMENTO, cuando lo encuentro obtengo el indice del elemento actual
+    //ese es la cola dentro de la lista en donde se encuentra el pcb del pid buscado
+    //obtengo en que posicion esta de alguna forma, si esta
+    int tipo_interfaz;
+    bool pcb_encontrado = false;
+    void* solicitud_io;
+    //t_pcb* pcb_buscado;
+
+    t_list_iterator* interfaces_iterar = list_iterator_create(interfaces->lista);
+
+    while(list_iterator_has_next(interfaces_iterar) && !pcb_encontrado)
+    {
+        t_list_io* interfaz = list_iterator_next(interfaces_iterar);
+        t_list_iterator* bloqueados_interfaz = list_iterator_create(interfaz->cola_procesos_blocked->elements);
+        tipo_interfaz = interfaz->tipo_interfaz;
+        while(list_iterator_has_next(bloqueados_interfaz) && !pcb_encontrado)
+        {
+            solicitud_io = list_iterator_next(bloqueados_interfaz);
+            int indice = list_iterator_index(bloqueados_interfaz);
+            bool es_el_pid_buscado = verificar_pid_de_solicitud(solicitud_io,tipo_interfaz,pid,indice,bloqueados_interfaz);
+            pcb_encontrado = (es_el_pid_buscado) ? true : false;
+        }
+        list_iterator_destroy(bloqueados_interfaz);
+    }
+    list_iterator_destroy(interfaces_iterar);
+    return pcb_encontrado;
+}
+//DEVUELVE EL PID, -1 SI NO ES LA SOLICITUD DE ESE PID
+bool verificar_pid_de_solicitud(void* solicitud_io,int tipo_interfaz, int pid_buscado, int indice, t_list_iterator* bloqueados_interfaz)
+{
+    bool es_el_pid_buscado;
+    if(tipo_interfaz==IO_GEN_SLEEP)
+    {
+        t_elemento_iogenerica* solicitud_generica = (t_elemento_iogenerica*) solicitud_io;
+        if(solicitud_generica->pcb->pid == pid_buscado)
+        {
+            es_el_pid_buscado = true;
+            if(indice == 0)
+            {
+                solicitud_generica->cola_destino=COLA_EXIT;
+            }
+            else
+            {
+                list_iterator_remove(bloqueados_interfaz);
+                //manejar_fin_con_motivo(INTERRUPTED_BY_USER_BLOCKED, solicitud_generica->pcb);
+                squeue_push(lista_procesos_exit,solicitud_generica->pcb);
+                free(solicitud_generica);
+            }
+            
+        }
+        es_el_pid_buscado = false;
+    }
+    return es_el_pid_buscado;
+    /*else if(tipo_interfaz==IO_STDIN_READ || tipo_interfaz==IO_STDOUT_WRITE)
+    {
+
+    }*/
+}
+
+/*
+bool _es_el_pcb_io_generica(t_elemento_iogenerica* solicitud_io)
+    {
+        return solicitud_io->pcb->pid == pid;
+    }
+    bool _es_el_pcb_io_in_out(t_elemento_io_in_out* solicitud_io)
+    {
+        return solicitud_io->pcb->pid == pid;
+    }
+
+    void _finalizar_proceso_io(t_list_io* interfaz)
+    {
+    if(interfaz->tipo_interfaz == IO_GEN_SLEEP)
+    {
+        if(list_any_satisfy(interfaz->cola_procesos_blocked->elements,(void*)_es_el_pcb_io_generica))
+        {
+            
+        }
+    }
+    else if(interfaz->tipo_interfaz == IO_STDIN_READ || interfaz->tipo_interfaz == IO_STDOUT_WRITE)
+    {
+
+    }
+    //FALTARIA UN ELSE PARA FS
+    }
+
+    pthread_mutex_lock(lista_procesos_blocked->mutex);
+    list_iterate(lista_procesos_blocked->lista,(void*))
+    pthread_mutex_lock(lista_procesos_blocked->mutex);
+
+*/
+
+
+
 
 /********************
  * Funciones lista con mutex

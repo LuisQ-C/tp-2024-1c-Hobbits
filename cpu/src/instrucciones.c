@@ -76,13 +76,15 @@ void sum_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 /* Ejecuta instruccion SUM */
 void sum(char** instruccion)
 {
-    if(instruccion[1][0] != 'E')
+
+    if(instruccion[1][0] != 'E' && strcmp(instruccion[1],"DI") != 0 &&  strcmp(instruccion[1],"SI") != 0)
     {
-        if(instruccion[2][0] != 'E')
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") != 0 &&  strcmp(instruccion[2],"SI") != 0)
         {
             uint8_t* registroDestino = string_to_register8(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
             sum_8_8(registroDestino,registroOrigen);
+            
         }
         else{
             uint8_t* registroDestino = string_to_register8(instruccion[1]);
@@ -91,7 +93,7 @@ void sum(char** instruccion)
         }
     }
     else{
-        if(instruccion[2][0] != 'E')
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") != 0 &&  strcmp(instruccion[2],"SI") != 0)
         {
             uint32_t* registroDestino = string_to_register32(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
@@ -134,9 +136,9 @@ void sub_32_8(uint32_t* registroDestino,uint8_t* registroOrigen)
 /* Ejecuta instruccion SUB */
 void sub(char** instruccion)
 {
-    if(instruccion[1][0] != 'E')
+    if(instruccion[1][0] != 'E'  && strcmp(instruccion[1],"DI") != 0 &&  strcmp(instruccion[1],"SI") != 0)
     {
-        if(instruccion[2][0] != 'E')
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") != 0 &&  strcmp(instruccion[2],"SI") != 0)
         {
             uint8_t* registroDestino = string_to_register8(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
@@ -149,7 +151,7 @@ void sub(char** instruccion)
         }
     }
     else{
-        if(instruccion[2][0] != 'E')
+        if(instruccion[2][0] != 'E' && strcmp(instruccion[2],"DI") != 0 &&  strcmp(instruccion[2],"SI") != 0)
         {
             uint32_t* registroDestino = string_to_register32(instruccion[1]);
             uint8_t* registroOrigen = string_to_register8(instruccion[2]);
@@ -183,7 +185,7 @@ void jnz_32(uint32_t* reg,uint32_t instruccion_proxima){
 /* Ejecuta instruccion JNZ */
 void jnz(char** instruccion)
 {
-    if(instruccion[1][0] != 'E')
+    if(instruccion[1][0] != 'E' && strcmp(instruccion[1],"DI") != 0 &&  strcmp(instruccion[1],"SI") != 0)
     {
         uint8_t* registro_a_chequear = string_to_register8(instruccion[1]);
         uint32_t instruccion_a_saltar = atoi(instruccion[2]);
@@ -215,9 +217,10 @@ void io_gen_sleep(t_pcb* pcb_a_enviar,char** instruccionDesarmada,int fd_dispatc
     eliminar_paquete(paquete);
 }
 
-void io_stdin_read(t_pcb* pcb_a_enviar,char* nombre_interfaz,int direccion_logica,int tamanio_dato,int fd_dispatch)
+//STDIN Y STDOUT
+void io_stdin_stdout(t_pcb* pcb_a_enviar,char* nombre_interfaz,int direccion_logica,int tamanio_dato,int fd_dispatch, int fd_memoria, int motivo)
 {
-    int motivo_desalojo = IO_GEN_SLEEP;
+    int motivo_desalojo = motivo;
     int tam_pagina = config_mem.tam_pagina;
     int tamanio_enviar;
     //
@@ -238,14 +241,19 @@ void io_stdin_read(t_pcb* pcb_a_enviar,char* nombre_interfaz,int direccion_logic
     //LUEGO EL NOMBRE DE LA INTERFAZ
     agregar_a_paquete(paquete,nombre_interfaz,strlen(nombre_interfaz)+1);
     //SOLICITO LOS MARCOS
-    t_list* marcos = solicitar_macros(pagina_inicial,pag_necesarias,pcb_a_enviar->pid,fd_dispatch);
+    t_list* marcos = solicitar_macros(pagina_inicial,pag_necesarias,pcb_a_enviar->pid,fd_memoria);
     //EMPIEZO A CALCULAR Y EMPAQUETAR LOS T_PORCION_DATO
     int* ptro_nro_frame = list_get(marcos,0);
     dir_fisica = calcular_direccion_fisica(*ptro_nro_frame,offset);
     
     tamanio_enviar = (espacio_restante > tamanio_dato) ? tamanio_dato : espacio_restante;
 
-    asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
+    //asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
+    porcion_empaquetar.base = base;
+    porcion_empaquetar.direccion_fisica = dir_fisica;
+    porcion_empaquetar.tamanio = tamanio_enviar;
+
+    //printf("BASE: %d TAMANIO: %d DIR.FIS: %d",porcion_empaquetar.base,porcion_empaquetar.);
 
     agregar_a_paquete(paquete,&porcion_empaquetar,sizeof(t_porcion_dato));
 
@@ -258,7 +266,11 @@ void io_stdin_read(t_pcb* pcb_a_enviar,char* nombre_interfaz,int direccion_logic
 
         tamanio_enviar = (restante<tam_pagina) ? restante : tam_pagina;
 
-        asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
+        //asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
+
+        porcion_empaquetar.base = base;
+        porcion_empaquetar.direccion_fisica = dir_fisica;
+        porcion_empaquetar.tamanio = tamanio_enviar;
 
         agregar_a_paquete(paquete,&porcion_empaquetar,sizeof(t_porcion_dato));
 
@@ -273,11 +285,58 @@ void io_stdin_read(t_pcb* pcb_a_enviar,char* nombre_interfaz,int direccion_logic
     eliminar_paquete(paquete);
 }
 
+//IO FILESYSTEM
+
+void io_fs_create(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_archivo, int fd_dispatch)
+{
+    int motivo_desalojo = IO_FS_CREATE;
+
+    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+
+    agregar_a_paquete(paquete,&motivo_desalojo,sizeof(int));
+    agregar_a_paquete(paquete,nombre_interfaz,strlen(nombre_interfaz)+1);
+    agregar_a_paquete(paquete,nombre_archivo,strlen(nombre_archivo)+1);
+
+    enviar_paquete(paquete,fd_dispatch);
+    eliminar_paquete(paquete);
+}
+void io_fs_delete(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_archivo, int fd_dispatch)
+{
+    int motivo_desalojo = IO_FS_DELETE;
+
+    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+
+    agregar_a_paquete(paquete,&motivo_desalojo,sizeof(int));
+    agregar_a_paquete(paquete,nombre_interfaz,strlen(nombre_interfaz)+1);
+    agregar_a_paquete(paquete,nombre_archivo,strlen(nombre_archivo)+1);
+
+    enviar_paquete(paquete,fd_dispatch);
+    eliminar_paquete(paquete);
+}
+void io_fs_truncate(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_archivo, int tamanio_archivo,int fd_dispatch)
+{
+    int motivo_desalojo = IO_FS_TRUNCATE;
+    int tamanio = tamanio_archivo;
+
+    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+
+    agregar_a_paquete(paquete,&motivo_desalojo,sizeof(int));
+    agregar_a_paquete(paquete,nombre_interfaz,strlen(nombre_interfaz)+1);
+    agregar_a_paquete(paquete,nombre_archivo,strlen(nombre_archivo)+1);
+    agregar_a_paquete(paquete,&tamanio,sizeof(int));
+
+    enviar_paquete(paquete,fd_dispatch);
+    eliminar_paquete(paquete);
+}
+
 void asignar_porcion_dato(t_porcion_dato* porcion, int base, int dir_fisica, int tamanio)
 {
-    porcion->base = base;
+    /**(porcion->base) = base;
+    *(porcion->tamanio) = tamanio;
+    *(porcion->direccion_fisica) = dir_fisica;*/
+    /*porcion->base = base;
     porcion->direccion_fisica = dir_fisica;
-    porcion->tamanio = tamanio;
+    porcion->tamanio = tamanio;*/
 }
 
 int resize(int pid,int new_size,int fd_memoria)

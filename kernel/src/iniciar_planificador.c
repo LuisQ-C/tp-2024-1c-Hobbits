@@ -22,6 +22,9 @@ sem_t planificacion_ready_iniciada;
 sem_t planificacion_exec_iniciada;
 sem_t planificacion_blocked_iniciada;
 sem_t hay_una_peticion_de_proceso;
+sem_t planificacion_detenida;
+
+pthread_mutex_t mutex_plani_iniciada;
 
 bool planificacion_iniciada = false;
 int multiprog;
@@ -41,6 +44,7 @@ void iniciar_cosas_necesarias_planificador(){
     lista_procesos_exit = squeue_create();
     lista_procesos_blocked = slist_create();
     instancias_utilizadas = sdictionary_create();
+    pthread_mutex_init(&mutex_plani_iniciada, NULL);
     sem_init(&pasar_a_ejecucion,0,1);
     sem_init(&proceso_en_cola_new, 0, 0);
     sem_init(&proceso_en_cola_ready, 0, 0);
@@ -51,6 +55,7 @@ void iniciar_cosas_necesarias_planificador(){
     sem_init(&planificacion_blocked_iniciada,0,0);
     sem_init(&grado_de_multiprogramacion, 0, multiprog);
     sem_init(&hay_una_peticion_de_proceso, 0, 0);
+    sem_init(&planificacion_detenida, 0, 0);
     iniciar_PLP();
     iniciar_PCP();
 

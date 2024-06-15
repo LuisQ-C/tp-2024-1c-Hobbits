@@ -78,7 +78,11 @@ enum{
     HANDSHAKE_ACEPTADO,
     MARCOS_CONSULTADOS,
     PROCESO_INEXISTENTE,
-    PROCESO_ELIMINADO
+    PROCESO_ELIMINADO,
+    NUEVO_PID,
+    MISMO_PID,
+    TIPO_DATO_STRING,
+    TIPO_DATO_INT
 };
 /*
 typedef struct {
@@ -102,6 +106,8 @@ typedef struct
     uint32_t EBX;
     uint32_t ECX;
     uint32_t EDX;
+    uint32_t SI;
+    uint32_t DI;
 }t_registros_generales;
 
 typedef struct
@@ -122,8 +128,8 @@ typedef struct {
 //void recibirHandshake(t_log* logger,int fd_origen, char* nombreOrigen,int32_t valorHandshake);
 int mandarHandshake(t_log* logger,int fd_destinatario, char* nombreDestinatario, char* nombreOrigen);
 //PARA ENVIARLE A CPU EL TAM_MEMORIA Y TAM_PAGINA NECESARIOS PARA LA MMU
-void enviar_datos_config_memoria_a_cpu(int tam_memoria, int tam_pagina, int fd_cpu);
-void recibir_datos_config_memoria(int* tam_memoria, int* tam_pagina, int fd_memoria,t_log* logger);
+void enviar_datos_config_memoria_a_cpu(int tam_memoria, int tam_pagina,int retardo_memoria, int fd_cpu);
+void recibir_datos_config_memoria(int* tam_memoria, int* tam_pagina,int* retardo_memoria, int fd_memoria, t_log* logger);
 //
 //
 void enviar_handshake_ok(t_log* logger,int fd_origen, char* nombreOrigen);
@@ -181,5 +187,9 @@ void* recibir_peticion_lectura(int* pid, int* tamanio,int* direccion_fisica,int 
 //RECIBIR CREACION PROCESO Y DESTRUCCION
 void recibir_creacion_proceso(int* pid, char** path_kernel,int fd_kernel);
 void recibir_destruccion_proceso(int* pid, int fd_kernel);
+
+
+//AVISO DESDE KERNEL A CPU NOTIFICANDOLE SI VUELVE A EXEC EL MISMO PID U OTRO
+int recibir_aviso(int fd_dispatch);
 
 #endif

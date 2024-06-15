@@ -45,9 +45,17 @@ void instruccion_signal(t_pcb* pcb_a_enviar,char* nombre_recurso, int fd_dispatc
 
 void instruccion_wait(t_pcb* pcb_a_enviar, char* nombre_recurso, int fd_dispatch);
 
-void io_stdin_read(t_pcb* pcb_a_enviar,char* nombre_interfaz,int direccion_logica,int tamanio_dato,int fd_dispatch);
+void io_stdin_stdout(t_pcb* pcb_a_enviar,char* nombre_interfaz,int direccion_logica,int tamanio_dato,int fd_dispatch, int fd_memoria,int motivo);
 
 void asignar_porcion_dato(t_porcion_dato* porcion, int base, int dir_fisica, int tamanio);
+
+//IO FILE SYSTEM
+
+void io_fs_create(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_archivo, int fd_dispatch);
+
+void io_fs_delete(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_archivo, int fd_dispatch);
+
+void io_fs_truncate(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_archivo, int tamanio_archivo,int fd_dispatch);
 
 
 enum{

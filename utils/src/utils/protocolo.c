@@ -57,18 +57,19 @@ void enviar_handshake_error(t_log* logger,int fd_origen, char* nombreOrigen)
     }
 }
 
-void enviar_datos_config_memoria_a_cpu(int tam_memoria, int tam_pagina, int fd_cpu)
+void enviar_datos_config_memoria_a_cpu(int tam_memoria, int tam_pagina,int retardo_memoria, int fd_cpu)
 {   
     t_paquete* nuevo_paquete = crear_paquete(DATOS_CONFIG);
 
     agregar_a_paquete(nuevo_paquete,&tam_memoria,sizeof(int));
     agregar_a_paquete(nuevo_paquete,&tam_pagina,sizeof(int));
+    agregar_a_paquete(nuevo_paquete,&retardo_memoria,sizeof(int));
 
     enviar_paquete(nuevo_paquete,fd_cpu);
     eliminar_paquete(nuevo_paquete);
 }
 
-void recibir_datos_config_memoria(int* tam_memoria, int* tam_pagina, int fd_memoria,t_log* logger)
+void recibir_datos_config_memoria(int* tam_memoria, int* tam_pagina,int* retardo_memoria, int fd_memoria,t_log* logger)
 {
     if(recibir_operacion(fd_memoria)==DATOS_CONFIG)
     {
@@ -76,9 +77,11 @@ void recibir_datos_config_memoria(int* tam_memoria, int* tam_pagina, int fd_memo
 
         int* tam_memoria_recibido = list_get(paquete_recibido,0);
         int* tam_pagina_recibido = list_get(paquete_recibido,1);
+        int* retardo_memoria_recibido = list_get(paquete_recibido,2);
 
         *tam_memoria = *tam_memoria_recibido;
         *tam_pagina = *tam_pagina_recibido;
+        *retardo_memoria = *retardo_memoria_recibido;
 
         list_destroy_and_destroy_elements(paquete_recibido,(void*)liberar_elemento);
     }
@@ -275,6 +278,14 @@ t_pcb* recibir_pcb(int fd_dispatch)
     list_destroy(lista);
     
     return pcb_recibido;
+}
+
+int recibir_aviso(int fd_dispatch)
+{
+    int rta;
+    recv(fd_dispatch,&rta,sizeof(int),MSG_WAITALL);
+
+    return rta; //PUEDE DEVOLVER NUEVO_PID O MISMO_PID
 }
 
 
