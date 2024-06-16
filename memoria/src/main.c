@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
     tomar_datos_config_y_destruir();
     ////////////////////////////////////////////////////////////////
     user_space = inicializar_user_space();
+    
     bitmap = crear_bitmap();
 
 

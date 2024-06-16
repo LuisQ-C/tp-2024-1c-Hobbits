@@ -510,7 +510,7 @@ void recibir_destruccion_proceso(int* pid, int fd_kernel)
 
 void* recibir_peticion_escritura(int* pid,int* base,int* tamanio,int* direccion_fisica,int fd_cpu)
 {
-    t_list* porcion_escritura = recibir_paquete(fd_cpu);
+    t_list* porcion_escritura = recibir_paquete(fd_cpu); //cambiar nombre de fd_cpu
     //VIENE EN ORDEN: DATO, BASE, TAMANIO, DIRECCION FISICA
     int* pid_recibido = list_get(porcion_escritura,0);
     void* dato_escribir = list_get(porcion_escritura,1);

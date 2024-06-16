@@ -167,18 +167,21 @@ void atender_interfaz_generica(t_list_io* interfaz)
             solicitud_io = peek_elemento_cola_io(interfaz);
             int tiempo_dormicion = solicitud_io->tiempo;
             err_send = enviar_solicitud_io_generico(solicitud_io->pcb->pid,tiempo_dormicion,interfaz->fd_interfaz);
-            if(err_send == -1){break;}
+            if(err_send == -1){
+                log_info(logger, "SE DESCONECTA LA INTERFAZ %s", interfaz->nombre_interfaz);    
+                break;
+            }
             err_recv = recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
             
             if(err_recv == 0)
             {
-            printf("\nLA %s SE DESCONECTO \n",interfaz->nombre_interfaz);
+                log_info(logger, "SE DESCONECTA LA INTERFAZ %s", interfaz->nombre_interfaz);
             break;
             }
 
             if(respuesta==INTERFAZ_LISTA) 
             {
-            printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
+                //log_info(logger, "COMPLETO LA SOLICITUD");
             }
         }
 
@@ -215,19 +218,23 @@ void atender_interfaz_stdin_stdout(t_list_io* interfaz, int tipo_interfaz)
 
             err_send = enviar_solicitud_stdin_stdout(solicitud_io->pcb->pid,solicitud_io->direcciones_fisicas,interfaz->fd_interfaz,cant_direcciones,tipo_interfaz);
             
-            if(err_send == -1){break;}
+            if(err_send == -1){
+                log_info(logger, "SE DESCONECTA LA INTERFAZ %s", interfaz->nombre_interfaz);    
+                break;
+            }
 
             err_recv = recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
             
             if(err_recv == 0)
             {
-            printf("\nLA %s SE DESCONECTO \n",interfaz->nombre_interfaz);
+                log_info(logger, "SE DESCONECTA LA INTERFAZ %s", interfaz->nombre_interfaz);    
+
             break;
             }
 
             if(respuesta==INTERFAZ_LISTA)
             {
-            printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
+            //printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
             }
         }
 
@@ -246,7 +253,8 @@ void atender_interfaz_stdin_stdout(t_list_io* interfaz, int tipo_interfaz)
         sem_post(&planificacion_blocked_iniciada);
         
     }
-    //DESTRUIRSE A SI MISMO, SACARSE DE LA LISTA, ENVIAR TODOS A WAIT
+    //DESTRUIRSE A SI MISMO, SACARSE DE LA LISTA, ENVIAR TODOS A EXIT
+    
 }
 
 void mandar_pcb_cola_correspondiente(t_pcb* pcb, int cola_destino)

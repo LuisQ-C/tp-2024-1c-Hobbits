@@ -49,6 +49,10 @@ while(1){
         eliminar_paquete(infoAenviar);
         recv(fd_conexion_memoria,&resultado,sizeof(int),MSG_WAITALL);
     }
+
+    free(cadenaAenviar);
+    list_destroy_and_destroy_elements(listaRecibida, (void*) liberar_elemento);
+
     int respuesta = INTERFAZ_LISTA;
     send(fd_conexion_kernel,&respuesta,sizeof(int),0);
 

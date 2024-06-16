@@ -56,6 +56,7 @@ void planificacion_vrr(){
 
         pthread_t hilo_q;
         data* new_data = malloc(sizeof(data));
+        log_trace(logger, "%d SOY EL QUANTUM SOBRANTE", pcb_auxiliar->quantum);
         new_data->quantum = pcb_auxiliar->quantum;
         new_data->pid = pcb_auxiliar->pid;
         pthread_create(&hilo_q, NULL, (void *)hilo_quantum, (void*) new_data);

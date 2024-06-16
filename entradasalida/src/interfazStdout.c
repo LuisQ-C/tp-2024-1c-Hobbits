@@ -74,6 +74,8 @@ while(1){
     casteo_string[tamanio_total] = '\0';
     log_info(logger,"La cadena recibida es: %s",casteo_string); //HACERLO CON UN LOGGER APARTE
     int respuesta = INTERFAZ_LISTA;
+    list_destroy_and_destroy_elements(listaRecibida, (void*) liberar_elemento);
+    free(casteo_string);
 
     send(fd_conexion_kernel,&respuesta,sizeof(int),0);
 

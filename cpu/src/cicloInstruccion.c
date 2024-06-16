@@ -39,16 +39,7 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
     if(check_interrupt(pcb_recibido,cliente_fd_conexion_dispatch))                     //CHEQUEA SI EN EL HILO DE INTERRUPCION LE LLEGO UNA INTERRUPCION
     {
         //PARA DEBUG Y PRUEBAS
-        if(i==3)
-        {
-            log_debug(logger,"TODO OKKK");
-        }
-        else
-        {
-            log_error(logger,"TODO MAAAAAAL");
-        }
-
-        //
+        
         log_warning(logger,"fue interrumpido");
         //resetear_var_globales();
         break;
@@ -201,6 +192,8 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
         {
             MOTIVO_DESALOJO = IO_GEN_SLEEP;
             pcb_a_enviar->pc = registro.PC+1;
+            pcb_a_enviar->quantum-=config_mem.retardo_memoria;
+            log_trace(logger, "%d SOY EL QUANTUM QUE VA A ACTUALIZAR", pcb_a_enviar->quantum);
             io_gen_sleep(pcb_a_enviar,instruccionDesarmada,fd_dispatch);
             break;
         }
@@ -361,6 +354,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             int tamanio_dato = obtener_valor_registro(instruccionDesarmada[3]);
             
             pcb_a_enviar->pc = registro.PC+1;
+            pcb_a_enviar->quantum-=config_mem.retardo_memoria;
             io_stdin_stdout(pcb_a_enviar,nombre_interfaz,direccion_logica,tamanio_dato,fd_dispatch,fd_memoria,IO_STDIN_READ);
             free(nombre_interfaz);
             break;
@@ -374,6 +368,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             int tamanio_dato = obtener_valor_registro(instruccionDesarmada[3]);
 
             pcb_a_enviar->pc = registro.PC+1;
+            pcb_a_enviar->quantum-=config_mem.retardo_memoria;
             io_stdin_stdout(pcb_a_enviar,nombre_interfaz,direccion_logica,tamanio_dato,fd_dispatch,fd_memoria,IO_STDOUT_WRITE);
             free(nombre_interfaz);
             break;

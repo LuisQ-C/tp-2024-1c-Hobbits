@@ -551,6 +551,7 @@ void proceso_estado()
             {
                 char *auxiliar_pids = pids_blocked(interfaz);
                 string_append_with_format(&pids, "%s", auxiliar_pids);
+                free(auxiliar_pids);
             }
         }
 
@@ -561,10 +562,11 @@ void proceso_estado()
         if (!string_is_empty(pids))
         {
             log_info(logger, "Procesos cola blocked: %s", pids);
-            free(pids);
         }
         else
             log_info(logger, "La cola blocked (interfaces) esta vacia");
+        
+        free(pids);
     }
     else
         log_info(logger, "No hay interfaz conectada");
@@ -590,10 +592,11 @@ void proceso_estado()
         if (!string_is_empty(pids))
         {
             log_info(logger, "Procesos cola blocked (recursos): %s", pids);
-            free(pids);
         }
         else
             log_info(logger, "La cola blocked (recursos) esta vacia");
+        
+        free(pids);
     }
     else
         log_info(logger, "No hay recursos para usar");

@@ -92,8 +92,9 @@ void actualizar_pcb_ejecutado(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 {
     int* pid = list_get(pcb_con_motivo,0);
     uint32_t* pc = list_get(pcb_con_motivo,1);
-    int* quantum = list_get(pcb_con_motivo,2);
-    uint32_t* estado = list_get(pcb_con_motivo,3);
+    uint32_t* estado = list_get(pcb_con_motivo,2);
+    int* quantum = list_get(pcb_con_motivo,3);
+    log_trace(logger, "%d ESTOY ACTUALIZANDO EL PCB", *quantum);
     t_registros_generales* registros_generales = list_get(pcb_con_motivo,4);
     pcb_a_actualizar->pid = *pid;
     pcb_a_actualizar->pc = *pc;

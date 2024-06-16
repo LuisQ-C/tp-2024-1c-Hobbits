@@ -115,7 +115,6 @@ void procesarConexionesIO(void* datosServerInterfaces){
                 int resultado = 1;
                 int pid,tamanio,base,direccion_fisica;
                 void* dato_escribir = recibir_peticion_escritura(&pid,&base,&tamanio,&direccion_fisica,fd_conexion_IO);
-
                 memcpy_pagina_frame(direccion_fisica,base,dato_escribir,tamanio);
                 log_info(logger_obligatorio,"Acceso a espacio de usuario: \"PID: %d - Accion: ESCRIBIR - Direccion fisica: %d - Tamaño %d\"",pid,direccion_fisica,tamanio);
 
