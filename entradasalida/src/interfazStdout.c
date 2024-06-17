@@ -78,7 +78,7 @@ while(1){
     free(casteo_string);
 
     send(fd_conexion_kernel,&respuesta,sizeof(int),0);
-
+    
 }
 
 }

@@ -2,6 +2,7 @@
 
 t_log* logger;
 
+/*
 int main(int argc, char** argv) {
      char* nombreDeInterfaz;
     int fd_conexion_kernel = 0;
@@ -17,9 +18,9 @@ int main(int argc, char** argv) {
         log_error(logger,"Error al crear conexiones iniciales");
         exit(1);
     }
-    /*mandarHandshake(logger,fd_conexion_kernel,"MODULO KERNEL","INTERFAZ CUALQUIERA");
-    mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA","INTERFAZ CUALQUIERA");
-    manejarConexion(logger,&fd_conexion_kernel,&fd_conexion_memoria);*/
+    //mandarHandshake(logger,fd_conexion_kernel,"MODULO KERNEL","INTERFAZ CUALQUIERA");
+    //mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA","INTERFAZ CUALQUIERA");
+    //manejarConexion(logger,&fd_conexion_kernel,&fd_conexion_memoria);
     
    
     nombreDeInterfaz = argv[1];
@@ -28,4 +29,20 @@ int main(int argc, char** argv) {
 
     //terminar_programa(logger,config,&fd_conexion_kernel,&fd_conexion_memoria);
     return 0;
+}*/
+
+int main(int argc, char** argv)
+{
+    char* nombreDeInterfaz;
+    int fd_kernel = 0;
+    int fd_memoria = 0;
+   // t_log* logger;
+    t_config* config;
+    logger = iniciar_logger("entrada_salida.log","MODULO INTERFAZ",1,LOG_LEVEL_DEBUG);
+    //config = iniciar_config("entrada_salida.config",logger);
+    config = iniciar_config(argv[2],logger);
+
+    //dialFS(config,fd_kernel,fd_memoria);
+    modificar_bitmap(1024);
+
 }

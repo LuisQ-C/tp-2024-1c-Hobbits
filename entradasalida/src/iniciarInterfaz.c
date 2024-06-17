@@ -38,6 +38,11 @@ void iniciarInterfaz(char* nombreDeInterfaz,  t_config* config, int fd_conexion_
         log_info(logger,"La interfaz recibida es: STDOUT");
         stdOut(config, fd_conexion_kernel, fd_conexion_memoria);
     }
+    else  if (!(strcmp(tipoDeInterfaz, "DIALFS")))
+    {
+        log_info(logger,"La interfaz recibida es: DIALFS");
+        dialFS(config, fd_conexion_kernel, fd_conexion_memoria);
+    }
 
     else
     {

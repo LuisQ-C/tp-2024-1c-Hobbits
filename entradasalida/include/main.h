@@ -11,6 +11,7 @@
 #include "../../utils/include/protocolo.h"
 #include "../include/conexionesIO.h"
 #include "iniciarInterfaz.h"
+#include "interfazDialFS.h"
 
 //void interfazGenerica( t_config* config, int fd_conexion_kernel);
 
