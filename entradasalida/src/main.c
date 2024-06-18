@@ -42,7 +42,9 @@ int main(int argc, char** argv)
     //config = iniciar_config("entrada_salida.config",logger);
     config = iniciar_config(argv[2],logger);
 
-    //dialFS(config,fd_kernel,fd_memoria);
-    modificar_bitmap(1024);
-
+    dialFS(config,fd_kernel,fd_memoria);
+   // modificar_bitmap(1024);
+    terminar_programa(logger,config,&fd_kernel,&fd_memoria);
+    //config_destroy(config);
 }
+
