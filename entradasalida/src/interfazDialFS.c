@@ -3,6 +3,7 @@
 extern t_log* logger;
 t_bitarray* bitmap_fs;
 void* block_fs;
+void* data_bitmap;
 
 void dialFS(t_config* config,int fd_kernel,int fd_memoria)
 {
@@ -42,26 +43,54 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
         //int opcode = recibir_operacion(fd_kernel);
         char* codop = readline("ingresa opcode 19(c) 20(d) 21(t) 22(w) 23(r) >");
         int opcode = atoi(codop);
-        char* nombre = "arch1.txt"; // TXT??
+        //char* nombre = "arch1.txt"; // TXT??
         switch (opcode)
         {
             case IO_FS_CREATE:
             {
+                char* nombre = readline("INGRESA NOMBRE AL ARCHIVO :");
                 char* ruta_archivo = string_new();
                 string_append(&ruta_archivo,path_base);
                 string_append(&ruta_archivo,"/");
-                string_append(&ruta_archivo,nombre);
+                string_append(&ruta_archivo,nombre); // SERA TXT??
+                
 
-                FILE* archivo_creado = fopen(ruta_archivo,"w+");// MANEJAR SI SE ABRE UN ARCHVO YA CREADO
+                FILE* archivo_creado = fopen(ruta_archivo,"w+"); // MANEJAR SI SE ABRE UN ARCHVO YA CREADO
                 t_config* config_archivo = config_create(ruta_archivo);
-                config_set_value(config_archivo,"BLOQUE_INICIAL","0");
+                int bloque_inicial = bloque_libre(cant_bloques); // MANEJAR SI NO HAY ESPACIO PARA UN NUEVO ARCHIVO
+                char* primer_bloque = string_itoa(bloque_inicial);
+                asignar_bloque(bloque_inicial);
+                config_set_value(config_archivo,"BLOQUE_INICIAL",primer_bloque);
                 config_set_value(config_archivo,"TAMANIO","0");
                 config_save_in_file(config_archivo,ruta_archivo);
+
                 config_destroy(config_archivo);
+                fclose(archivo_creado);
+
+                free(ruta_archivo);
+                free(nombre);
+                free(primer_bloque);
                 break;
             }
             case IO_FS_DELETE:
             {
+                char* nombre = readline("INGRESA NOMBRE DEL ARHCIVO A ELIMINAR :");
+                char* ruta_archivo = string_new();
+                string_append(&ruta_archivo,path_base);
+                string_append(&ruta_archivo,"/");
+                string_append(&ruta_archivo,nombre); 
+
+                t_config* config_archivo = config_create(ruta_archivo);
+                int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL"); 
+                int tamanio = config_get_int_value(config_archivo,"TAMANIO"); 
+
+                liberar_bloques(bloque_inicial,tamanio,tam_bloque);
+                remove(ruta_archivo);
+                config_destroy(config_archivo);
+
+
+                free(ruta_archivo);
+                free(nombre);
                 break;
             }
             case IO_FS_TRUNCATE:
@@ -77,9 +106,14 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 break;
             }
             default:
+            {
+
                 break;
+            }
         }
+        free(cod_op);
     }
+    
 }
 
 t_bitarray* cargar_bitmap_nuevo(FILE* arch_bitmap,int cant_bloques)
@@ -90,12 +124,12 @@ t_bitarray* cargar_bitmap_nuevo(FILE* arch_bitmap,int cant_bloques)
     fflush(arch_bitmap);
     ftruncate(fileno(arch_bitmap),tam_bitmap);
 
-    void* data_bitmap = mmap(NULL,tam_bitmap,PROT_READ|PROT_WRITE,MAP_SHARED,fileno(arch_bitmap),0);
+    data_bitmap = mmap(NULL,tam_bitmap,PROT_READ|PROT_WRITE,MAP_SHARED,fileno(arch_bitmap),0);
     memset(data_bitmap,0,tam_bitmap);
     t_bitarray* bitmap_fs_aux = bitarray_create_with_mode(data_bitmap,tam_bitmap,LSB_FIRST);
     msync(data_bitmap,tam_bitmap,MS_SYNC);
     
-    munmap(data_bitmap,tam_bitmap);
+    //munmap(data_bitmap,tam_bitmap);
 
     fclose(arch_bitmap);
     return bitmap_fs_aux;
@@ -107,27 +141,13 @@ t_bitarray* cargar_bitmap_existente(FILE* arch_bitmap,int cant_bloques)
     arch_bitmap = fopen("file_system/bitmap.dat","rb+"); 
     int tam_bitmap = ceil(cant_bloques/8.00);
 
-    void* data_bitmap = mmap(NULL,tam_bitmap,PROT_READ|PROT_WRITE,MAP_SHARED,fileno(arch_bitmap),0);
+    data_bitmap = mmap(NULL,tam_bitmap,PROT_READ|PROT_WRITE,MAP_SHARED,fileno(arch_bitmap),0);
     t_bitarray* bitmap_fs_aux = bitarray_create_with_mode(data_bitmap,tam_bitmap,LSB_FIRST);
     
-    munmap(data_bitmap,tam_bitmap);
+    //munmap(data_bitmap,tam_bitmap);
 
     fclose(arch_bitmap);
     return bitmap_fs_aux;
-}
-
-void modificar_bitmap(int cant_bloques)
-{
-    FILE* arch_bitmap = fopen("file_system/bitmap.dat","rb+");
-    int cant_bloques_redondeados = ceil(cant_bloques/8.00);
-    void* data_bitmap = mmap(NULL,cant_bloques_redondeados,PROT_READ|PROT_WRITE,MAP_SHARED,fileno(arch_bitmap),0);
-    t_bitarray* bitmap_fs_aux = bitarray_create_with_mode(data_bitmap,cant_bloques_redondeados,LSB_FIRST);
-    bitarray_set_bit(bitmap_fs_aux,0);
-    bitarray_set_bit(bitmap_fs_aux,1);
-    
-    msync(arch_bitmap,cant_bloques_redondeados,MS_SYNC);
-    fclose(arch_bitmap);
-
 }
 
 void imprimir_bitmap()
@@ -180,4 +200,84 @@ void* cargar_block_fs_existente(FILE* arch_bloques,int tam_block_fs)
     fclose(arch_bloques);
 
     return data_bloques;
+}
+
+int espacio_libre_bitmap(int cant_bloques) // CANT BLOQUES ES DEL CONFIG
+{
+    int bloques_libres = 0;
+    int valor;
+    //pthread_mutex_lock(&mutex_bitmap);
+    for(int i=0;i<cant_bloques;i++)
+    {
+        valor = bitarray_test_bit(bitmap_fs,i);
+        if(valor==0)
+            bloques_libres++;
+    }
+    //pthread_mutex_unlock(&mutex_bitmap);
+    return bloques_libres;
+}
+
+int espacio_contiguo_bitmap(int bloque_inicial,int tamanio, int tam_bloque) // TAM BLOQUE ES DEL CONFIG
+{
+    int bloques_libres = 0;
+    int valor;
+    int inicio = bloque_inicial + tamanio / tam_bloque;
+    //pthread_mutex_lock(&mutex_bitmap);
+    while(1)
+    {
+        valor = bitarray_test_bit(bitmap_fs,inicio);
+        if(valor==0)
+            bloques_libres++;
+        else
+            break;
+        
+    }
+    //pthread_mutex_unlock(&mutex_bitmap);
+    return bloques_libres;
+}
+
+/******************
+MARCO LIBRE
+
+>DEVUELVE EL PRIMER MARCO LIBRE QUE ENCUENTRA
+
+**********************/
+int bloque_libre(int cant_bloques)
+{
+    int valor;
+    int bloque_libre;
+    //pthread_mutex_lock(&mutex_bitmap);
+    for(int i=0;i<cant_bloques;i++)
+    {
+        valor = bitarray_test_bit(bitmap_fs,i);
+        if(valor==0)
+        {
+            bloque_libre = i;
+            break;
+        }
+    } 
+    //pthread_mutex_unlock(&mutex_bitmap);
+    return bloque_libre;
+}
+
+void asignar_bloque(int bloque_a_asignar)
+{
+   // pthread_mutex_lock(&mutex_bitmap);
+    int tam_bitmap = bitarray_get_max_bit(bitmap_fs);
+    bitarray_set_bit(bitmap_fs,bloque_a_asignar);
+    
+    msync(data_bitmap,tam_bitmap,MS_SYNC);
+
+    //pthread_mutex_unlock(&mutex_bitmap);
+}
+
+void liberar_bloques(int bloque_inicial,int tamanio,int tam_bloque)
+{
+    int tam_total = bloque_inicial + tamanio / tam_bloque;
+    int tam_bitmap = bitarray_get_max_bit(bitmap_fs);
+    for(;bloque_inicial<tam_total;bloque_inicial++)
+    {
+        bitarray_clean_bit(bitmap_fs,bloque_inicial);
+        msync(data_bitmap,tam_bitmap,MS_SYNC);
+    }
 }
