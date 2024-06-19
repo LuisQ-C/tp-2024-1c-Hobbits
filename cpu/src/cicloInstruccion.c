@@ -62,7 +62,7 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
 void resetear_interrupcion()
 {
     pthread_mutex_lock(&mutex_interrupcion);
-    PID_ACTUAL = -1;
+    PID_INTERRUMPIR = -1; //ANTES ESTABA ACA PID ACTUAL, SI ROMPE ALGO PUEDE SER A CAUSA DE ESO
     MOTIVO_INTERRUPCION = -1;
     pthread_mutex_unlock(&mutex_interrupcion);
 }

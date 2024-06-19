@@ -504,7 +504,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             break;
         }
         default:
-            log_warning(logger,"MOTIVO DE DESALOJO DESCONOCIDO");
+            log_warning(logger,"MOTIVO DE DESALOJO DESCONOCIDO, CODIGO OPERACION: %d",*motivo_interrupcion);
             return false;
             break;
     }
@@ -542,6 +542,7 @@ void hilo_quantum(void* arg)
     int pid_r = quantum_recibido->pid;
     free(quantum_recibido);
     usleep(quantum_r*1000);
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
     enviar_interrupcion(INTERRUPCION_QUANTUM, pid_r,fd_interrupt);
 }
 
