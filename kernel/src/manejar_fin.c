@@ -28,7 +28,7 @@ void manejar_fin_con_motivo(int motivo_interrupcion, t_pcb* pcb_a_finalizar){
         break;
     case OUT_OF_MEMORY_FIN:
         squeue_push(lista_procesos_exit, pcb_a_finalizar);
-        log_debug(logger, "Finaliza el proceso %d - Motivo : OUT_OF_MEMORY", pcb_a_finalizar->pid);
+        log_info(logger, "Finaliza el proceso %d - Motivo : OUT_OF_MEMORY", pcb_a_finalizar->pid);
         log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: EXIT", pcb_a_finalizar->pid);
         break;
     case INTERRUPTED_BY_USER_READY:

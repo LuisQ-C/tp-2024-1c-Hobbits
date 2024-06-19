@@ -13,7 +13,7 @@ void interfazGenerica(t_config* config, int fd_conexion_kernel)//pasa el config 
         //recv(fd_conexion_kernel,&cantidad_unidad_trabajo,sizeof(int),MSG_WAITALL);
         recibir_operacion(fd_conexion_kernel);
         recibir_solicitud_io_generico(&pid,&cantidad_unidad_trabajo,fd_conexion_kernel);
-        int resultado = 1000 * cantidad_unidad_trabajo * tiempoDeUnidadDeTrabajo; 
+        int resultado = 1000 * cantidad_unidad_trabajo * tiempoDeUnidadDeTrabajo;
         log_info(logger,"Generica - Operación: \"PID: %d - Operacion: IO_GEN_SLEEP\"",pid);
         printf("\nTIEMPO dormir: %d \n",resultado);
         usleep(resultado);

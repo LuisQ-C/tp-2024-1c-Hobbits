@@ -125,11 +125,11 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_iogenerica* nueva_solicitud_gen = malloc(sizeof(t_elemento_iogenerica));
                 //nueva_solicitud_gen->cola_destino = READY; //ACA DEFINIRIAS LO DE VRR
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
                     pcb_a_actualizar->quantum = quantum;
                     nueva_solicitud_gen->cola_destino = READY;
                 }
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                else if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
                     nueva_solicitud_gen->cola_destino = READYPLUS;
                 }
                 else 
@@ -181,14 +181,14 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_io_in_out* nueva_solicitud_stdin= malloc(sizeof(t_elemento_io_in_out));
                // nueva_solicitud_stdin->cola_destino=READY;
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
                     pcb_a_actualizar->quantum = quantum;
                     nueva_solicitud_stdin->cola_destino = READY;
                 }
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                else if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
                     nueva_solicitud_stdin->cola_destino = READYPLUS;
                 }
-                else 
+                else
                     nueva_solicitud_stdin->cola_destino = READY;
 
                 nueva_solicitud_stdin->pcb = pcb_a_actualizar;
@@ -239,11 +239,11 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_io_in_out* nueva_solicitud_stdin= malloc(sizeof(t_elemento_io_in_out));
                 //nueva_solicitud_stdin->cola_destino=READY;
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
                     pcb_a_actualizar->quantum = quantum;
                     nueva_solicitud_stdin->cola_destino = READY;
                 }
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                else if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
                     nueva_solicitud_stdin->cola_destino = READYPLUS;
                 }
                 else 
@@ -299,7 +299,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 return false;
             break;
         case INTERRUPCION_QUANTUM:
-            //log_warning(logger, "PID: %d Fue desalojado por fin de Q", pcb_a_actualizar->pid);
+            log_warning(logger, "PID: %d Fue desalojado por fin de Q", pcb_a_actualizar->pid);
             pcb_a_actualizar->estado = READY;
             pcb_a_actualizar->quantum = quantum; //PARA VRR
             squeue_push(lista_procesos_ready, pcb_a_actualizar);

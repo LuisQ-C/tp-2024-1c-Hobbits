@@ -28,8 +28,24 @@ while(1){
     int* lista_PID = list_get(listaRecibida,0);
     pid  = *lista_PID;
     log_info(logger,"STDIN - Operación: \"PID: %d - Operacion: IO_STDIN_READ\"",pid);
+
+    int tamanio_total = 0;
+
+    for(int i=1;i<list_size(listaRecibida);i++)
+    {
+        t_porcion_dato* dato = list_get(listaRecibida,i);
+        tamanio_total += dato->tamanio;
+    }
     
     cadenaDeCaracteres = readline(">");
+
+    
+    while(tamanio_total > string_length(cadenaDeCaracteres))
+    {
+        printf("\nLA CADENA INGRESADA DEBE SER DE UNA LONGITUD >= %d\n",tamanio_total);
+        free(cadenaDeCaracteres);
+        cadenaDeCaracteres = readline(">");
+    }
     
     void * cadenaAenviar = (void*) cadenaDeCaracteres;
 
