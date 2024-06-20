@@ -359,6 +359,67 @@ int enviar_solicitud_stdin_stdout(int pid, t_list* direcciones_fisicas , int fd_
 
     return err;
 }
+///////
+int enviar_solicitud_dial_fs_create_delete(int pid, char* nombre_archivo , int fd_interfaz, int tipo_interfaz)
+{
+    t_paquete* paquete = crear_paquete(tipo_interfaz);
+    t_porcion_dato auxiliar;
+    agregar_a_paquete(paquete,&pid,sizeof(int));
+    
+    agregar_a_paquete(paquete, nombre_archivo, strlen(nombre_archivo)+1);
+    
+    int err = enviar_paquete_io(paquete, fd_interfaz);//DEVUELVE -1 SI HUBO ERROR
+
+    eliminar_paquete(paquete);
+
+    return err;
+}
+/////////// //PREGUNTAR COMO HACER LOS PAQUETES TRUNCATE Y READ WRITE
+int enviar_solicitud_dial_fs_truncate(int pid, char* nombre_archivo,int* tamanio, int fd_interfaz , int tipo_interfaz)
+{
+    t_paquete* paquete = crear_paquete(tipo_interfaz);
+    t_porcion_dato auxiliar;
+    agregar_a_paquete(paquete,&pid,sizeof(int));
+
+    agregar_a_paquete(paquete,tamanio,sizeof(int));
+    
+    agregar_a_paquete(paquete, nombre_archivo, strlen(nombre_archivo)+1);
+    
+    int err = enviar_paquete_io(paquete, fd_interfaz);//DEVUELVE -1 SI HUBO ERROR
+
+    eliminar_paquete(paquete);
+
+    return err;
+}
+int enviar_solicitud_dial_fs_read_write(int pid, char* nombre_archivo,int* tamanio, t_list* direcciones_fisicas, int cant_direcciones, int fd_interfaz , int tipo_interfaz)
+{
+    t_paquete* paquete = crear_paquete(tipo_interfaz);
+    t_porcion_dato auxiliar;
+    agregar_a_paquete(paquete,&pid,sizeof(int));
+    agregar_a_paquete(paquete, nombre_archivo, strlen(nombre_archivo)+1);
+    agregar_a_paquete(paquete,tamanio,sizeof(int));
+    
+    for(int i=0;i<cant_direcciones;i++)
+    {
+        t_porcion_dato* direccion = list_get(direcciones_fisicas,i);
+        auxiliar.base=direccion->base;
+        auxiliar.direccion_fisica=direccion->direccion_fisica;
+        auxiliar.tamanio=direccion->tamanio;
+        agregar_a_paquete(paquete,&auxiliar,sizeof(t_porcion_dato));
+    }
+
+    int err = enviar_paquete_io(paquete, fd_interfaz);//DEVUELVE -1 SI HUBO ERROR
+
+    eliminar_paquete(paquete);
+
+    return err;
+}
+
+
+
+
+///////
+
 
 void enviar_nuevo_proceso(int* pid, char* nombre_archivo, int fd_memoria){
     t_paquete* paquete = crear_paquete(INICIAR_PROCESO);

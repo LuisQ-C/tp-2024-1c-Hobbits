@@ -283,21 +283,233 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             return false;
             break;
         }
+//#################
         case IO_FS_CREATE:
-                return false;
+        {
+            char* nombre_interfaz = list_get(pcb_con_motivo,6);
+            char* nombre_archivo = list_get(pcb_con_motivo,7);
+            //[pid,pc,estado,quatum,registros,nombre,nomarchivo,direciones]
+
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_CREATE);
+            // validez2 = slist_comprobate_io(nombre_interfaz,IO_FS_WRITE);
+            if(validez)
+            {
+                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
+                pcb_a_actualizar->estado = BLOCKED;
+                t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
+                //nueva_solicitud_stdin->cola_destino=READY;
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                    pcb_a_actualizar->quantum = quantum;
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+                }
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                    nueva_solicitud_dial_fs->cola_destino = READYPLUS;
+                }
+                else 
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+
+
+                nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
+                nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
+                push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
+
+                log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
+
+                sem_post(interfaz_buscada->hay_proceso_cola);
+            }
+            else
+            {
+                manejar_fin_con_motivo(INVALID_INTERFACE, pcb_a_actualizar);
+
+                sem_post(&grado_de_multiprogramacion);
+            }
+            return false;
             break;
-        case IO_FS_DELETE:
-                return false;
+        }
+        case IO_FS_DELETE://ok
+        {
+            char* nombre_interfaz = list_get(pcb_con_motivo,6);
+            char* nombre_archivo = list_get(pcb_con_motivo,7);
+            //[pid,pc,estado,quatum,registros,nombre,nomarchivo,direciones]
+
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_DELETE);
+            // validez2 = slist_comprobate_io(nombre_interfaz,IO_FS_WRITE);
+            if(validez)
+            {
+                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
+                pcb_a_actualizar->estado = BLOCKED;
+                t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
+                //nueva_solicitud_stdin->cola_destino=READY;
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                    pcb_a_actualizar->quantum = quantum;
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+                }
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                    nueva_solicitud_dial_fs->cola_destino = READYPLUS;
+                }
+                else 
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+
+
+                nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
+                nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
+                push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
+
+                log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
+
+                sem_post(interfaz_buscada->hay_proceso_cola);
+            }
+            else
+            {
+                manejar_fin_con_motivo(INVALID_INTERFACE, pcb_a_actualizar);
+
+                sem_post(&grado_de_multiprogramacion);
+            }
+            return false;
             break;
+        }
         case IO_FS_TRUNCATE:
-                return false;
+        {
+            char* nombre_interfaz = list_get(pcb_con_motivo,6);
+            char* nombre_archivo = list_get(pcb_con_motivo,7);
+            int* tamanio = list_get(pcb_con_motivo,8);
+
+            //[pid,pc,estado,quatum,registros,nombre,nomarchivo,direciones]
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_TRUNCATE);
+
+            if(validez)
+            {
+                // t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 8, cant_direcciones);
+                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
+                pcb_a_actualizar->estado = BLOCKED;
+                t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
+                //nueva_solicitud_stdin->cola_destino=READY;
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                    pcb_a_actualizar->quantum = quantum;
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+                }
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                    nueva_solicitud_dial_fs->cola_destino = READYPLUS;
+                }
+                else 
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+
+
+                nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
+                nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
+                nueva_solicitud_dial_fs->tamanio = tamanio;
+                push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
+
+                log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
+
+                sem_post(interfaz_buscada->hay_proceso_cola);
+            }  
+            else
+            {
+                manejar_fin_con_motivo(INVALID_INTERFACE, pcb_a_actualizar);
+
+                sem_post(&grado_de_multiprogramacion);
+            }
+            return false;
             break;
+        }
+//##################################TERMINAR CON LOS DATOS Q CORRESPONDAN
         case IO_FS_WRITE:
-                return false;
+        {
+            char* nombre_interfaz = list_get(pcb_con_motivo,6);
+            char* nombre_archivo = list_get(pcb_con_motivo,7);
+            int* tamanio = list_get(pcb_con_motivo,8);
+
+            int tam_lista = list_size(pcb_con_motivo);
+            int cant_direcciones = tam_lista - 9;
+
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_WRITE);
+            
+            if(validez)
+            {
+                t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 9, cant_direcciones);
+                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
+                pcb_a_actualizar->estado = BLOCKED;
+                t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
+                //nueva_solicitud_stdin->cola_destino=READY;
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                    pcb_a_actualizar->quantum = quantum;
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+                }
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                    nueva_solicitud_dial_fs->cola_destino = READYPLUS;
+                }
+                else 
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+
+
+                nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
+                nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
+                nueva_solicitud_dial_fs->direcciones_fisicas = direcciones;
+                push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
+
+                log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
+
+                sem_post(interfaz_buscada->hay_proceso_cola);
+            }
+            else
+            {
+                manejar_fin_con_motivo(INVALID_INTERFACE, pcb_a_actualizar);
+
+                sem_post(&grado_de_multiprogramacion);
+            }
+            return false;
             break;
+        }
         case IO_FS_READ:
-                return false;
+        {
+            char* nombre_interfaz = list_get(pcb_con_motivo,6);
+            char* nombre_archivo = list_get(pcb_con_motivo,7);
+            int* tamanio = list_get(pcb_con_motivo,8);
+            // Interfaz, Nombre Archivo, Registro Dirección, Registro Tamaño, Registro Puntero Archivo)
+
+            int tam_lista = list_size(pcb_con_motivo);
+            int cant_direcciones = tam_lista - 9;
+            //[pid,pc,estado,quatum,registros,nombre,nomarchivo,direciones]
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_READ);
+            // validez2 = slist_comprobate_io(nombre_interfaz,IO_FS_CREATE);
+            if(validez)
+            {
+                t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 8, cant_direcciones);
+                t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
+                pcb_a_actualizar->estado = BLOCKED;
+                t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
+                //nueva_solicitud_stdin->cola_destino=READY;
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                    pcb_a_actualizar->quantum = quantum;
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+                }
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum>0){
+                    nueva_solicitud_dial_fs->cola_destino = READYPLUS;
+                }
+                else 
+                    nueva_solicitud_dial_fs->cola_destino = READY;
+
+
+                nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
+                nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
+                nueva_solicitud_dial_fs->direcciones_fisicas = direcciones;
+                push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
+
+                log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
+
+                sem_post(interfaz_buscada->hay_proceso_cola);
+            }
+            else
+            {
+                manejar_fin_con_motivo(INVALID_INTERFACE, pcb_a_actualizar);
+
+                sem_post(&grado_de_multiprogramacion);
+            }
+            return false;
             break;
+        }
+        //#################################
         case INTERRUPCION_QUANTUM:
             log_warning(logger, "PID: %d Fue desalojado por fin de Q", pcb_a_actualizar->pid);
             pcb_a_actualizar->estado = READY;
