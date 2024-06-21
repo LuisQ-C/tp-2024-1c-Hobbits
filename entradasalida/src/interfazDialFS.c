@@ -14,16 +14,21 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
     char* path_base = config_get_string_value(config,"PATH_BASE_DIALFS");
     int tam_block_fs = cant_bloques * tam_bloque;
 
+    //IO FS TRUNCATE ARCHIVO2.TXT 4069
+    //ARCHIVOS_CREADOS = ARCHIVO1.TXT -  ARCHIVO2.TXT - A3 - A4;
     FILE* arch_bitmap = NULL;
     FILE* arch_bloques = NULL;
     //t_bitarray* bitmap_fs;
 
     char* ruta_bitmap = string_new();
     char* ruta_bloques = string_new();
+    char* ruta_archivo_madre = string_new();//falta liberarlo
     string_append(&ruta_bitmap,path_base);
     string_append(&ruta_bloques,path_base);
+    string_append(&ruta_archivo_madre,path_base);
     string_append(&ruta_bitmap,"/bitmap.dat");
     string_append(&ruta_bloques,"/bloques.dat");
+    string_append(&ruta_archivo_madre,"/archivo_madr3.txt");
 
     bitmap_fs = (access(ruta_bitmap,F_OK) == -1)
         ? cargar_bitmap_nuevo(arch_bitmap,cant_bloques)
@@ -34,6 +39,10 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
     block_fs = (access(ruta_bloques,F_OK) == -1)
         ? cargar_block_fs_nuevo(arch_bloques,tam_block_fs)
         : cargar_block_fs_existente(arch_bloques,tam_block_fs);
+
+    if(access(ruta_archivo_madre,F_OK) == -1)
+        crear_archivo_metadatas(ruta_archivo_madre);
+
 
     free(ruta_bitmap);
     free(ruta_bloques);
@@ -55,11 +64,12 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 string_append(&ruta_archivo,nombre); // SERA TXT??
                 
 
-                FILE* archivo_creado = fopen(ruta_archivo,"w+"); // MANEJAR SI SE ABRE UN ARCHVO YA CREADO
+                FILE* archivo_creado = fopen(ruta_archivo,"w+"); //MANEJAR SI SE ABRE UN ARCHVO YA CREADO
                 t_config* config_archivo = config_create(ruta_archivo);
-                int bloque_inicial = bloque_libre(cant_bloques); // MANEJAR SI NO HAY ESPACIO PARA UN NUEVO ARCHIVO
+                int bloque_inicial = bloque_libre(cant_bloques); //MANEJAR SI NO HAY ESPACIO PARA UN NUEVO ARCHIVO
                 char* primer_bloque = string_itoa(bloque_inicial);
                 asignar_bloque(bloque_inicial);
+                agregar_nombre_metadatas(nombre,ruta_archivo_madre);
                 config_set_value(config_archivo,"BLOQUE_INICIAL",primer_bloque);
                 config_set_value(config_archivo,"TAMANIO","0");
                 config_save_in_file(config_archivo,ruta_archivo);
@@ -78,13 +88,14 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 char* ruta_archivo = string_new();
                 string_append(&ruta_archivo,path_base);
                 string_append(&ruta_archivo,"/");
-                string_append(&ruta_archivo,nombre); 
+                string_append(&ruta_archivo,nombre);
 
                 t_config* config_archivo = config_create(ruta_archivo);
                 int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL"); 
                 int tamanio = config_get_int_value(config_archivo,"TAMANIO"); 
 
                 liberar_bloques(bloque_inicial,tamanio,tam_bloque);
+                eliminar_nombre_metadatas(nombre,ruta_archivo_madre,path_base);
                 remove(ruta_archivo);
                 config_destroy(config_archivo);
 
@@ -95,6 +106,26 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
             }
             case IO_FS_TRUNCATE:
             {
+                //L-1-1-L-L-2-2-L-3
+                //TAM_BLOQUE 64 DEL CONFIG
+                //TAM ACTUAL DEL ARCHIVO -> ARCHIVO METADATA -> 128
+                //TRUNCATE 2 190 -> NECESITAS 2 BLOQUES
+                //TOTAL ESPACIO CONTIGUO: 1-> NO ALCANZA PARA EVITAR COMPACTACION
+                //TOTAL ESPACIO TOTAL: 4 -> NECESITAS COMPACTAR
+
+                //VOID* DATOS_2 = ACA GUARDARIAS TODOS LOS DATOS ACTUALES DEL ARCHIVO 2
+                //MEMCPY DESDE EL INICIO AL FINAL
+
+                //ARCHIVO BLOQUE_INICIAL TAMANIO
+                // 1-1-2 3-8-1
+
+                // ACCEDER AL 1
+                // CAMBIAR SU METADATA -> BLOQUE INICIAL = 0 TAMANIO = 2
+                // MEMCPY PARA MOVER LOS DATOS DEL 1
+
+                //1-1-3-2-2-2-2-L-L
+                //4 PODES METER EL ARCHIVO 2
+
                 break;
             }
             case IO_FS_WRITE:
@@ -111,7 +142,7 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 break;
             }
         }
-        free(cod_op);
+        free(codop);
     }
     
 }
@@ -216,7 +247,7 @@ int espacio_libre_bitmap(int cant_bloques) // CANT BLOQUES ES DEL CONFIG
     //pthread_mutex_unlock(&mutex_bitmap);
     return bloques_libres;
 }
-
+//BLOQUE INICIAL = 2 TAMANIO = 1024 TAM BLOQUE = 512
 int espacio_contiguo_bitmap(int bloque_inicial,int tamanio, int tam_bloque) // TAM BLOQUE ES DEL CONFIG
 {
     int bloques_libres = 0;
@@ -230,7 +261,7 @@ int espacio_contiguo_bitmap(int bloque_inicial,int tamanio, int tam_bloque) // T
             bloques_libres++;
         else
             break;
-        
+        inicio++;
     }
     //pthread_mutex_unlock(&mutex_bitmap);
     return bloques_libres;
@@ -271,6 +302,7 @@ void asignar_bloque(int bloque_a_asignar)
     //pthread_mutex_unlock(&mutex_bitmap);
 }
 
+//EL TAMANIO DE LOS METADATAS SIEMPRE SERA MULTIPLO DEL TAMANIO DEL BLOQUE?? PREGUNTAR FORO
 void liberar_bloques(int bloque_inicial,int tamanio,int tam_bloque)
 {
     int tam_total = bloque_inicial + tamanio / tam_bloque;
@@ -281,3 +313,7 @@ void liberar_bloques(int bloque_inicial,int tamanio,int tam_bloque)
         msync(data_bitmap,tam_bitmap,MS_SYNC);
     }
 }
+
+/*
+
+*/

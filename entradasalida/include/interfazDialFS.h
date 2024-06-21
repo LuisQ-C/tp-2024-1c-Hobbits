@@ -11,6 +11,7 @@
 #include <math.h>
 #include <readline/readline.h>
 #include <commons/string.h>
+#include "compactacion.h"
 
 
 void dialFS(t_config* config,int fd_kernel,int fd_memoria);
