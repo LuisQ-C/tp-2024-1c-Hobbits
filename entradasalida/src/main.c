@@ -44,6 +44,7 @@ int main(int argc, char** argv)
 
     dialFS(config,fd_kernel,fd_memoria);
    // modificar_bitmap(1024);
+   //imprimir_bitmap();
     terminar_programa(logger,config,&fd_kernel,&fd_memoria);
     //config_destroy(config);
 }
