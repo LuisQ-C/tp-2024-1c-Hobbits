@@ -124,7 +124,7 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 config_destroy(config_archivo);
                 //ESCENARIOS
                 int tamanio_total_asignado = calcular_bloques(tamanio,tam_bloque) * tam_bloque;
-                printf("TAMANIO TOTAL ASIGNADO: %d",tamanio_total_asignado);
+                //printf("TAMANIO TOTAL ASIGNADO: %d",tamanio_total_asignado);
                 
                 logear_truncate(logger,pid,nombre,tamanio_truncate);
 
@@ -172,6 +172,9 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
 
                     }
                 }
+
+                free(nombre);
+                free(ruta_archivo);
 
 
                 //-> TRUNCATE QUE ALCANZA CON LOS BLOQUES QUE YA TIENE EL ARCHIVO -> SOLO LOGEAR EL NUEVO TAMANIO y cambiar el metadata
