@@ -2,6 +2,8 @@
 
 extern t_config* config;
 extern t_log* logger;
+extern t_log* logger_obligatorio;
+
 
 extern t_squeue *lista_procesos_new;
 extern t_squeue *lista_procesos_ready;
@@ -50,13 +52,12 @@ void planificacion_vrr(){
 
         pcb_auxiliar->estado = EXEC;
         squeue_push(lista_procesos_exec, pcb_auxiliar);
-        log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
+        log_info(logger_obligatorio, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
         
         enviar_pcb(pcb_auxiliar, fd_dispatch);
 
         pthread_t hilo_q;
         data* new_data = malloc(sizeof(data));
-        log_trace(logger, "%d SOY EL QUANTUM SOBRANTE", pcb_auxiliar->quantum);
         new_data->quantum = pcb_auxiliar->quantum;
         new_data->pid = pcb_auxiliar->pid;
         pthread_create(&hilo_q, NULL, (void *)hilo_quantum, (void*) new_data);

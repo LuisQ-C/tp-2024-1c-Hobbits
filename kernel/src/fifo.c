@@ -1,6 +1,7 @@
 #include "../include/fifo.h"
 
 extern t_config* config;
+extern t_log* logger_obligatorio;
 extern t_log* logger;
 
 extern t_squeue *lista_procesos_new;
@@ -48,7 +49,7 @@ void planificacion_fifo(){
             pcb_auxiliar->estado = EXEC;
             squeue_push(lista_procesos_exec, pcb_auxiliar);
             enviar_pcb(pcb_auxiliar, fd_dispatch);
-            log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
+            log_info(logger_obligatorio, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
             sem_post(&planificacion_ready_iniciada);
             recibir_contexto_actualizado(fd_dispatch);
             //sem_post(&ejecutar_proceso);
