@@ -34,8 +34,8 @@ extern char* algoritmo;
 void planificacion_vrr(){
     while (1)
     {
-        sem_wait(&proceso_en_cola_ready);
         sem_wait(&planificacion_ready_iniciada);
+        sem_wait(&proceso_en_cola_ready);
         t_pcb* pcb_auxiliar;
         if(squeue_is_empty(lista_procesos_ready_plus) && squeue_is_empty(lista_procesos_ready))
         {

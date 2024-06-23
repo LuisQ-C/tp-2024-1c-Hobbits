@@ -33,8 +33,8 @@ void planificacion_rr(){
     
     while (1)
     {
-        sem_wait(&planificacion_ready_iniciada);
         sem_wait(&proceso_en_cola_ready);
+        sem_wait(&planificacion_ready_iniciada);
         if(squeue_is_empty(lista_procesos_ready)){
             sem_post(&planificacion_ready_iniciada);
             continue;

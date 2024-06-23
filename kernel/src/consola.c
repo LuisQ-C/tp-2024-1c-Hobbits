@@ -195,12 +195,14 @@ void instrucciones_consola(char *leido)
 
 void ejecutar_script(char *path)
 {
+    char *pathv2 = string_new();
+    string_append_with_format(&pathv2, ".%s" ,path);
     FILE *arch_instrucciones;
     char *linea_almacenada = NULL;
     size_t tam_almacenamiento = 0;
     int linea_leida;
 
-    arch_instrucciones = fopen(path, "rt");
+    arch_instrucciones = fopen(pathv2, "rt");
     if (arch_instrucciones == NULL)
     {
         log_error(logger, "No se pudo abrir el archivo de instrucciones");
@@ -219,6 +221,7 @@ void ejecutar_script(char *path)
             instrucciones_consola(linea_almacenada);
         }
     }
+    free(pathv2);
     free(linea_almacenada);
     fclose(arch_instrucciones);
 }
@@ -499,45 +502,60 @@ void proceso_estado()
     // printf("proceso_estado \n");
     if (!squeue_is_empty(lista_procesos_new))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_new);
-        log_info(logger, "Procesos cola new: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola new: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else
         log_info(logger, "La cola new esta vacia");
 
     if (!squeue_is_empty(lista_procesos_ready))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_ready);
-        log_info(logger, "Procesos cola ready: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola ready: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else
         log_info(logger, "La cola ready esta vacia");
 
     if (strcmp(algoritmo, "VRR") == 0 && !squeue_is_empty(lista_procesos_ready_plus))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_ready_plus);
-        log_info(logger, "Procesos cola ready: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola ready: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else if (strcmp(algoritmo, "VRR") == 0)
         log_info(logger, "La cola ready plus esta vacia");
 
     if (!squeue_is_empty(lista_procesos_exec))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_exec);
-        log_info(logger, "Procesos cola exec: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola exec: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else
         log_info(logger, "La cola exec esta vacia");
 
     if (!squeue_is_empty(lista_procesos_exit))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_exit);
-        log_info(logger, "Procesos cola exit: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola exit: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else
         log_info(logger, "La cola exit esta vacia");
@@ -561,7 +579,10 @@ void proceso_estado()
 
         if (!string_is_empty(pids))
         {
-            log_info(logger, "Procesos cola blocked: %s", pids);
+            char* lista_pids = string_new();
+            string_n_append(&lista_pids, pids, string_length(pids)-2);
+            log_info(logger, "Procesos cola blocked: %s", lista_pids);
+            free(lista_pids);    
         }
         else
             log_info(logger, "La cola blocked (interfaces) esta vacia");
@@ -591,7 +612,10 @@ void proceso_estado()
 
         if (!string_is_empty(pids))
         {
-            log_info(logger, "Procesos cola blocked (recursos): %s", pids);
+            char* lista_pids = string_new();
+            string_n_append(&lista_pids, pids, string_length(pids)-2);
+            log_info(logger, "Procesos cola blocked (recursos): %s", lista_pids);
+            free(lista_pids);    
         }
         else
             log_info(logger, "La cola blocked (recursos) esta vacia");
@@ -600,7 +624,7 @@ void proceso_estado()
     }
     else
         log_info(logger, "No hay recursos para usar");
-    // FALTA IMPRIMIR BLOCKED, TODAS SUS COLAS
+
 }
 
 
