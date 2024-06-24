@@ -639,7 +639,6 @@ char *pids_blocked(t_list_io *interfaz)
             if (!(strcmp(pid, " ") == 0))
             {
                 string_append_with_format(&pids, "%s, ", pid);
-                //log_warning(logger, "%s", pid);
             }
             free(pid);
         }
@@ -649,17 +648,27 @@ char *pids_blocked(t_list_io *interfaz)
             if (!(strcmp(pid, " ") == 0))
             {
                 string_append_with_format(&pids, "%s, ", pid);
-                //log_warning(logger, "%s", pid);
+            }
+            free(pid);
+        }
+
+        void obtener_pids_blocked_dialfs(t_elemento_io_fs * elemento_fs){
+            char *pid = string_itoa(elemento_fs->pcb->pid);
+            if (!(strcmp(pid, " ") == 0))
+            {
+                string_append_with_format(&pids, "%s, ", pid);
             }
             free(pid);
         }
     
-    if(interfaz->tipo_interfaz == 16){
+    if(interfaz->tipo_interfaz == IO_GEN_SLEEP){
         cola_io_iterate(interfaz, (void *) obtener_pids_blocked_gen);
     }
-    else if(interfaz->tipo_interfaz == 17 || interfaz->tipo_interfaz == 18){
-        cola_io_iterate(interfaz, (void *)obtener_pids_blocked_in_out);
-
+    else if(interfaz->tipo_interfaz == IO_STDIN_READ || interfaz->tipo_interfaz == IO_STDOUT_WRITE){
+        cola_io_iterate(interfaz, (void *) obtener_pids_blocked_in_out);
+    }
+    else if(interfaz->tipo_interfaz == IO_FS){
+        cola_io_iterate(interfaz, (void *) obtener_pids_blocked_dialfs);
     }
     return pids;
 }
