@@ -423,7 +423,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             //NECESARIO PARA EL CALCULO DE MMU
             int direccion_logica = obtener_valor_registro(instruccionDesarmada[3]);
             int tamanio = obtener_valor_registro(instruccionDesarmada[4]);
-            int puntero = atoi(puntero_archivo);
+            int puntero = obtener_valor_registro(puntero_archivo);
 
             pcb_a_enviar->pc = registro.PC+1;
             pcb_a_enviar->quantum-=config_mem.retardo_memoria;
@@ -444,13 +444,13 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             //NECESARIO PARA EL CALCULO DE MMU
             int direccion_logica = obtener_valor_registro(instruccionDesarmada[3]);
             int tamanio = obtener_valor_registro(instruccionDesarmada[4]);
-            int puntero = atoi(puntero_archivo);
+            int puntero = obtener_valor_registro(puntero_archivo);
 
             pcb_a_enviar->pc = registro.PC+1;
             pcb_a_enviar->quantum-=config_mem.retardo_memoria;
             
             io_fs_write_read(pcb_a_enviar,nombre_interfaz,nombre_archivo,direccion_logica,tamanio,puntero,fd_dispatch,fd_memoria,IO_FS_WRITE);
-            
+
             free(nombre_interfaz);
             free(nombre_archivo);
             free(puntero_archivo);

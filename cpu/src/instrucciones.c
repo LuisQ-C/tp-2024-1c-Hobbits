@@ -329,6 +329,7 @@ void aniadir_porciones_dato (t_paquete* paquete,int pid ,int direccion_logica, i
     
     tamanio_enviar = (espacio_restante > tamanio_dato) ? tamanio_dato : espacio_restante;
 
+   
     asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
 
     agregar_a_paquete(paquete,&porcion_empaquetar,sizeof(t_porcion_dato));
@@ -342,6 +343,7 @@ void aniadir_porciones_dato (t_paquete* paquete,int pid ,int direccion_logica, i
 
         tamanio_enviar = (restante<tam_pagina) ? restante : tam_pagina;
 
+        
         asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
 
         agregar_a_paquete(paquete,&porcion_empaquetar,sizeof(t_porcion_dato));
@@ -397,12 +399,9 @@ void io_fs_truncate(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_arc
 
 void asignar_porcion_dato(t_porcion_dato* porcion, int base, int dir_fisica, int tamanio)
 {
-    /**(porcion->base) = base;
-    *(porcion->tamanio) = tamanio;
-    *(porcion->direccion_fisica) = dir_fisica;*/
-    /*porcion->base = base;
+    porcion->base = base;
     porcion->direccion_fisica = dir_fisica;
-    porcion->tamanio = tamanio;*/
+    porcion->tamanio = tamanio;
 }
 
 int resize(int pid,int new_size,int fd_memoria)
