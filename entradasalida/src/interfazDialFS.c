@@ -65,7 +65,6 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 string_append(&ruta_archivo,"/");
                 string_append(&ruta_archivo,nombre); // SERA TXT??
                 
-
                 FILE* archivo_creado = fopen(ruta_archivo,"w+"); //MANEJAR SI SE ABRE UN ARCHVO YA CREADO
                 t_config* config_archivo = config_create(ruta_archivo);
                 int bloque_inicial = bloque_libre(cant_bloques); //MANEJAR SI NO HAY ESPACIO PARA UN NUEVO ARCHIVO
@@ -100,7 +99,7 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 int puntero_inicial = bloque_inicial*tam_bloque;
 
                 int tamanio_bloques_asignados = calcular_bloques(tamanio,tam_bloque) * tam_bloque;
-                
+
                 liberar_bloques(bloque_inicial,tamanio_bloques_asignados,tam_bloque);
                 
                 //PODRIA NO IR DEPENDE DE LO QUE RESPONDAN EN EL FORO
