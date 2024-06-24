@@ -122,6 +122,10 @@ void procesarConexionesIO(void* datosServerInterfaces){
         case IO_STDOUT_WRITE:
             atender_interfaz_stdin_stdout(interfaz_agregada,IO_STDOUT_WRITE);
             break;
+        case IO_FS:
+            atender_interfaz_dial_fs(interfaz_agregada, IO_FS);
+            break;
+        /*
        case IO_FS_CREATE:
             atender_interfaz_dial_fs(interfaz_agregada,IO_FS_CREATE);// fs-write truncate y esas cosas
             break;
@@ -137,6 +141,7 @@ void procesarConexionesIO(void* datosServerInterfaces){
         case IO_FS_READ:
             atender_interfaz_dial_fs(interfaz_agregada,IO_FS_READ);// fs-write truncate y esas cosas
             break;
+        */
     }
 
     
@@ -157,6 +162,13 @@ int string_to_type(char* tipo)
     {
         return IO_STDOUT_WRITE;
     }
+    else if(!strcmp("IO_FS", tipo)){
+        return IO_FS;
+    }
+    else{
+        return -1;
+    }
+    /*
     else if(!strcmp("IO_FS_CREATE",tipo))//CAmbiar al tipo q corresponda
     {
         return IO_FS_CREATE;
@@ -180,7 +192,7 @@ int string_to_type(char* tipo)
     else
     {
         return -1;
-    }
+    }*/
 }
 
 void atender_interfaz_generica(t_list_io* interfaz)
@@ -301,6 +313,8 @@ void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
 
             solicitud_dial_fs = peek_elemento_cola_io(interfaz);
             int cant_direcciones = 0;
+
+            
 
             if(IO_FS_CREATE == tipo_interfaz)//nombrea rch
                 err_send = enviar_solicitud_dial_fs_create_delete(solicitud_dial_fs->pcb->pid,solicitud_dial_fs->nombre_archivo,interfaz->fd_interfaz,tipo_interfaz);

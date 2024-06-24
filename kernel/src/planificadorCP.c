@@ -290,7 +290,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             char* nombre_archivo = list_get(pcb_con_motivo,7);
             //[pid,pc,estado,quatum,registros,nombre,nomarchivo,direciones]
 
-            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_CREATE);
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS);
             // validez2 = slist_comprobate_io(nombre_interfaz,IO_FS_WRITE);
             if(validez)
             {
@@ -298,7 +298,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
                     pcb_a_actualizar->quantum = quantum;
                     nueva_solicitud_dial_fs->cola_destino = READY;
                 }
@@ -311,6 +311,8 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 
                 nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
                 nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
+                nueva_solicitud_dial_fs->direcciones_fisicas = NULL;
+                nueva_solicitud_dial_fs->tamanio = 0;
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
 
                 log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
@@ -332,7 +334,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             char* nombre_archivo = list_get(pcb_con_motivo,7);
             //[pid,pc,estado,quatum,registros,nombre,nomarchivo,direciones]
 
-            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_DELETE);
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS);
             // validez2 = slist_comprobate_io(nombre_interfaz,IO_FS_WRITE);
             if(validez)
             {
@@ -340,7 +342,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
                     pcb_a_actualizar->quantum = quantum;
                     nueva_solicitud_dial_fs->cola_destino = READY;
                 }
@@ -353,6 +355,8 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
 
                 nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
                 nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
+                nueva_solicitud_dial_fs->tamanio = 0;
+                nueva_solicitud_dial_fs->direcciones_fisicas = NULL;
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
 
                 log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
@@ -375,7 +379,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             int* tamanio = list_get(pcb_con_motivo,8);
 
             //[pid,pc,estado,quatum,registros,nombre,nomarchivo,direciones]
-            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_TRUNCATE);
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS);
 
             if(validez)
             {
@@ -384,7 +388,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
                     pcb_a_actualizar->quantum = quantum;
                     nueva_solicitud_dial_fs->cola_destino = READY;
                 }
@@ -398,6 +402,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
                 nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
                 nueva_solicitud_dial_fs->tamanio = tamanio;
+                nueva_solicitud_dial_fs->direcciones_fisicas = NULL;
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
 
                 log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
@@ -423,7 +428,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             int tam_lista = list_size(pcb_con_motivo);
             int cant_direcciones = tam_lista - 9;
 
-            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_WRITE);
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS);
             
             if(validez)
             {
@@ -432,7 +437,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
                     pcb_a_actualizar->quantum = quantum;
                     nueva_solicitud_dial_fs->cola_destino = READY;
                 }
@@ -446,6 +451,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
                 nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
                 nueva_solicitud_dial_fs->direcciones_fisicas = direcciones;
+                nueva_solicitud_dial_fs->tamanio = tamanio;
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
 
                 log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
@@ -471,16 +477,16 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             int tam_lista = list_size(pcb_con_motivo);
             int cant_direcciones = tam_lista - 9;
             //[pid,pc,estado,quatum,registros,nombre,nomarchivo,direciones]
-            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS_READ);
+            bool validez = slist_comprobate_io(nombre_interfaz,IO_FS);
             // validez2 = slist_comprobate_io(nombre_interfaz,IO_FS_CREATE);
             if(validez)
             {
-                t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 8, cant_direcciones);
+                t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 9, cant_direcciones);
                 t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
                 pcb_a_actualizar->estado = BLOCKED;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
-                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum == 0){
+                if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
                     pcb_a_actualizar->quantum = quantum;
                     nueva_solicitud_dial_fs->cola_destino = READY;
                 }
@@ -494,6 +500,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                 nueva_solicitud_dial_fs->pcb = pcb_a_actualizar;
                 nueva_solicitud_dial_fs->nombre_archivo = nombre_archivo;
                 nueva_solicitud_dial_fs->direcciones_fisicas = direcciones;
+                nueva_solicitud_dial_fs->tamanio = tamanio;
                 push_elemento_cola_io(interfaz_buscada,nueva_solicitud_dial_fs);
 
                 log_info(logger, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: BLOCKED", pcb_a_actualizar->pid);
