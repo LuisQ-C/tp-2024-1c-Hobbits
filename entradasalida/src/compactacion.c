@@ -163,7 +163,7 @@ t_list* obtener_nombres_metadatas(char* ruta_archivo_madre)
 
 void ordenar_lista_por_bloque_inicial(t_list* lista)
 {
-    list_sort(lista,bloque_inicial_menor);
+    list_sort(lista,(void*)bloque_inicial_menor);
 }
 
 bool bloque_inicial_menor(t_metadata* actual, t_metadata* siguiente)

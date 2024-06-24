@@ -9,6 +9,7 @@
 #include "interfazGen.h"
 #include "interfazStdin.h"
 #include "interfazStdout.h"
+#include "interfazDialFS.h"
 
 
 void iniciarInterfaz(char* nombreDeInterfaz,  t_config* config, int fd_conexion_kernel,int fd_conexion_memoria );

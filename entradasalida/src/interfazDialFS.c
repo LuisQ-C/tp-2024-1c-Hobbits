@@ -58,6 +58,7 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
         {
             case IO_FS_CREATE:
             {
+                //SI EL ARCHIVO YA EXISTE NO HAGA NADA, SIMPLEMENTE ESPERAR EL TIEMPO TRABAJO Y DEVOLVERLE OK AL KERNEL
                 char* nombre = readline("INGRESA NOMBRE AL ARCHIVO :");
                 char* ruta_archivo = string_new();
                 string_append(&ruta_archivo,path_base);
@@ -85,6 +86,7 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
             }
             case IO_FS_DELETE:
             {
+                //SI EL ACCES NO LO DETECTA, NO HACER NADA, DEVOLVERLE OK AL KERNEL
                 char* nombre = readline("INGRESA NOMBRE DEL ARHCIVO A ELIMINAR :");
                 char* ruta_archivo = string_new();
                 string_append(&ruta_archivo,path_base);
@@ -95,9 +97,16 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL"); 
                 int tamanio = config_get_int_value(config_archivo,"TAMANIO"); 
                 
-                int tamanio_bloques_asignados = calcular_bloques(tamanio,tam_bloque) * tam_bloque;
+                int puntero_inicial = bloque_inicial*tam_bloque;
 
+                int tamanio_bloques_asignados = calcular_bloques(tamanio,tam_bloque) * tam_bloque;
+                
                 liberar_bloques(bloque_inicial,tamanio_bloques_asignados,tam_bloque);
+                
+                //PODRIA NO IR DEPENDE DE LO QUE RESPONDAN EN EL FORO
+                memset(block_fs+puntero_inicial,0,tamanio_bloques_asignados);
+                msync(block_fs,tam_block_fs,MS_SYNC);
+
                 eliminar_nombre_metadatas(nombre,ruta_archivo_madre,path_base);
                 remove(ruta_archivo);
                 config_destroy(config_archivo);
@@ -108,6 +117,8 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
             }
             case IO_FS_TRUNCATE:
             {
+                //COMPROBAR SI EL ARCHIVO EXISTE, SI NO EXISTE NO HACER NADA
+                
                 //64bytes - 20
                 char* nombre = readline("INGRESA NOMBRE DEL ARCHIVO A TRUNCAR :");
                 char* tamanio_truncar = readline("INGRESA TAMANIO A TRUNCAR EN BYTES:");
@@ -124,13 +135,20 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 config_destroy(config_archivo);
                 //ESCENARIOS
                 int tamanio_total_asignado = calcular_bloques(tamanio,tam_bloque) * tam_bloque;
-                //printf("TAMANIO TOTAL ASIGNADO: %d",tamanio_total_asignado);
+                
                 
                 logear_truncate(logger,pid,nombre,tamanio_truncate);
-
-                //FALTA TENER EN CUENTA SI SE QUIERE ACHICAR EL ARCHIVO
+                //150 - 130 //64-128-192
+                //20
+                //FALTA TENER EN CUENTA SI SE QUIERE ACHICAR EL ARCHIVO -65
                 if(tamanio_truncate<=tamanio_total_asignado)
                 {
+                    int bloques_totales = calcular_bloques(tamanio_total_asignado,tam_bloque);
+                    int bloques_quitar = bloques_totales - calcular_bloques(tamanio_truncate,tam_bloque);
+                    int bloque_inicial_a_quitar = bloques_totales - bloques_quitar + bloque_inicial;
+                    int tamanio_quitar = bloques_quitar*tam_bloque;
+                    
+                    liberar_bloques(bloque_inicial_a_quitar,tamanio_quitar,tam_bloque);
                     printf("\nALCANZA CON LO QUE YA TENES\n");
                     modificar_metadata(nombre,path_base,tamanio_truncate,bloque_inicial);
                     //FALTA DESTRUIR EL CONFIG
@@ -211,15 +229,86 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
             }
             case IO_FS_WRITE:
             {
+
+                //ESCRIBE EN FILE SYSTEM ALGO TRAIDO DESDE MEMORIA
+                char* nombre_archivo = readline("Ingrese nombre archivo a escribir: ");
+                char* numero_escribir = readline("Ingrese numero escribir: ");
+                char* puntero_string = readline("Ingrese el numero de puntero: ");
+                int puntero = atoi(puntero_string);
+                //PUNTERO 2
+                char* ruta_archivo = string_new();
+                string_append(&ruta_archivo,path_base);
+                string_append(&ruta_archivo,"/");
+                string_append(&ruta_archivo,nombre_archivo);
+                //190
+                //190*TAM_BLOQUE+PUNTERO
+                int numero = atoi(numero_escribir);
+
+                uint32_t numero_guardar = (uint32_t) numero;
+
+                t_config* config_archivo = config_create(ruta_archivo);
+                int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL");
+                int tamanio = config_get_int_value(config_archivo,"TAMANIO");
+                config_destroy(config_archivo);
+
+                int puntero_fisico = bloque_inicial*tam_bloque+puntero;
+                uint32_t* puntero_numero_guardar = &numero_guardar;
+                memcpy(block_fs+puntero_fisico,puntero_numero_guardar,sizeof(uint32_t));
+                msync(block_fs,tam_block_fs,MS_SYNC);
+
+                free(nombre_archivo);
+                free(numero_escribir);
+                free(puntero_string);
+                free(ruta_archivo);
+
                 break;
             }
             case IO_FS_READ:
             {
+                char* nombre_archivo = readline("Ingrese nombre archivo a leer: ");
+                char* puntero_string = readline("Ingrese el numero de puntero: ");
+                int puntero = atoi(puntero_string);
+                //PUNTERO 2
+                char* ruta_archivo = string_new();
+                string_append(&ruta_archivo,path_base);
+                string_append(&ruta_archivo,"/");
+                string_append(&ruta_archivo,nombre_archivo);
+                //190
+                //190*TAM_BLOQUE+PUNTERO
+                
+
+                uint32_t numero_mostrar = 0;
+                uint32_t* puntero_numero_mostrar = &numero_mostrar;
+
+                t_config* config_archivo = config_create(ruta_archivo);
+                int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL");
+                int tamanio = config_get_int_value(config_archivo,"TAMANIO");
+                config_destroy(config_archivo);
+
+                int puntero_fisico = bloque_inicial*tam_bloque+puntero;
+               
+                memcpy(puntero_numero_mostrar,block_fs+puntero_fisico,sizeof(uint32_t));
+
+                
+
+                log_info(logger,"EL NUMERO GUARDADO ES: %d",numero_mostrar);
+
+                free(nombre_archivo);
+                free(puntero_string);
+                free(ruta_archivo);
+
                 break;
             }
             case 30:
             {
                 imprimir_bitmap();
+                break;
+            }
+            case 31:
+            {
+                remove("./file_system/bitmap.dat");
+                remove("./file_system/bloques.dat");
+                remove("./file_system/archivo_madr3.txt");
                 break;
             }
             default:
@@ -390,9 +479,9 @@ void asignar_bloque(int bloque_a_asignar)
 //EL TAMANIO DE LOS METADATAS SIEMPRE SERA MULTIPLO DEL TAMANIO DEL BLOQUE?? PREGUNTAR FORO
 void liberar_bloques(int bloque_inicial,int tamanio,int tam_bloque)
 {
-    int tam_total = bloque_inicial + tamanio / tam_bloque;
+    int bloque_final = bloque_inicial + tamanio / tam_bloque;
     int tam_bitmap = bitarray_get_max_bit(bitmap_fs);
-    for(;bloque_inicial<tam_total;bloque_inicial++)
+    for(;bloque_inicial<bloque_final;bloque_inicial++)
     {
         bitarray_clean_bit(bitmap_fs,bloque_inicial);
         msync(data_bitmap,tam_bitmap,MS_SYNC);
