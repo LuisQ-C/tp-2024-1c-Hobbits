@@ -413,8 +413,8 @@ int enviar_solicitud_dial_fs_read_write(int pid, char* nombre_archivo,int* taman
     return err;
 }
 
-int enviar_solicitud_dial_fs(int pid, char* nombre_archivo,int* tamanio, t_list* direcciones_fisicas, int cant_direcciones, int fd_interfaz , int tipo_interfaz){
-    t_paquete* paquete = crear_paquete(tipo_interfaz);
+int enviar_solicitud_dial_fs(int pid, char* nombre_archivo,int* tamanio, t_list* direcciones_fisicas, int cant_direcciones, int fd_interfaz , int tipo_solicitud){
+    t_paquete* paquete = crear_paquete(tipo_solicitud);
     t_porcion_dato auxiliar;
     agregar_a_paquete(paquete,&pid,sizeof(int));
     agregar_a_paquete(paquete, nombre_archivo, strlen(nombre_archivo)+1);

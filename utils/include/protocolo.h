@@ -215,5 +215,6 @@ int enviar_solicitud_stdin_stdout(int pid, t_list* direcciones_fisicas , int fd_
 int enviar_solicitud_dial_fs_create_delete(int pid, char* nombre_archivo , int fd_interfaz, int tipo_interfaz);
 int enviar_solicitud_dial_fs_truncate(int pid, char* nombre_archivo,int* tamanio, int fd_interfaz , int tipo_interfaz);
 int enviar_solicitud_dial_fs_read_write(int pid, char* nombre_archivo,int* tamanio, t_list* direcciones_fisicas, int cant_direcciones, int fd_interfaz , int tipo_interfaz);
+int enviar_solicitud_dial_fs(int pid, char* nombre_archivo,int* tamanio, t_list* direcciones_fisicas, int cant_direcciones, int fd_interfaz , int tipo_solicitud);
 
 #endif

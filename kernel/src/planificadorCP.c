@@ -295,7 +295,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             if(validez)
             {
                 t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
-                pcb_a_actualizar->estado = BLOCKED;
+                pcb_a_actualizar->estado = IO_FS_CREATE;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
                 if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
@@ -339,7 +339,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             if(validez)
             {
                 t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
-                pcb_a_actualizar->estado = BLOCKED;
+                pcb_a_actualizar->estado = IO_FS_DELETE;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
                 if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
@@ -385,7 +385,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             {
                 // t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 8, cant_direcciones);
                 t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
-                pcb_a_actualizar->estado = BLOCKED;
+                pcb_a_actualizar->estado = IO_FS_TRUNCATE;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
                 if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
@@ -434,7 +434,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             {
                 t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 9, cant_direcciones);
                 t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
-                pcb_a_actualizar->estado = BLOCKED;
+                pcb_a_actualizar->estado = IO_FS_WRITE;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
                 if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){
@@ -483,7 +483,7 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             {
                 t_list* direcciones = list_slice_and_remove(pcb_con_motivo, 9, cant_direcciones);
                 t_list_io* interfaz_buscada = slist_buscar_interfaz(nombre_interfaz); 
-                pcb_a_actualizar->estado = BLOCKED;
+                pcb_a_actualizar->estado = IO_FS_READ;
                 t_elemento_io_fs* nueva_solicitud_dial_fs= malloc(sizeof(t_elemento_io_fs));
                 //nueva_solicitud_stdin->cola_destino=READY;
                 if(strcmp(algoritmo, "VRR") == 0 && pcb_a_actualizar->quantum <= 0){

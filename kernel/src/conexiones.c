@@ -312,10 +312,13 @@ void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
         {   
 
             solicitud_dial_fs = peek_elemento_cola_io(interfaz);
-            int cant_direcciones = 0;
+            int cant_direcciones = list_is_empty(solicitud_dial_fs->direcciones_fisicas) ? 0 : list_size(solicitud_dial_fs->direcciones_fisicas);
+
+            err_send = enviar_solicitud_dial_fs(solicitud_dial_fs->pcb->pid, solicitud_dial_fs->nombre_archivo, solicitud_dial_fs->tamanio, solicitud_dial_fs->direcciones_fisicas, cant_direcciones, interfaz->fd_interfaz, solicitud_dial_fs->pcb->estado);
 
             
 
+            /*
             if(IO_FS_CREATE == tipo_interfaz)//nombrea rch
                 err_send = enviar_solicitud_dial_fs_create_delete(solicitud_dial_fs->pcb->pid,solicitud_dial_fs->nombre_archivo,interfaz->fd_interfaz,tipo_interfaz);
             
@@ -334,7 +337,7 @@ void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
             if(IO_FS_READ == tipo_interfaz){
                 cant_direcciones = list_size(solicitud_dial_fs->direcciones_fisicas);
                 err_send = enviar_solicitud_dial_fs_read_write(solicitud_dial_fs->pcb->pid,solicitud_dial_fs->nombre_archivo,solicitud_dial_fs->tamanio,solicitud_dial_fs->direcciones_fisicas,cant_direcciones,interfaz->fd_interfaz,tipo_interfaz);
-            }
+            }*/
             
 
             if(err_send == -1){
