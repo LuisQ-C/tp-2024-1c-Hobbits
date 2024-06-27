@@ -1,6 +1,7 @@
 #include "../include/conexiones.h"
 
 extern t_log* logger;
+extern t_log* logger_obligatorio;
 extern sem_t planificacion_blocked_iniciada;
 extern sem_t proceso_en_cola_ready;
 
@@ -314,31 +315,7 @@ void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
             solicitud_dial_fs = peek_elemento_cola_io(interfaz);
             int cant_direcciones = list_is_empty(solicitud_dial_fs->direcciones_fisicas) ? 0 : list_size(solicitud_dial_fs->direcciones_fisicas);
 
-            err_send = enviar_solicitud_dial_fs(solicitud_dial_fs->pcb->pid, solicitud_dial_fs->nombre_archivo, solicitud_dial_fs->tamanio, solicitud_dial_fs->direcciones_fisicas, cant_direcciones, interfaz->fd_interfaz, solicitud_dial_fs->pcb->estado);
-
-            
-
-            /*
-            if(IO_FS_CREATE == tipo_interfaz)//nombrea rch
-                err_send = enviar_solicitud_dial_fs_create_delete(solicitud_dial_fs->pcb->pid,solicitud_dial_fs->nombre_archivo,interfaz->fd_interfaz,tipo_interfaz);
-            
-            if(IO_FS_DELETE == tipo_interfaz)
-                err_send = enviar_solicitud_dial_fs_create_delete(solicitud_dial_fs->pcb->pid,solicitud_dial_fs->nombre_archivo,interfaz->fd_interfaz,tipo_interfaz);
-
-            if(IO_FS_TRUNCATE == tipo_interfaz){
-                err_send = enviar_solicitud_dial_fs_truncate(solicitud_dial_fs->pcb->pid,solicitud_dial_fs->nombre_archivo,solicitud_dial_fs->tamanio,interfaz->fd_interfaz,tipo_interfaz);
-            }
-            //CAMBIAR A LOS TIPOS QUE NECESITE JUNTO CON EL ENVIAR
-            if(IO_FS_WRITE == tipo_interfaz){//DIRECCCIONES ACA
-                cant_direcciones = list_size(solicitud_dial_fs->direcciones_fisicas);
-                err_send = enviar_solicitud_dial_fs_read_write(solicitud_dial_fs->pcb->pid,solicitud_dial_fs->nombre_archivo,solicitud_dial_fs->tamanio,solicitud_dial_fs->direcciones_fisicas,cant_direcciones,interfaz->fd_interfaz,tipo_interfaz);
-            }
-            
-            if(IO_FS_READ == tipo_interfaz){
-                cant_direcciones = list_size(solicitud_dial_fs->direcciones_fisicas);
-                err_send = enviar_solicitud_dial_fs_read_write(solicitud_dial_fs->pcb->pid,solicitud_dial_fs->nombre_archivo,solicitud_dial_fs->tamanio,solicitud_dial_fs->direcciones_fisicas,cant_direcciones,interfaz->fd_interfaz,tipo_interfaz);
-            }*/
-            
+            err_send = enviar_solicitud_dial_fs(solicitud_dial_fs->pcb->pid, solicitud_dial_fs->nombre_archivo, solicitud_dial_fs->tamanio, solicitud_dial_fs->direcciones_fisicas, cant_direcciones, interfaz->fd_interfaz, solicitud_dial_fs->puntero, solicitud_dial_fs->codOp);
 
             if(err_send == -1){
                 log_info(logger, "SE DESCONECTA LA INTERFAZ %s", interfaz->nombre_interfaz);    
@@ -365,8 +342,11 @@ void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
         if(!cola_io_is_empty(interfaz))
         {
             pop_elemento_cola_io(interfaz);
+            free(solicitud_dial_fs->nombre_archivo);
             mandar_pcb_cola_correspondiente(solicitud_dial_fs->pcb,solicitud_dial_fs->cola_destino);
-            list_destroy_and_destroy_elements(solicitud_dial_fs->direcciones_fisicas,(void*) liberar_elemento);
+            if(!list_is_empty(solicitud_dial_fs->direcciones_fisicas))
+                list_destroy_and_destroy_elements(solicitud_dial_fs->direcciones_fisicas,(void*) liberar_elemento);
+            
             free(solicitud_dial_fs);
         }
 
@@ -382,20 +362,20 @@ void mandar_pcb_cola_correspondiente(t_pcb* pcb, int cola_destino)
 {
     if(cola_destino == READY)
     {
-        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", pcb->pid);
+        log_info(logger_obligatorio, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", pcb->pid);
         cambiar_a_ready(pcb);
         sem_post(&proceso_en_cola_ready);
     }
     else if(cola_destino == READYPLUS)
     {
-        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY+", pcb->pid);
+        log_info(logger_obligatorio, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY+", pcb->pid);
         cambiar_a_ready_plus(pcb);
         sem_post(&proceso_en_cola_ready);
     }
     else if(cola_destino == COLA_EXIT)
     {
         squeue_push(lista_procesos_exit,pcb);
-        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: EXIT", pcb->pid);
+        log_info(logger_obligatorio, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: EXIT", pcb->pid);
     }
     else if(cola_destino == COLA_EXIT_USUARIO)
     {

@@ -42,8 +42,10 @@ typedef struct
 typedef struct
 {
     int cola_destino;
+    int codOp;
     char* nombre_archivo;
-    int* tamanio;
+    int tamanio;
+    int puntero;
     t_list* direcciones_fisicas;
     t_pcb* pcb;
 } t_elemento_io_fs;
