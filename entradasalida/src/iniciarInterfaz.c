@@ -16,12 +16,14 @@ void iniciarInterfaz(char* nombreDeInterfaz,  t_config* config, int fd_conexion_
     resultado_handshake_kernel = mandarHandshake(logger,fd_conexion_kernel,"MODULO KERNEL",tipoYnombreDeInterfaz);
     resultado_handshake_memoria = mandarHandshake(logger,fd_conexion_memoria,"MODULO MEMORIA",tipoYnombreDeInterfaz);
 
+    free(tipoYnombreDeInterfaz);
+    
     if(resultado_handshake_kernel == HANDSHAKE_DENEGADO || resultado_handshake_memoria == HANDSHAKE_DENEGADO)
     {
         return;
     }
 
-    free(tipoYnombreDeInterfaz);
+    
 
     if (!(strcmp(tipoDeInterfaz, "GENERICA")))
     {
