@@ -297,6 +297,7 @@ void io_fs_write_read(t_pcb* pcb_a_enviar,char* nombre_interfaz,char* nombre_arc
     //LUEGO EL NOMBRE DE LA INTERFAZ
     agregar_a_paquete(paquete,nombre_interfaz,strlen(nombre_interfaz)+1);
     agregar_a_paquete(paquete,nombre_archivo,strlen(nombre_archivo)+1);
+    agregar_a_paquete(paquete,&tamanio_dato,sizeof(int));
     agregar_a_paquete(paquete,&puntero_archivo,sizeof(int));
     //SOLICITO LOS MARCOS
     aniadir_porciones_dato(paquete,pcb_a_enviar->pid,direccion_logica,tamanio_dato,fd_memoria);

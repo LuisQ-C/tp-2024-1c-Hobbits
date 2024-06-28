@@ -13,16 +13,13 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
     int retraso_compactacion = config_get_int_value(config,"RETRASO_COMPACTACION");
     char* path_base = config_get_string_value(config,"PATH_BASE_DIALFS");
     int tam_block_fs = cant_bloques * tam_bloque;
-
-    //IO FS TRUNCATE ARCHIVO2.TXT 4069
-    //ARCHIVOS_CREADOS = ARCHIVO1.TXT -  ARCHIVO2.TXT - A3 - A4;
+    
     FILE* arch_bitmap = NULL;
     FILE* arch_bloques = NULL;
-    //t_bitarray* bitmap_fs;
 
     char* ruta_bitmap = string_new();
     char* ruta_bloques = string_new();
-    char* ruta_archivo_madre = string_new();//falta liberarlo
+    char* ruta_archivo_madre = string_new();//falta liberarlo, no se donde
     string_append(&ruta_bitmap,path_base);
     string_append(&ruta_bloques,path_base);
     string_append(&ruta_archivo_madre,path_base);
@@ -49,80 +46,123 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
 
     while(1)
     {
-        //int opcode = recibir_operacion(fd_kernel);
-        char* codop = readline("ingresa opcode 19(c) 20(d) 21(t) 22(w) 23(r) >");
+        int opcode = recibir_operacion(fd_kernel);
+        t_list* paquete_recibido;
+        /*char* codop = readline("ingresa opcode 19(c) 20(d) 21(t) 22(w) 23(r) >");
         int opcode = atoi(codop);
-        int pid = 1; //SE RECIBE DEL KERNEL
+        int pid = 1; */
         //char* nombre = "arch1.txt"; // TXT??
         switch (opcode)
         {
             case IO_FS_CREATE:
             {
-                //SI EL ARCHIVO YA EXISTE NO HAGA NADA, SIMPLEMENTE ESPERAR EL TIEMPO TRABAJO Y DEVOLVERLE OK AL KERNEL
-                char* nombre = readline("INGRESA NOMBRE AL ARCHIVO :");
+                paquete_recibido = recibir_paquete(fd_kernel);
+                int* pid_recibido = list_get(paquete_recibido,0);
+                char* nombre_recibido = list_get(paquete_recibido,1);
+                //GUARDO LO RECIBIDO EN VARIABLES LOCALES
+                int pid = *pid_recibido;
+                char* nombre = string_duplicate(nombre_recibido);
+                //LOGEO OPERACION Y CREACION ARCHIVO
+                logear_operacion_dialFS(logger,pid,IO_FS_CREATE);
+                logear_creacion_archivo(logger,pid,nombre);
+                //ARMO RUTA ARCHIVO
                 char* ruta_archivo = string_new();
                 string_append(&ruta_archivo,path_base);
                 string_append(&ruta_archivo,"/");
-                string_append(&ruta_archivo,nombre); // SERA TXT??
+                string_append(&ruta_archivo,nombre);
                 
-                FILE* archivo_creado = fopen(ruta_archivo,"w+"); //MANEJAR SI SE ABRE UN ARCHVO YA CREADO
-                t_config* config_archivo = config_create(ruta_archivo);
-                int bloque_inicial = bloque_libre(cant_bloques); //MANEJAR SI NO HAY ESPACIO PARA UN NUEVO ARCHIVO
-                char* primer_bloque = string_itoa(bloque_inicial);
-                asignar_bloque(bloque_inicial);
-                agregar_nombre_metadatas(nombre,ruta_archivo_madre);
-                config_set_value(config_archivo,"BLOQUE_INICIAL",primer_bloque);
-                config_set_value(config_archivo,"TAMANIO","0");
-                config_save_in_file(config_archivo,ruta_archivo);
+                
+                int bloque_inicial = bloque_libre(cant_bloques);
 
-                config_destroy(config_archivo);
-                fclose(archivo_creado);
+                if(bloque_inicial != -1 && access(ruta_archivo,F_OK) == -1)
+                {
+                    FILE* archivo_creado = fopen(ruta_archivo,"w+");
+                    t_config* config_archivo = config_create(ruta_archivo);
+                    char* primer_bloque = string_itoa(bloque_inicial);
+                    asignar_bloque(bloque_inicial);
+                    agregar_nombre_metadatas(nombre,ruta_archivo_madre);
+                    config_set_value(config_archivo,"BLOQUE_INICIAL",primer_bloque);
+                    config_set_value(config_archivo,"TAMANIO","0");
+                    config_save_in_file(config_archivo,ruta_archivo);
 
+                    config_destroy(config_archivo);
+                    fclose(archivo_creado);
+
+                    free(primer_bloque);
+                }
                 free(ruta_archivo);
                 free(nombre);
-                free(primer_bloque);
+                list_destroy_and_destroy_elements(paquete_recibido,(void*) liberar_elemento);
+
+                usleep(tiempo_trabajo*1000);
+                int respuesta = INTERFAZ_LISTA;
+                send(fd_kernel,&respuesta,sizeof(int),0);
+                
                 break;
             }
             case IO_FS_DELETE:
             {
-                //SI EL ACCES NO LO DETECTA, NO HACER NADA, DEVOLVERLE OK AL KERNEL
-                char* nombre = readline("INGRESA NOMBRE DEL ARHCIVO A ELIMINAR :");
+                paquete_recibido = recibir_paquete(fd_kernel);
+                int* pid_recibido = list_get(paquete_recibido,0);
+                char* nombre_recibido = list_get(paquete_recibido,1);
+                //GUARDO LO RECIBIDO EN VARIABLES LOCALES
+                int pid = *pid_recibido;
+                char* nombre = string_duplicate(nombre_recibido);
+                //LOGEO OPERACION Y ELIMINACION ARCHIVO
+                logear_operacion_dialFS(logger,pid,IO_FS_DELETE);
+                logear_eliminacion_archivo(logger,pid,nombre);
+                //ARMO LA RUTA DEL ARCHIVO
                 char* ruta_archivo = string_new();
                 string_append(&ruta_archivo,path_base);
                 string_append(&ruta_archivo,"/");
                 string_append(&ruta_archivo,nombre);
 
-                t_config* config_archivo = config_create(ruta_archivo);
-                int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL"); 
-                int tamanio = config_get_int_value(config_archivo,"TAMANIO"); 
+                if(access(ruta_archivo,F_OK) != -1)
+                {
+                    t_config* config_archivo = config_create(ruta_archivo);
+                    int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL"); 
+                    int tamanio = config_get_int_value(config_archivo,"TAMANIO"); 
                 
-                int puntero_inicial = bloque_inicial*tam_bloque;
+                    int puntero_inicial = bloque_inicial*tam_bloque;
 
-                int tamanio_bloques_asignados = calcular_bloques(tamanio,tam_bloque) * tam_bloque;
+                    int tamanio_bloques_asignados = calcular_bloques(tamanio,tam_bloque) * tam_bloque;
 
-                liberar_bloques(bloque_inicial,tamanio_bloques_asignados,tam_bloque);
+                    liberar_bloques(bloque_inicial,tamanio_bloques_asignados,tam_bloque);
                 
-                //PODRIA NO IR DEPENDE DE LO QUE RESPONDAN EN EL FORO
-                memset(block_fs+puntero_inicial,0,tamanio_bloques_asignados);
-                msync(block_fs,tam_block_fs,MS_SYNC);
+                    //SE SETEA TODO EN 0 EL ESPACIO LIBERADO DE BLOQUES
+                    memset(block_fs+puntero_inicial,0,tamanio_bloques_asignados);
+                    msync(block_fs,tam_block_fs,MS_SYNC);
 
-                eliminar_nombre_metadatas(nombre,ruta_archivo_madre,path_base);
-                remove(ruta_archivo);
-                config_destroy(config_archivo);
+                    eliminar_nombre_metadatas(nombre,ruta_archivo_madre,path_base);
+                    remove(ruta_archivo);
+                    config_destroy(config_archivo);
+                }
+                
 
                 free(ruta_archivo);
                 free(nombre);
+                list_destroy_and_destroy_elements(paquete_recibido,(void*) liberar_elemento);
+
+                usleep(tiempo_trabajo*1000);
+                int respuesta = INTERFAZ_LISTA;
+                send(fd_kernel,&respuesta,sizeof(int),0);
+
                 break;
             }
             case IO_FS_TRUNCATE:
             {
-                //COMPROBAR SI EL ARCHIVO EXISTE, SI NO EXISTE NO HACER NADA
-                
-                //64bytes - 20
-                char* nombre = readline("INGRESA NOMBRE DEL ARCHIVO A TRUNCAR :");
-                char* tamanio_truncar = readline("INGRESA TAMANIO A TRUNCAR EN BYTES:");
-                int tamanio_truncate = atoi(tamanio_truncar);
-                free(tamanio_truncar);
+                //COMPROBAR SI EL ARCHIVO EXISTE, SI NO EXISTE NO HACER NADA - NO ESTA HECHO, NO QUIERO AGREGAR OTRO IF XD
+                paquete_recibido = recibir_paquete(fd_kernel);
+                int* pid_recibido = list_get(paquete_recibido,0);
+                char* nombre_recibido = list_get(paquete_recibido,1);
+                int* tamanio_recibido = list_get(paquete_recibido,2);
+                //GUARDO LO RECIBIDO EN VARIABLES LOCALES
+                int pid = *pid_recibido;
+                char* nombre = string_duplicate(nombre_recibido);
+                int tamanio_truncate = *tamanio_recibido;
+                //LOGEO OPERACION A REALIZAR
+                logear_operacion_dialFS(logger,pid,IO_FS_TRUNCATE);
+                //ARMO RUTA ARCHIVO
                 char* ruta_archivo = string_new();
                 string_append(&ruta_archivo,path_base);
                 string_append(&ruta_archivo,"/");
@@ -132,14 +172,10 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                 int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL"); 
                 int tamanio = config_get_int_value(config_archivo,"TAMANIO");
                 config_destroy(config_archivo);
-                //ESCENARIOS
+                //CALCULO EL TAMANIO TOTAL CONTANDO TODOS LOS BLOQUES QUE TENGO ASIGNADO
                 int tamanio_total_asignado = calcular_bloques(tamanio,tam_bloque) * tam_bloque;
-                
-                
-                logear_truncate(logger,pid,nombre,tamanio_truncate);
-                //150 - 130 //64-128-192
-                //20
-                //FALTA TENER EN CUENTA SI SE QUIERE ACHICAR EL ARCHIVO -65
+            
+                //SI DESEAN ACHICAR EL TAMANIO ENTRA AL IF, SE ANALIZA SI SE QUITAN BLOQUES O NO PARTIENDO DESDE EL ULTIMO
                 if(tamanio_truncate<=tamanio_total_asignado)
                 {
                     int bloques_totales = calcular_bloques(tamanio_total_asignado,tam_bloque);
@@ -148,33 +184,40 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                     int tamanio_quitar = bloques_quitar*tam_bloque;
                     
                     liberar_bloques(bloque_inicial_a_quitar,tamanio_quitar,tam_bloque);
-                    printf("\nALCANZA CON LO QUE YA TENES\n");
+                    //printf("\nALCANZA CON LO QUE YA TENES\n");
                     modificar_metadata(nombre,path_base,tamanio_truncate,bloque_inicial);
-                    //FALTA DESTRUIR EL CONFIG
+                    logear_truncate(logger,pid,nombre,tamanio_truncate); //VA EL TAMANIO QUE ME MANDAN O LA RESTA?
+
                 }
+                //SI NECESITO MAS TAMANIO Y NO ES SUFICIENTE CON LOS BLOQUES QUE CUENTO ENTRO AL ELSE, SE ANALIZAN 2 CASOS
+                //1- SI HAY ESPACIO CONTIGUO SOLO MODIFICO EL BITMAP (IF)
+                //2- SI NO HAY ESPACIO CONTIGUO, HAGO LA COMPACTACION Y COLOCO EL ARCHIVO AL FINAL CON SUS NUEVOS BLOQUES (ELSE)
                 else
                 {
                     int tamanio_necesario = tamanio_truncate - tamanio_total_asignado;
                     int tam_contiguo_en_bytes = espacio_contiguo_bitmap(bloque_inicial,tamanio_total_asignado,tam_bloque,cant_bloques) * tam_bloque;
-                    printf("\nTAMANIO NECESARIO: %d\n",tamanio_necesario);
-                    printf("\nTAMANIO CONTIGUO: %d\n",tam_contiguo_en_bytes);
+                    //printf("\nTAMANIO NECESARIO: %d\n",tamanio_necesario);
+                    //printf("\nTAMANIO CONTIGUO: %d\n",tam_contiguo_en_bytes);
                     if(tam_contiguo_en_bytes>=tamanio_necesario)
                     {
-                        printf("\nHAY ESPACIO CONTIGUO\n");
+                        //printf("\nHAY ESPACIO CONTIGUO\n");
                         int primer_bloque_libre_asignar = bloque_inicial + calcular_bloques(tamanio,tam_bloque);
                         asignar_bloques_adicionales(primer_bloque_libre_asignar,calcular_bloques(tamanio_necesario,tam_bloque)); //FALTA HACER FUNCION
                         modificar_metadata(nombre,path_base,tamanio_truncate,bloque_inicial);
+                        logear_truncate(logger,pid,nombre,tamanio_truncate);
                     }
                     else
                     {
-                        printf("\nSE NECESITA COMPACTAR\n");
+                        //printf("\nSE NECESITA COMPACTAR\n");
                         //GUARDO EN UN AUXILIAR LOS DATOS DEL ARCHIVO A TRUNCAR
                         int puntero_inicial = calcular_puntero_inicial(bloque_inicial,tam_bloque);
                         void* copia_datos_archivo = malloc(tamanio);
                         memcpy(copia_datos_archivo,block_fs+puntero_inicial,tamanio);
                         //INICIO COMPACTACION
-                        //LOGEO INICIO
+                        logear_inicio_compactacion(logger,pid);
                         iniciar_compactacion(ruta_archivo_madre,path_base,tam_bloque,tam_block_fs,nombre);
+                        //FINALIZADA LA COMPACTACION, BUSCO EL PRIMERO BLOQUE LIBRE, LO QUE ME HABIA GUARDADO COMO
+                        //AUXILIAR LO COPIO EN LA NUEVA UBICACION Y LE ASIGNO NUEVOS BLOQUES AL PROCESO EN EL BITMAP
                         int nuevo_bloque_inicial = bloque_libre(cant_bloques);
                         int nuevo_puntero_inicial = calcular_puntero_inicial(nuevo_bloque_inicial,tam_bloque);
 
@@ -184,139 +227,158 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                         modificar_metadata(nombre,path_base,tamanio_truncate,nuevo_bloque_inicial);
                         asignar_bloques_adicionales(nuevo_bloque_inicial,calcular_bloques(tamanio_truncate,tam_bloque));
                         //ESPERO DELAY
+                        usleep(retraso_compactacion*1000);
                         //LOGEO LA FINALIZACION DE COMPACTACION
-                        //FINALIZA LA COMPACTACION, ENTONCES BUSCO EL PRIMER MARCO LIBRE, ASIGNO BLOQUES ADICIONALES Y COPIO LO QUE TENGO EN EL AUXILIAR
-
+                        logear_fin_compactacion(logger,pid);
+                        //LOGEO EL TRUNCATE
+                        logear_truncate(logger,pid,nombre,tamanio_truncate);
                     }
                 }
 
                 free(nombre);
                 free(ruta_archivo);
+                list_destroy_and_destroy_elements(paquete_recibido,(void*) liberar_elemento);
 
-
-                //-> TRUNCATE QUE ALCANZA CON LOS BLOQUES QUE YA TIENE EL ARCHIVO -> SOLO LOGEAR EL NUEVO TAMANIO y cambiar el metadata
-                //-> TRUCATE QUE NO ALCANZA CON LOS BLOQUES QUE YA TIENE
-                //-> TIENE ESPACIO CONTIGUO SUFICIENTE -> MODIFICO EL METADATA, BITMAP Y LO LOGEO
-                //-> NO TIENE ESPACIO CONTIGUO SUFICIENTE -> GUARDO COPIA DEL QUE QUIERO SACAR -> HAGO COMPACTACION
-                //-> VUELVO Y EL PRIMER MARCO LIBRE QUE ENCUENTRE LO ASIGNO Y GUARDO TODO AHI CON MEMCPY DESDE LA COPIA
-
-               /* t_list* metadatas_atributos = obtener_nombres_metadatas_con_atributos(ruta_archivo_madre,path_base);
-                iterar_imprimir_atributos(metadatas_atributos);
-                list_destroy_and_destroy_elements(metadatas_atributos,(void*)liberar_t_metadata);*/
-                
-                //L-1-1-L-L-2-2-L-3
-                //TAM_BLOQUE 64 DEL CONFIG
-                //TAM ACTUAL DEL ARCHIVO -> ARCHIVO METADATA -> 128
-                //TRUNCATE 2 190 -> NECESITAS 2 BLOQUES
-                //TOTAL ESPACIO CONTIGUO: 1-> NO ALCANZA PARA EVITAR COMPACTACION
-                //TOTAL ESPACIO TOTAL: 4 -> NECESITAS COMPACTAR
-
-                //VOID* DATOS_2 = ACA GUARDARIAS TODOS LOS DATOS ACTUALES DEL ARCHIVO 2
-                //MEMCPY DESDE EL INICIO AL FINAL
-
-                //ARCHIVO BLOQUE_INICIAL TAMANIO
-                // 1-1-2 3-8-1
-
-                // ACCEDER AL 1
-                // CAMBIAR SU METADATA -> BLOQUE INICIAL = 0 TAMANIO = 2
-                // MEMCPY PARA MOVER LOS DATOS DEL 1
-
-                //1-1-3-2-2-2-2-L-L
-                //4 PODES METER EL ARCHIVO 2
+                usleep(tiempo_trabajo*1000);
+                int respuesta = INTERFAZ_LISTA;
+                send(fd_kernel,&respuesta,sizeof(int),0);
 
                 break;
             }
             case IO_FS_WRITE:
             {
-
-                //ESCRIBE EN FILE SYSTEM ALGO TRAIDO DESDE MEMORIA
-                char* nombre_archivo = readline("Ingrese nombre archivo a escribir: ");
-                char* numero_escribir = readline("Ingrese numero escribir: ");
-                char* puntero_string = readline("Ingrese el numero de puntero: ");
-                int puntero = atoi(puntero_string);
-                //PUNTERO 2
+                paquete_recibido = recibir_paquete(fd_kernel);
+                int* pid_recibido = list_get(paquete_recibido,0);
+                char* nombre_recibido = list_get(paquete_recibido,1);
+                int* tamanio_dato_recibido = list_get(paquete_recibido,2);
+                int* puntero_recibido = list_get(paquete_recibido,3);
+                //GUARDO LO RECIBIDO EN VARIABLES LOCALES MENOS LAS DIRECCIONES FISICAS
+                int pid = *pid_recibido;
+                char* nombre = string_duplicate(nombre_recibido);
+                int tamanio_dato = *tamanio_dato_recibido;
+                int puntero = *puntero_recibido;
+                //LOGEAR OPERACION
+                logear_operacion_dialFS(logger,pid,IO_FS_WRITE);
+                //ARMO RUTA ARCHIVO
                 char* ruta_archivo = string_new();
                 string_append(&ruta_archivo,path_base);
                 string_append(&ruta_archivo,"/");
-                string_append(&ruta_archivo,nombre_archivo);
-                //190
-                //190*TAM_BLOQUE+PUNTERO
-                int numero = atoi(numero_escribir);
+                string_append(&ruta_archivo,nombre);
+                //OBTENGO DE MEMORIA LOS FRAGMENTOS Y REARMO EL DATO
+                void* dato_entero = malloc(tamanio_dato);
+                int base, direccionFisica, tamanio;
 
-                uint32_t numero_guardar = (uint32_t) numero;
+                for(int i=4; i<list_size(paquete_recibido); i++)
+                {
+                    t_porcion_dato* datoAenviar = list_get(paquete_recibido,i);
+                    t_paquete* infoAenviar = crear_paquete(LECTURA);
+                    base= datoAenviar->base;
+                    direccionFisica= datoAenviar->direccion_fisica;
+                    tamanio= datoAenviar-> tamanio;
+                
+                    agregar_a_paquete(infoAenviar,&pid,sizeof(int));
+                    agregar_a_paquete(infoAenviar,&tamanio,sizeof(int));
+                    agregar_a_paquete(infoAenviar,&direccionFisica,sizeof(int));
+                    enviar_paquete(infoAenviar,fd_memoria);
+                    eliminar_paquete(infoAenviar);
 
+                    void* fragmento_recibido = malloc(tamanio);
+                
+                    recv(fd_memoria, fragmento_recibido, tamanio,MSG_WAITALL);
+
+                    memcpy(dato_entero+base,fragmento_recibido,tamanio);
+
+                    free(fragmento_recibido);
+                }
+                logear_escritura_archivo(logger,pid,nombre,tamanio_dato,puntero);
+                //OBTENGO LOS DATOS DEL CONFIG DEL ARCHIVO
                 t_config* config_archivo = config_create(ruta_archivo);
                 int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL");
-                int tamanio = config_get_int_value(config_archivo,"TAMANIO");
+                //int tamanio = config_get_int_value(config_archivo,"TAMANIO"); NO HACE FALTA LEERLO
                 config_destroy(config_archivo);
-
+                //CALCULO EL PUNTERO FISICO CON EL BLOQUES INICIAL
                 int puntero_fisico = bloque_inicial*tam_bloque+puntero;
-                uint32_t* puntero_numero_guardar = &numero_guardar;
-                memcpy(block_fs+puntero_fisico,puntero_numero_guardar,sizeof(uint32_t));
+                //COPIO EL DATO AL ARCHIVO
+                memcpy(block_fs+puntero_fisico,dato_entero,tamanio_dato);
                 msync(block_fs,tam_block_fs,MS_SYNC);
 
-                free(nombre_archivo);
-                free(numero_escribir);
-                free(puntero_string);
+                free(nombre);
                 free(ruta_archivo);
+                free(dato_entero);
+                list_destroy_and_destroy_elements(paquete_recibido,(void*) liberar_elemento);
+
+                usleep(tiempo_trabajo*1000);
+                int respuesta = INTERFAZ_LISTA;
+                send(fd_kernel,&respuesta,sizeof(int),0);
 
                 break;
             }
             case IO_FS_READ:
             {
-                char* nombre_archivo = readline("Ingrese nombre archivo a leer: ");
-                char* puntero_string = readline("Ingrese el numero de puntero: ");
-                int puntero = atoi(puntero_string);
-                //PUNTERO 2
+                paquete_recibido = recibir_paquete(fd_kernel);
+                int* pid_recibido = list_get(paquete_recibido,0);
+                char* nombre_recibido = list_get(paquete_recibido,1);
+                int* tamanio_dato_recibido = list_get(paquete_recibido,2);
+                int* puntero_recibido = list_get(paquete_recibido,3);
+                //GUARDO LO RECIBIDO EN VARIABLES LOCALES MENOS LAS DIRECCIONES FISICAS
+                int pid = *pid_recibido;
+                char* nombre = string_duplicate(nombre_recibido);
+                int tamanio_dato = *tamanio_dato_recibido;
+                int puntero = *puntero_recibido;
+                //LOGEAR OPERACION
+                logear_operacion_dialFS(logger,pid,IO_FS_READ);
+                //ARMO RUTA ARCHIVO
                 char* ruta_archivo = string_new();
                 string_append(&ruta_archivo,path_base);
                 string_append(&ruta_archivo,"/");
-                string_append(&ruta_archivo,nombre_archivo);
-                //190
-                //190*TAM_BLOQUE+PUNTERO
-                
-
-                uint32_t numero_mostrar = 0;
-                uint32_t* puntero_numero_mostrar = &numero_mostrar;
-
+                string_append(&ruta_archivo,nombre);
+                //BUSCO EL DATO CALCULANDO EL PUNTERO FISICO Y LO GUARDO EN UN VOID*
+                void* dato_escribir_mem = malloc(tamanio_dato);
                 t_config* config_archivo = config_create(ruta_archivo);
                 int bloque_inicial = config_get_int_value(config_archivo,"BLOQUE_INICIAL");
-                int tamanio = config_get_int_value(config_archivo,"TAMANIO");
+                //int tamanio = config_get_int_value(config_archivo,"TAMANIO"); NO HACE FALTA LEERLO
                 config_destroy(config_archivo);
 
                 int puntero_fisico = bloque_inicial*tam_bloque+puntero;
+                int resultado, base, direccionFisica, tamanio;
                
-                memcpy(puntero_numero_mostrar,block_fs+puntero_fisico,sizeof(uint32_t));
+                memcpy(dato_escribir_mem,block_fs+puntero_fisico,tamanio_dato);
 
+                for(int i=1; i<list_size(paquete_recibido); i++){
+                    t_porcion_dato* datoAenviar = list_get(paquete_recibido,i);
+                    //cadenaDeCaracteres+base+tamanio+direccionfisica
+                    t_paquete* infoAenviar = crear_paquete(ESCRITURA);
+                    base= datoAenviar->base;
+                    direccionFisica= datoAenviar->direccion_fisica;
+                    tamanio= datoAenviar-> tamanio;
+                    agregar_a_paquete(infoAenviar,&pid,sizeof(int));
+                    agregar_a_paquete(infoAenviar,dato_escribir_mem,tamanio_dato);
+                    agregar_a_paquete(infoAenviar,&base,sizeof(int));
+                    agregar_a_paquete(infoAenviar,&tamanio,sizeof(int));
+                    agregar_a_paquete(infoAenviar,&direccionFisica,sizeof(int));
+                    enviar_paquete(infoAenviar, fd_memoria);
+                    eliminar_paquete(infoAenviar);
+                    recv(fd_memoria,&resultado,sizeof(int),MSG_WAITALL);
+                }
                 
+                logear_lectura_archivo(logger,pid,nombre,tamanio_dato,puntero);
 
-                log_info(logger,"EL NUMERO GUARDADO ES: %d",numero_mostrar);
-
-                free(nombre_archivo);
-                free(puntero_string);
+                free(nombre);
                 free(ruta_archivo);
+                free(dato_escribir_mem);
+                list_destroy_and_destroy_elements(paquete_recibido,(void*) liberar_elemento);
 
-                break;
-            }
-            case 30:
-            {
-                imprimir_bitmap();
-                break;
-            }
-            case 31:
-            {
-                remove("./file_system/bitmap.dat");
-                remove("./file_system/bloques.dat");
-                remove("./file_system/archivo_madr3.txt");
+                usleep(tiempo_trabajo*1000);
+                int respuesta = INTERFAZ_LISTA;
+                send(fd_kernel,&respuesta,sizeof(int),0);
+
                 break;
             }
             default:
             {
-
                 break;
             }
         }
-        free(codop);
     }
     
 }
@@ -449,7 +511,7 @@ MARCO LIBRE
 int bloque_libre(int cant_bloques)
 {
     int valor;
-    int bloque_libre;
+    int bloque_libre = -1;
     //pthread_mutex_lock(&mutex_bitmap);
     for(int i=0;i<cant_bloques;i++)
     {
