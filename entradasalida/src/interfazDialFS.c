@@ -344,7 +344,7 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
                
                 memcpy(dato_escribir_mem,block_fs+puntero_fisico,tamanio_dato);
 
-                for(int i=1; i<list_size(paquete_recibido); i++){
+                for(int i=4; i<list_size(paquete_recibido); i++){
                     t_porcion_dato* datoAenviar = list_get(paquete_recibido,i);
                     //cadenaDeCaracteres+base+tamanio+direccionfisica
                     t_paquete* infoAenviar = crear_paquete(ESCRITURA);
