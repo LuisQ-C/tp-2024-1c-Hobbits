@@ -42,26 +42,32 @@ void logear_operacion_dialFS(t_log* logger, int pid, int operacion_realizar)
         case IO_FS_CREATE:
         {
             log_info(logger,"DialFS - Operacion: \"PID: %d - Operacion: IO_FS_CREATE\"",pid);
+            break;
         }
         case IO_FS_DELETE:
         {
             log_info(logger,"DialFS - Operacion: \"PID: %d - Operacion: IO_FS_DELETE\"",pid);
+            break;
         }
         case IO_FS_TRUNCATE:
         {
             log_info(logger,"DialFS - Operacion: \"PID: %d - Operacion: IO_FS_TRUNCATE\"",pid);
+            break;
         }
         case IO_FS_WRITE:
         {
             log_info(logger,"DialFS - Operacion: \"PID: %d - Operacion: IO_FS_WRITE\"",pid);
+            break;
         }
         case IO_FS_READ:
         {
             log_info(logger,"DialFS - Operacion: \"PID: %d - Operacion: IO_FS_READ\"",pid);
+            break;
         }
         default:
         {
             log_warning(logger,"OPERACION SOLICITADA AL dialFS DESCONOCIDA");
+            break;
         }
     }
 }

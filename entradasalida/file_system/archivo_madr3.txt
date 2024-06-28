@@ -1,3 +1,2 @@
-hola
-adios
-hola2
+archivo1.txt
+archivo2.txt

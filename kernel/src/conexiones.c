@@ -163,7 +163,7 @@ int string_to_type(char* tipo)
     {
         return IO_STDOUT_WRITE;
     }
-    else if(!strcmp("IO_FS", tipo)){
+    else if(!strcmp("DIALFS", tipo)){
         return IO_FS;
     }
     else{
@@ -313,8 +313,11 @@ void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
         {   
 
             solicitud_dial_fs = peek_elemento_cola_io(interfaz);
-            int cant_direcciones = list_is_empty(solicitud_dial_fs->direcciones_fisicas) ? 0 : list_size(solicitud_dial_fs->direcciones_fisicas);
-
+            int cant_direcciones = 0;
+            if(solicitud_dial_fs->direcciones_fisicas != NULL)
+            {
+                cant_direcciones = list_is_empty(solicitud_dial_fs->direcciones_fisicas) ? 0 : list_size(solicitud_dial_fs->direcciones_fisicas);
+            }
             err_send = enviar_solicitud_dial_fs(solicitud_dial_fs->pcb->pid, solicitud_dial_fs->nombre_archivo, solicitud_dial_fs->tamanio, solicitud_dial_fs->direcciones_fisicas, cant_direcciones, interfaz->fd_interfaz, solicitud_dial_fs->puntero, solicitud_dial_fs->codOp);
 
             if(err_send == -1){
@@ -344,7 +347,7 @@ void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
             pop_elemento_cola_io(interfaz);
             free(solicitud_dial_fs->nombre_archivo);
             mandar_pcb_cola_correspondiente(solicitud_dial_fs->pcb,solicitud_dial_fs->cola_destino);
-            if(!list_is_empty(solicitud_dial_fs->direcciones_fisicas))
+            if(solicitud_dial_fs->direcciones_fisicas!=NULL)
                 list_destroy_and_destroy_elements(solicitud_dial_fs->direcciones_fisicas,(void*) liberar_elemento);
             
             free(solicitud_dial_fs);

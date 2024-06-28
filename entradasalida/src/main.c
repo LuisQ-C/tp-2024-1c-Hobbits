@@ -2,7 +2,7 @@
 
 t_log* logger;
 
-/*
+
 int main(int argc, char** argv) {
 
     char* nombreDeInterfaz;
@@ -30,8 +30,8 @@ int main(int argc, char** argv) {
 
     //terminar_programa(logger,config,&fd_conexion_kernel,&fd_conexion_memoria);
     return 0;
-}*/
-
+}
+/*
 int main(int argc, char** argv)
 {
     char* nombreDeInterfaz;
@@ -49,4 +49,4 @@ int main(int argc, char** argv)
     terminar_programa(logger,config,&fd_kernel,&fd_memoria);
     //config_destroy(config);
 }
-
+*/

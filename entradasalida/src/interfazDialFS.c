@@ -385,7 +385,7 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
 
 t_bitarray* cargar_bitmap_nuevo(FILE* arch_bitmap,int cant_bloques)
 {
-    log_info(logger,"ENTRE AL IF");
+    //log_info(logger,"ENTRE AL IF");
     int tam_bitmap = ceil(cant_bloques/8.00);
     arch_bitmap = fopen("file_system/bitmap.dat","wb+"); //NO EXISTE ENTONCES LO CREO
     fflush(arch_bitmap);
@@ -404,7 +404,7 @@ t_bitarray* cargar_bitmap_nuevo(FILE* arch_bitmap,int cant_bloques)
 
 t_bitarray* cargar_bitmap_existente(FILE* arch_bitmap,int cant_bloques)
 {
-    log_info(logger,"ENTRE AL ELSE");
+    //log_info(logger,"ENTRE AL ELSE");
     arch_bitmap = fopen("file_system/bitmap.dat","rb+"); 
     int tam_bitmap = ceil(cant_bloques/8.00);
 
@@ -436,7 +436,7 @@ void imprimir_bitmap()
 
 void* cargar_block_fs_nuevo(FILE* arch_bloques,int tam_block_fs)
 {
-    log_info(logger,"ENTRE AL IF");
+    //log_info(logger,"ENTRE AL IF");
     arch_bloques = fopen("file_system/bloques.dat","wb+"); //NO EXISTE ENTONCES LO CREO
     fflush(arch_bloques);
     ftruncate(fileno(arch_bloques),tam_block_fs);
@@ -457,7 +457,7 @@ void* cargar_block_fs_nuevo(FILE* arch_bloques,int tam_block_fs)
 
 void* cargar_block_fs_existente(FILE* arch_bloques,int tam_block_fs)
 {
-    log_info(logger,"ENTRE AL ELSE");
+    //log_info(logger,"ENTRE AL ELSE");
     arch_bloques = fopen("file_system/bloques.dat","rb+"); 
 
     void* data_bloques = mmap(NULL,tam_block_fs,PROT_READ|PROT_WRITE,MAP_SHARED,fileno(arch_bloques),0);

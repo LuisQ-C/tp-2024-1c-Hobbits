@@ -193,7 +193,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             MOTIVO_DESALOJO = IO_GEN_SLEEP;
             pcb_a_enviar->pc = registro.PC+1;
             pcb_a_enviar->quantum-=config_mem.retardo_memoria;
-            log_trace(logger, "%d SOY EL QUANTUM QUE VA A ACTUALIZAR", pcb_a_enviar->quantum);
+            //log_trace(logger, "%d SOY EL QUANTUM QUE VA A ACTUALIZAR", pcb_a_enviar->quantum);
             io_gen_sleep(pcb_a_enviar,instruccionDesarmada,fd_dispatch);
             break;
         }
@@ -267,6 +267,8 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             
             if(respuesta == OUT_OF_MEMORY)
             {
+                pcb_a_enviar->pc = registro.PC+1;
+                pcb_a_enviar->quantum-=config_mem.retardo_memoria;
                 desalojar_proceso(pcb_a_enviar,OUT_OF_MEMORY,fd_dispatch);
                 break;
             }

@@ -410,3 +410,138 @@
 [INFO] 19:59:59:226 Kernel-Oblig/(5007:5012): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
 [INFO] 19:59:59:249 Kernel-Oblig/(5007:5012): PID: 1 - Bloqueado por: RA
 [INFO] 19:59:59:249 Kernel-Oblig/(5007:5012): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:11:00:134 Kernel-Oblig/(10484:10492): Se crea el proceso 0 en NEW
+[INFO] 03:11:09:945 Kernel-Oblig/(10484:10488): Cola ready: 0
+[INFO] 03:11:09:945 Kernel-Oblig/(10484:10488): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:11:09:945 Kernel-Oblig/(10484:10489): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:11:14:609 Kernel-Oblig/(10484:10489): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:11:14:609 Kernel-Oblig/(10484:10489): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:12:33:924 Kernel-Oblig/(10690:10698): Se crea el proceso 0 en NEW
+[INFO] 03:12:35:852 Kernel-Oblig/(10690:10692): Cola ready: 0
+[INFO] 03:12:35:855 Kernel-Oblig/(10690:10692): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:12:35:861 Kernel-Oblig/(10690:10695): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:12:40:618 Kernel-Oblig/(10690:10695): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:12:40:619 Kernel-Oblig/(10690:10695): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:19:48:289 Kernel-Oblig/(11056:11064): Se crea el proceso 0 en NEW
+[INFO] 03:19:51:729 Kernel-Oblig/(11056:11060): Cola ready: 0
+[INFO] 03:19:51:729 Kernel-Oblig/(11056:11060): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:19:51:729 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:19:56:426 Kernel-Oblig/(11056:11061): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:19:56:426 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:19:56:679 Kernel-Oblig/(11056:11066): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:19:56:679 Kernel-Oblig/(11056:11066): Cola ready: 0
+[INFO] 03:19:56:679 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:19:56:880 Kernel-Oblig/(11056:11061): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:19:56:880 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:19:57:133 Kernel-Oblig/(11056:11066): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:19:57:133 Kernel-Oblig/(11056:11066): Cola ready: 0
+[INFO] 03:19:57:133 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:19:57:534 Kernel-Oblig/(11056:11061): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:19:57:534 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:19:57:877 Kernel-Oblig/(11056:11066): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:19:57:877 Kernel-Oblig/(11056:11066): Cola ready: 0
+[INFO] 03:19:57:877 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:19:58:683 Kernel-Oblig/(11056:11061): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:19:58:683 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:19:59:165 Kernel-Oblig/(11056:11066): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:19:59:166 Kernel-Oblig/(11056:11066): Cola ready: 0
+[INFO] 03:19:59:166 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:19:59:576 Kernel-Oblig/(11056:11061): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:19:59:576 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:20:04:860 Kernel-Oblig/(11056:11066): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:20:04:860 Kernel-Oblig/(11056:11066): Cola ready: 0
+[INFO] 03:20:04:860 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:20:05:870 Kernel-Oblig/(11056:11061): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:20:05:870 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:20:06:322 Kernel-Oblig/(11056:11066): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:20:06:322 Kernel-Oblig/(11056:11066): Cola ready: 0
+[INFO] 03:20:06:322 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:20:06:727 Kernel-Oblig/(11056:11061): PID: 0 - Bloqueado por: MONITOR
+[INFO] 03:20:06:727 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:20:06:928 Kernel-Oblig/(11056:11069): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:20:06:928 Kernel-Oblig/(11056:11069): Cola ready: 0
+[INFO] 03:20:06:928 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:20:07:136 Kernel-Oblig/(11056:11061): Finaliza el proceso 0 - Motivo: SUCCESS
+[INFO] 03:20:07:136 Kernel-Oblig/(11056:11061): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 03:30:49:188 Kernel-Oblig/(11767:11775): Se crea el proceso 0 en NEW
+[INFO] 03:30:59:045 Kernel-Oblig/(11767:11768): Cola ready: 0
+[INFO] 03:30:59:048 Kernel-Oblig/(11767:11768): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:30:59:054 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:31:03:883 Kernel-Oblig/(11767:11771): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:31:03:883 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:31:04:174 Kernel-Oblig/(11767:11935): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:31:04:176 Kernel-Oblig/(11767:11935): Cola ready: 0
+[INFO] 03:31:04:178 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:31:04:382 Kernel-Oblig/(11767:11771): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:31:04:382 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:31:04:638 Kernel-Oblig/(11767:11935): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:31:04:640 Kernel-Oblig/(11767:11935): Cola ready: 0
+[INFO] 03:31:04:641 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:31:05:052 Kernel-Oblig/(11767:11771): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:31:05:053 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:31:05:325 Kernel-Oblig/(11767:11935): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:31:05:326 Kernel-Oblig/(11767:11935): Cola ready: 0
+[INFO] 03:31:05:326 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:31:06:154 Kernel-Oblig/(11767:11771): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:31:06:155 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:31:06:637 Kernel-Oblig/(11767:11935): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:31:06:638 Kernel-Oblig/(11767:11935): Cola ready: 0
+[INFO] 03:31:06:639 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:31:07:044 Kernel-Oblig/(11767:11771): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:31:07:045 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:31:12:367 Kernel-Oblig/(11767:11935): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:31:12:367 Kernel-Oblig/(11767:11935): Cola ready: 0
+[INFO] 03:31:12:368 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:31:13:413 Kernel-Oblig/(11767:11771): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:31:13:414 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:31:13:900 Kernel-Oblig/(11767:11935): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:31:13:901 Kernel-Oblig/(11767:11935): Cola ready: 0
+[INFO] 03:31:13:901 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:31:14:316 Kernel-Oblig/(11767:11771): PID: 0 - Bloqueado por: MONITOR
+[INFO] 03:31:14:319 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:31:14:537 Kernel-Oblig/(11767:11858): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:31:14:538 Kernel-Oblig/(11767:11858): Cola ready: 0
+[INFO] 03:31:14:539 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:31:14:747 Kernel-Oblig/(11767:11771): Finaliza el proceso 0 - Motivo: SUCCESS
+[INFO] 03:31:14:748 Kernel-Oblig/(11767:11771): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 03:34:15:194 Kernel-Oblig/(12182:12190): Se crea el proceso 0 en NEW
+[INFO] 03:34:18:105 Kernel-Oblig/(12182:12186): Cola ready: 0
+[INFO] 03:34:18:105 Kernel-Oblig/(12182:12186): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:34:18:106 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:34:22:845 Kernel-Oblig/(12182:12187): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:34:22:845 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:34:23:097 Kernel-Oblig/(12182:12223): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:34:23:098 Kernel-Oblig/(12182:12223): Cola ready: 0
+[INFO] 03:34:23:098 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:34:23:317 Kernel-Oblig/(12182:12187): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:34:23:317 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:34:23:570 Kernel-Oblig/(12182:12223): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:34:23:570 Kernel-Oblig/(12182:12223): Cola ready: 0
+[INFO] 03:34:23:570 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:34:23:973 Kernel-Oblig/(12182:12187): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:34:23:973 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:34:24:226 Kernel-Oblig/(12182:12223): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:34:24:226 Kernel-Oblig/(12182:12223): Cola ready: 0
+[INFO] 03:34:24:226 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:34:25:045 Kernel-Oblig/(12182:12187): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:34:25:045 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:34:25:504 Kernel-Oblig/(12182:12223): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:34:25:504 Kernel-Oblig/(12182:12223): Cola ready: 0
+[INFO] 03:34:25:504 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:34:25:906 Kernel-Oblig/(12182:12187): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:34:25:906 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:34:31:173 Kernel-Oblig/(12182:12223): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:34:31:173 Kernel-Oblig/(12182:12223): Cola ready: 0
+[INFO] 03:34:31:173 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:34:32:192 Kernel-Oblig/(12182:12187): PID: 0 - Bloqueado por: dialfs
+[INFO] 03:34:32:192 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:34:32:643 Kernel-Oblig/(12182:12223): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:34:32:643 Kernel-Oblig/(12182:12223): Cola ready: 0
+[INFO] 03:34:32:643 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:34:33:045 Kernel-Oblig/(12182:12187): PID: 0 - Bloqueado por: MONITOR
+[INFO] 03:34:33:045 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:34:33:248 Kernel-Oblig/(12182:12257): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: READY
+[INFO] 03:34:33:248 Kernel-Oblig/(12182:12257): Cola ready: 0
+[INFO] 03:34:33:248 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:34:33:452 Kernel-Oblig/(12182:12187): Finaliza el proceso 0 - Motivo: SUCCESS
+[INFO] 03:34:33:453 Kernel-Oblig/(12182:12187): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
