@@ -212,4 +212,6 @@ int enviar_paquete_io(t_paquete* paquete, int socket_cliente);
 
 int enviar_solicitud_stdin_stdout(int pid, t_list* direcciones_fisicas , int fd_interfaz , int cant_direcciones, int tipo_interfaz);
 
+int enviar_solicitud_dial_fs(int pid, char* nombre_archivo,int tamanio, t_list* direcciones_fisicas, int cant_direcciones, int fd_interfaz, int puntero, int tipo_solicitud);
+
 #endif

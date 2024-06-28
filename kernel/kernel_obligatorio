@@ -13,3 +13,400 @@
 [INFO] 03:46:49:715 Kernel_Obligatorio/(6678:6683): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
 [INFO] 03:46:49:758 Kernel_Obligatorio/(6678:6683): Finaliza el proceso 0 - Motivo: SUCCESS
 [INFO] 03:46:49:758 Kernel_Obligatorio/(6678:6683): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 02:27:57:935 Kernel-Oblig/(2476:2483): Se crea el proceso 0 en NEW
+[INFO] 02:28:15:775 Kernel-Oblig/(2476:2483): Se crea el proceso 1 en NEW
+[INFO] 02:28:15:786 Kernel-Oblig/(2476:2483): Se crea el proceso 2 en NEW
+[INFO] 02:28:15:796 Kernel-Oblig/(2476:2483): Se crea el proceso 3 en NEW
+[INFO] 02:39:44:912 Kernel-Oblig/(3386:3393): Se crea el proceso 0 en NEW
+[INFO] 02:39:45:731 Kernel-Oblig/(3386:3393): Se crea el proceso 1 en NEW
+[INFO] 02:39:45:759 Kernel-Oblig/(3386:3393): Se crea el proceso 2 en NEW
+[INFO] 02:40:38:401 Kernel-Oblig/(3566:3573): Se crea el proceso 0 en NEW
+[INFO] 02:40:39:178 Kernel-Oblig/(3566:3573): Se crea el proceso 1 en NEW
+[INFO] 02:40:39:213 Kernel-Oblig/(3566:3573): Se crea el proceso 2 en NEW
+[INFO] 02:41:45:944 Kernel-Oblig/(3698:3705): Se crea el proceso 0 en NEW
+[INFO] 02:41:46:716 Kernel-Oblig/(3698:3705): Se crea el proceso 1 en NEW
+[INFO] 02:41:46:744 Kernel-Oblig/(3698:3705): Se crea el proceso 2 en NEW
+[INFO] 02:41:47:572 Kernel-Oblig/(3698:3705): Se crea el proceso 3 en NEW
+[INFO] 02:41:48:378 Kernel-Oblig/(3698:3705): Se crea el proceso 4 en NEW
+[INFO] 02:41:48:408 Kernel-Oblig/(3698:3705): Se crea el proceso 5 en NEW
+[INFO] 02:41:49:287 Kernel-Oblig/(3698:3705): Se crea el proceso 6 en NEW
+[INFO] 02:41:50:115 Kernel-Oblig/(3698:3705): Se crea el proceso 7 en NEW
+[INFO] 02:41:50:146 Kernel-Oblig/(3698:3705): Se crea el proceso 8 en NEW
+[INFO] 02:44:47:169 Kernel-Oblig/(3961:3968): Se crea el proceso 0 en NEW
+[INFO] 02:44:47:942 Kernel-Oblig/(3961:3968): Se crea el proceso 1 en NEW
+[INFO] 02:44:47:970 Kernel-Oblig/(3961:3968): Se crea el proceso 2 en NEW
+[INFO] 02:46:30:412 Kernel-Oblig/(4215:4222): Se crea el proceso 0 en NEW
+[INFO] 02:46:31:177 Kernel-Oblig/(4215:4222): Se crea el proceso 1 en NEW
+[INFO] 02:46:31:207 Kernel-Oblig/(4215:4222): Se crea el proceso 2 en NEW
+[INFO] 02:47:25:917 Kernel-Oblig/(4406:4413): Se crea el proceso 0 en NEW
+[INFO] 02:47:26:690 Kernel-Oblig/(4406:4413): Se crea el proceso 1 en NEW
+[INFO] 02:47:26:719 Kernel-Oblig/(4406:4413): Se crea el proceso 2 en NEW
+[INFO] 02:52:34:678 Kernel-Oblig/(5029:5036): Se crea el proceso 0 en NEW
+[INFO] 02:52:41:024 Kernel-Oblig/(5029:5031): Cola ready: 0, 
+[INFO] 02:52:41:027 Kernel-Oblig/(5029:5031): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 02:52:41:027 Kernel-Oblig/(5029:5034): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 02:52:41:124 Kernel-Oblig/(5029:5034): PID: 0 - Bloqueado por: RA
+[INFO] 02:52:41:125 Kernel-Oblig/(5029:5034): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 02:52:50:103 Kernel-Oblig/(5029:5036): Se crea el proceso 1 en NEW
+[INFO] 02:52:50:104 Kernel-Oblig/(5029:5031): Cola ready: 1, 
+[INFO] 02:52:50:104 Kernel-Oblig/(5029:5031): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 02:52:50:104 Kernel-Oblig/(5029:5034): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 02:52:50:129 Kernel-Oblig/(5029:5034): PID: 1 - Bloqueado por: RA
+[INFO] 02:52:50:129 Kernel-Oblig/(5029:5034): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 02:53:22:502 Kernel-Oblig/(5029:5047): Finaliza el proceso 1 - Motivo: INTERRUPTED BY USER
+[INFO] 02:53:22:503 Kernel-Oblig/(5029:5047): PID: 1 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 02:53:22:503 Kernel-Oblig/(5029:5034): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 02:53:22:561 Kernel-Oblig/(5029:5034): Finaliza el proceso 0 - Motivo: SUCCESS
+[INFO] 02:53:22:563 Kernel-Oblig/(5029:5034): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 02:53:53:895 Kernel-Oblig/(5029:5036): Se crea el proceso 2 en NEW
+[INFO] 02:53:56:795 Kernel-Oblig/(5029:5031): Cola ready: 2, 
+[INFO] 02:53:56:797 Kernel-Oblig/(5029:5031): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 02:53:56:797 Kernel-Oblig/(5029:5034): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 02:53:56:847 Kernel-Oblig/(5029:5034): PID: 2 - Bloqueado por: RA
+[INFO] 02:53:56:847 Kernel-Oblig/(5029:5034): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 02:54:29:030 Kernel-Oblig/(5029:5036): Se crea el proceso 3 en NEW
+[INFO] 02:54:29:030 Kernel-Oblig/(5029:5031): Cola ready: 3, 
+[INFO] 02:54:29:031 Kernel-Oblig/(5029:5031): PID: 3 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 02:54:29:031 Kernel-Oblig/(5029:5034): PID: 3 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 02:54:29:055 Kernel-Oblig/(5029:5034): PID: 3 - Bloqueado por: RA
+[INFO] 02:54:29:055 Kernel-Oblig/(5029:5034): PID: 3 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 02:54:57:371 Kernel-Oblig/(5029:5034): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 02:54:57:372 Kernel-Oblig/(5029:5068): Finaliza el proceso 3 - Motivo: INTERRUPTED BY USER
+[INFO] 02:54:57:372 Kernel-Oblig/(5029:5068): PID: 3 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 02:54:57:424 Kernel-Oblig/(5029:5034): Finaliza el proceso 2 - Motivo: SUCCESS
+[INFO] 02:54:57:425 Kernel-Oblig/(5029:5034): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 02:56:08:114 Kernel-Oblig/(5192:5199): Se crea el proceso 0 en NEW
+[INFO] 02:56:10:093 Kernel-Oblig/(5192:5194): Cola ready: 0, 
+[INFO] 02:56:10:095 Kernel-Oblig/(5192:5194): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 02:56:10:096 Kernel-Oblig/(5192:5197): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 02:56:10:175 Kernel-Oblig/(5192:5197): PID: 0 - Bloqueado por: RA
+[INFO] 02:56:10:175 Kernel-Oblig/(5192:5197): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 02:57:34:028 Kernel-Oblig/(5192:5228): Finaliza el proceso 0 - Motivo: INTERRUPTED BY USER
+[INFO] 02:57:34:029 Kernel-Oblig/(5192:5228): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 02:57:41:061 Kernel-Oblig/(5192:5199): Se crea el proceso 1 en NEW
+[INFO] 02:57:45:220 Kernel-Oblig/(5192:5194): Cola ready: 1, 
+[INFO] 02:57:45:223 Kernel-Oblig/(5192:5194): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 02:57:45:224 Kernel-Oblig/(5192:5197): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 02:57:45:277 Kernel-Oblig/(5192:5197): PID: 1 - Bloqueado por: RA
+[INFO] 02:57:45:277 Kernel-Oblig/(5192:5197): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:00:50:416 Kernel-Oblig/(5423:5430): Se crea el proceso 0 en NEW
+[INFO] 03:00:51:983 Kernel-Oblig/(5423:5430): Se crea el proceso 1 en NEW
+[INFO] 03:00:52:469 Kernel-Oblig/(5423:5430): Se crea el proceso 2 en NEW
+[INFO] 03:00:53:865 Kernel-Oblig/(5423:5427): Cola ready: 0, 
+[INFO] 03:00:53:867 Kernel-Oblig/(5423:5427): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:00:53:867 Kernel-Oblig/(5423:5428): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:00:53:868 Kernel-Oblig/(5423:5427): Cola ready: 1, 
+[INFO] 03:00:53:871 Kernel-Oblig/(5423:5427): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:00:53:872 Kernel-Oblig/(5423:5427): Cola ready: 1, 2, 
+[INFO] 03:00:53:872 Kernel-Oblig/(5423:5427): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:00:53:950 Kernel-Oblig/(5423:5428): PID: 0 - Bloqueado por: RA
+[INFO] 03:00:53:950 Kernel-Oblig/(5423:5428): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:00:53:997 Kernel-Oblig/(5423:5428): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:00:54:037 Kernel-Oblig/(5423:5428): PID: 1 - Bloqueado por: RA
+[INFO] 03:00:54:037 Kernel-Oblig/(5423:5428): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:00:54:039 Kernel-Oblig/(5423:5428): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:00:54:104 Kernel-Oblig/(5423:5428): PID: 2 - Bloqueado por: RA
+[INFO] 03:00:54:104 Kernel-Oblig/(5423:5428): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:00:59:719 Kernel-Oblig/(5423:5428): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:00:59:723 Kernel-Oblig/(5423:5439): Finaliza el proceso 0 - Motivo: INTERRUPTED BY USER
+[INFO] 03:00:59:723 Kernel-Oblig/(5423:5439): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:00:59:745 Kernel-Oblig/(5423:5428): PID: 1 - Bloqueado por: RA
+[INFO] 03:00:59:745 Kernel-Oblig/(5423:5428): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:00:59:745 Kernel-Oblig/(5423:5428): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:00:59:807 Kernel-Oblig/(5423:5428): PID: 2 - Bloqueado por: RA
+[INFO] 03:00:59:807 Kernel-Oblig/(5423:5428): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:02:50:097 Kernel-Oblig/(5613:5621): Se crea el proceso 0 en NEW
+[INFO] 03:02:50:991 Kernel-Oblig/(5613:5621): Se crea el proceso 1 en NEW
+[INFO] 03:02:53:729 Kernel-Oblig/(5613:5616): Cola ready: 0, 
+[INFO] 03:02:53:734 Kernel-Oblig/(5613:5616): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:02:53:734 Kernel-Oblig/(5613:5616): Cola ready: 1, 
+[INFO] 03:02:53:734 Kernel-Oblig/(5613:5616): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:02:53:735 Kernel-Oblig/(5613:5618): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:02:53:818 Kernel-Oblig/(5613:5618): PID: 0 - Bloqueado por: RA
+[INFO] 03:02:53:819 Kernel-Oblig/(5613:5618): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:02:53:820 Kernel-Oblig/(5613:5618): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:02:53:884 Kernel-Oblig/(5613:5618): PID: 1 - Bloqueado por: RA
+[INFO] 03:02:53:884 Kernel-Oblig/(5613:5618): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:02:56:777 Kernel-Oblig/(5613:5622): Finaliza el proceso 0 - Motivo: INTERRUPTED BY USER
+[INFO] 03:02:56:778 Kernel-Oblig/(5613:5622): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:02:56:779 Kernel-Oblig/(5613:5618): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:02:56:804 Kernel-Oblig/(5613:5618): PID: 1 - Bloqueado por: RA
+[INFO] 03:02:56:804 Kernel-Oblig/(5613:5618): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:03:02:218 Kernel-Oblig/(5613:5627): Finaliza el proceso 1 - Motivo: INTERRUPTED BY USER
+[INFO] 03:03:02:219 Kernel-Oblig/(5613:5627): PID: 1 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:04:53:372 Kernel-Oblig/(5613:5621): Se crea el proceso 2 en NEW
+[INFO] 03:04:53:373 Kernel-Oblig/(5613:5616): Cola ready: 2, 
+[INFO] 03:04:53:373 Kernel-Oblig/(5613:5616): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:04:53:374 Kernel-Oblig/(5613:5618): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:04:53:427 Kernel-Oblig/(5613:5618): PID: 2 - Bloqueado por: RA
+[INFO] 03:04:53:428 Kernel-Oblig/(5613:5618): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:11:05:659 Kernel-Oblig/(5841:5849): Se crea el proceso 0 en NEW
+[INFO] 03:11:06:612 Kernel-Oblig/(5841:5849): Se crea el proceso 1 en NEW
+[INFO] 03:11:07:398 Kernel-Oblig/(5841:5849): Se crea el proceso 2 en NEW
+[INFO] 03:11:08:642 Kernel-Oblig/(5841:5844): Cola ready: 0, 
+[INFO] 03:11:08:645 Kernel-Oblig/(5841:5844): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:11:08:646 Kernel-Oblig/(5841:5844): Cola ready: 1, 
+[INFO] 03:11:08:646 Kernel-Oblig/(5841:5844): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:11:08:647 Kernel-Oblig/(5841:5844): Cola ready: 1, 2, 
+[INFO] 03:11:08:647 Kernel-Oblig/(5841:5846): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:11:08:648 Kernel-Oblig/(5841:5844): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:11:08:719 Kernel-Oblig/(5841:5846): PID: 0 - Bloqueado por: RA
+[INFO] 03:11:08:719 Kernel-Oblig/(5841:5846): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:11:08:720 Kernel-Oblig/(5841:5846): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:11:08:789 Kernel-Oblig/(5841:5846): PID: 1 - Bloqueado por: RA
+[INFO] 03:11:08:790 Kernel-Oblig/(5841:5846): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:11:08:790 Kernel-Oblig/(5841:5846): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:11:08:855 Kernel-Oblig/(5841:5846): PID: 2 - Bloqueado por: RA
+[INFO] 03:11:08:855 Kernel-Oblig/(5841:5846): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:11:11:693 Kernel-Oblig/(5841:5851): Finaliza el proceso 2 - Motivo: INTERRUPTED BY USER
+[INFO] 03:11:11:694 Kernel-Oblig/(5841:5851): PID: 2 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:11:11:695 Kernel-Oblig/(5841:5846): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:11:11:752 Kernel-Oblig/(5841:5846): Finaliza el proceso 0 - Motivo: SUCCESS
+[INFO] 03:11:11:752 Kernel-Oblig/(5841:5846): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 03:11:11:753 Kernel-Oblig/(5841:5846): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:11:11:777 Kernel-Oblig/(5841:5846): PID: 1 - Bloqueado por: RA
+[INFO] 03:11:11:777 Kernel-Oblig/(5841:5846): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:11:43:851 Kernel-Oblig/(5841:5866): Finaliza el proceso 1 - Motivo: INTERRUPTED BY USER
+[INFO] 03:11:43:852 Kernel-Oblig/(5841:5866): PID: 1 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:14:19:186 Kernel-Oblig/(6237:6244): Se crea el proceso 0 en NEW
+[INFO] 03:14:20:489 Kernel-Oblig/(6237:6244): Se crea el proceso 1 en NEW
+[INFO] 03:14:20:952 Kernel-Oblig/(6237:6244): Se crea el proceso 2 en NEW
+[INFO] 03:14:22:560 Kernel-Oblig/(6237:6240): Cola ready: 0, 
+[INFO] 03:14:22:562 Kernel-Oblig/(6237:6240): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:14:22:562 Kernel-Oblig/(6237:6242): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:14:22:598 Kernel-Oblig/(6237:6240): Cola ready: 1, 
+[INFO] 03:14:22:599 Kernel-Oblig/(6237:6240): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:14:22:599 Kernel-Oblig/(6237:6240): Cola ready: 1, 2, 
+[INFO] 03:14:22:600 Kernel-Oblig/(6237:6240): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:14:22:656 Kernel-Oblig/(6237:6242): PID: 0 - Bloqueado por: RA
+[INFO] 03:14:22:657 Kernel-Oblig/(6237:6242): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:14:22:687 Kernel-Oblig/(6237:6242): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:14:22:738 Kernel-Oblig/(6237:6242): PID: 1 - Bloqueado por: RA
+[INFO] 03:14:22:738 Kernel-Oblig/(6237:6242): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:14:22:740 Kernel-Oblig/(6237:6242): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:14:22:803 Kernel-Oblig/(6237:6242): PID: 2 - Bloqueado por: RA
+[INFO] 03:14:22:803 Kernel-Oblig/(6237:6242): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:14:26:439 Kernel-Oblig/(6237:6248): Finaliza el proceso 0 - Motivo: INTERRUPTED BY USER
+[INFO] 03:14:26:439 Kernel-Oblig/(6237:6248): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:14:26:440 Kernel-Oblig/(6237:6242): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:14:26:466 Kernel-Oblig/(6237:6242): PID: 1 - Bloqueado por: RA
+[INFO] 03:14:26:466 Kernel-Oblig/(6237:6242): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:14:26:466 Kernel-Oblig/(6237:6242): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:14:26:579 Kernel-Oblig/(6237:6242): PID: 2 - Bloqueado por: RA
+[INFO] 03:14:26:579 Kernel-Oblig/(6237:6242): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:14:32:480 Kernel-Oblig/(6237:6255): Finaliza el proceso 2 - Motivo: INTERRUPTED BY USER
+[INFO] 03:14:32:480 Kernel-Oblig/(6237:6255): PID: 2 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:14:32:481 Kernel-Oblig/(6237:6242): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:14:32:531 Kernel-Oblig/(6237:6242): Finaliza el proceso 1 - Motivo: SUCCESS
+[INFO] 03:14:32:531 Kernel-Oblig/(6237:6242): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 03:15:11:270 Kernel-Oblig/(6237:6244): Se crea el proceso 3 en NEW
+[INFO] 03:15:11:270 Kernel-Oblig/(6237:6240): Cola ready: 3, 
+[INFO] 03:15:11:271 Kernel-Oblig/(6237:6240): PID: 3 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:15:11:271 Kernel-Oblig/(6237:6242): PID: 3 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:15:11:324 Kernel-Oblig/(6237:6242): PID: 3 - Bloqueado por: RA
+[INFO] 03:15:11:324 Kernel-Oblig/(6237:6242): PID: 3 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:21:54:221 Kernel-Oblig/(6477:6484): Se crea el proceso 0 en NEW
+[INFO] 03:21:57:228 Kernel-Oblig/(6477:6481): Cola ready: 0, 
+[INFO] 03:21:57:230 Kernel-Oblig/(6477:6481): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:21:57:231 Kernel-Oblig/(6477:6482): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:21:57:352 Kernel-Oblig/(6477:6482): PID: 0 - Bloqueado por: RA
+[INFO] 03:21:57:352 Kernel-Oblig/(6477:6482): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:22:01:775 Kernel-Oblig/(6477:6484): Se crea el proceso 1 en NEW
+[INFO] 03:22:01:775 Kernel-Oblig/(6477:6481): Cola ready: 1, 
+[INFO] 03:22:01:776 Kernel-Oblig/(6477:6481): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:22:01:776 Kernel-Oblig/(6477:6482): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:22:01:802 Kernel-Oblig/(6477:6482): PID: 1 - Bloqueado por: RA
+[INFO] 03:22:01:802 Kernel-Oblig/(6477:6482): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:22:12:173 Kernel-Oblig/(6477:6484): Se crea el proceso 2 en NEW
+[INFO] 03:22:12:173 Kernel-Oblig/(6477:6481): Cola ready: 2, 
+[INFO] 03:22:12:173 Kernel-Oblig/(6477:6481): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:22:12:173 Kernel-Oblig/(6477:6482): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:22:12:199 Kernel-Oblig/(6477:6482): PID: 2 - Bloqueado por: RA
+[INFO] 03:22:12:199 Kernel-Oblig/(6477:6482): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:22:42:474 Kernel-Oblig/(6477:6493): Finaliza el proceso 0 - Motivo: INTERRUPTED BY USER
+[INFO] 03:22:42:474 Kernel-Oblig/(6477:6493): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:22:42:475 Kernel-Oblig/(6477:6482): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:22:42:501 Kernel-Oblig/(6477:6482): PID: 1 - Bloqueado por: RA
+[INFO] 03:22:42:502 Kernel-Oblig/(6477:6482): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:22:42:502 Kernel-Oblig/(6477:6482): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:22:42:570 Kernel-Oblig/(6477:6482): PID: 2 - Bloqueado por: RA
+[INFO] 03:22:42:570 Kernel-Oblig/(6477:6482): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:23:16:811 Kernel-Oblig/(6477:6505): Finaliza el proceso 1 - Motivo: INTERRUPTED BY USER
+[INFO] 03:23:16:811 Kernel-Oblig/(6477:6505): PID: 1 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:23:16:812 Kernel-Oblig/(6477:6482): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:23:16:862 Kernel-Oblig/(6477:6482): Finaliza el proceso 2 - Motivo: SUCCESS
+[INFO] 03:23:16:863 Kernel-Oblig/(6477:6482): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 03:23:37:200 Kernel-Oblig/(6477:6484): Se crea el proceso 3 en NEW
+[INFO] 03:23:37:200 Kernel-Oblig/(6477:6481): Cola ready: 3, 
+[INFO] 03:23:37:201 Kernel-Oblig/(6477:6481): PID: 3 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:23:37:201 Kernel-Oblig/(6477:6482): PID: 3 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:23:37:250 Kernel-Oblig/(6477:6482): PID: 3 - Bloqueado por: RA
+[INFO] 03:23:37:251 Kernel-Oblig/(6477:6482): PID: 3 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:26:05:617 Kernel-Oblig/(6700:6707): Se crea el proceso 0 en NEW
+[INFO] 03:26:07:098 Kernel-Oblig/(6700:6707): Se crea el proceso 1 en NEW
+[INFO] 03:26:07:398 Kernel-Oblig/(6700:6707): Se crea el proceso 2 en NEW
+[INFO] 03:26:08:841 Kernel-Oblig/(6700:6704): Cola ready: 0, 
+[INFO] 03:26:08:843 Kernel-Oblig/(6700:6704): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:26:08:844 Kernel-Oblig/(6700:6705): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:26:08:845 Kernel-Oblig/(6700:6704): Cola ready: 1, 
+[INFO] 03:26:08:887 Kernel-Oblig/(6700:6704): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:26:08:890 Kernel-Oblig/(6700:6704): Cola ready: 1, 2, 
+[INFO] 03:26:08:890 Kernel-Oblig/(6700:6704): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:26:08:936 Kernel-Oblig/(6700:6705): PID: 0 - Bloqueado por: RA
+[INFO] 03:26:08:937 Kernel-Oblig/(6700:6705): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:26:08:962 Kernel-Oblig/(6700:6705): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:26:09:022 Kernel-Oblig/(6700:6705): PID: 1 - Bloqueado por: RA
+[INFO] 03:26:09:023 Kernel-Oblig/(6700:6705): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:26:09:024 Kernel-Oblig/(6700:6705): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:26:09:092 Kernel-Oblig/(6700:6705): PID: 2 - Bloqueado por: RA
+[INFO] 03:26:09:092 Kernel-Oblig/(6700:6705): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:26:12:355 Kernel-Oblig/(6700:6711): Finaliza el proceso 0 - Motivo: INTERRUPTED BY USER
+[INFO] 03:26:12:356 Kernel-Oblig/(6700:6711): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:26:12:357 Kernel-Oblig/(6700:6705): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:26:12:404 Kernel-Oblig/(6700:6705): PID: 1 - Bloqueado por: RA
+[INFO] 03:26:12:404 Kernel-Oblig/(6700:6705): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:26:12:405 Kernel-Oblig/(6700:6705): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:26:12:429 Kernel-Oblig/(6700:6705): PID: 2 - Bloqueado por: RA
+[INFO] 03:26:12:430 Kernel-Oblig/(6700:6705): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:28:35:307 Kernel-Oblig/(6958:6965): Se crea el proceso 0 en NEW
+[INFO] 03:28:36:665 Kernel-Oblig/(6958:6965): Se crea el proceso 1 en NEW
+[INFO] 03:28:36:976 Kernel-Oblig/(6958:6965): Se crea el proceso 2 en NEW
+[INFO] 03:28:38:067 Kernel-Oblig/(6958:6959): Cola ready: 0, 
+[INFO] 03:28:38:069 Kernel-Oblig/(6958:6961): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:28:38:070 Kernel-Oblig/(6958:6959): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:28:38:113 Kernel-Oblig/(6958:6959): Cola ready: 1, 
+[INFO] 03:28:38:117 Kernel-Oblig/(6958:6959): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:28:38:118 Kernel-Oblig/(6958:6959): Cola ready: 1, 2, 
+[INFO] 03:28:38:118 Kernel-Oblig/(6958:6959): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:28:38:182 Kernel-Oblig/(6958:6961): PID: 0 - Bloqueado por: RA
+[INFO] 03:28:38:183 Kernel-Oblig/(6958:6961): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:28:38:207 Kernel-Oblig/(6958:6961): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:28:38:258 Kernel-Oblig/(6958:6961): PID: 1 - Bloqueado por: RA
+[INFO] 03:28:38:259 Kernel-Oblig/(6958:6961): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:28:38:260 Kernel-Oblig/(6958:6961): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:28:38:328 Kernel-Oblig/(6958:6961): PID: 2 - Bloqueado por: RA
+[INFO] 03:28:38:329 Kernel-Oblig/(6958:6961): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:28:41:197 Kernel-Oblig/(6958:6970): Finaliza el proceso 0 - Motivo: INTERRUPTED BY USER
+[INFO] 03:28:41:198 Kernel-Oblig/(6958:6970): PID: 0 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:28:41:199 Kernel-Oblig/(6958:6961): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:28:41:229 Kernel-Oblig/(6958:6961): PID: 1 - Bloqueado por: RA
+[INFO] 03:28:41:229 Kernel-Oblig/(6958:6961): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:28:41:230 Kernel-Oblig/(6958:6961): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:28:41:291 Kernel-Oblig/(6958:6961): PID: 2 - Bloqueado por: RA
+[INFO] 03:28:41:291 Kernel-Oblig/(6958:6961): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:28:46:122 Kernel-Oblig/(6958:6977): Finaliza el proceso 2 - Motivo: INTERRUPTED BY USER
+[INFO] 03:28:46:123 Kernel-Oblig/(6958:6977): PID: 2 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:28:46:123 Kernel-Oblig/(6958:6961): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:28:46:175 Kernel-Oblig/(6958:6961): Finaliza el proceso 1 - Motivo: SUCCESS
+[INFO] 03:28:46:176 Kernel-Oblig/(6958:6961): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 03:28:56:481 Kernel-Oblig/(6958:6965): Se crea el proceso 3 en NEW
+[INFO] 03:28:56:482 Kernel-Oblig/(6958:6959): Cola ready: 3, 
+[INFO] 03:28:56:482 Kernel-Oblig/(6958:6959): PID: 3 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:28:56:483 Kernel-Oblig/(6958:6961): PID: 3 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:28:56:541 Kernel-Oblig/(6958:6961): PID: 3 - Bloqueado por: RA
+[INFO] 03:28:56:541 Kernel-Oblig/(6958:6961): PID: 3 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:29:00:699 Kernel-Oblig/(6958:6965): Se crea el proceso 4 en NEW
+[INFO] 03:29:00:699 Kernel-Oblig/(6958:6959): Cola ready: 4, 
+[INFO] 03:29:00:700 Kernel-Oblig/(6958:6959): PID: 4 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:29:00:700 Kernel-Oblig/(6958:6961): PID: 4 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:29:00:724 Kernel-Oblig/(6958:6961): PID: 4 - Bloqueado por: RA
+[INFO] 03:29:00:725 Kernel-Oblig/(6958:6961): PID: 4 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:29:03:695 Kernel-Oblig/(6958:6987): Finaliza el proceso 4 - Motivo: INTERRUPTED BY USER
+[INFO] 03:29:03:696 Kernel-Oblig/(6958:6987): PID: 4 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:29:03:696 Kernel-Oblig/(6958:6961): PID: 3 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:29:03:763 Kernel-Oblig/(6958:6961): Finaliza el proceso 3 - Motivo: SUCCESS
+[INFO] 03:29:03:763 Kernel-Oblig/(6958:6961): PID: 3 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 03:33:16:662 Kernel-Oblig/(7363:7370): Se crea el proceso 0 en NEW
+[INFO] 03:33:17:325 Kernel-Oblig/(7363:7370): Se crea el proceso 1 en NEW
+[INFO] 03:33:17:656 Kernel-Oblig/(7363:7370): Se crea el proceso 2 en NEW
+[INFO] 03:33:17:939 Kernel-Oblig/(7363:7370): Se crea el proceso 3 en NEW
+[INFO] 03:33:19:122 Kernel-Oblig/(7363:7367): Cola ready: 0
+[INFO] 03:33:19:124 Kernel-Oblig/(7363:7367): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:33:19:125 Kernel-Oblig/(7363:7367): Cola ready: 0, 1
+[INFO] 03:33:19:125 Kernel-Oblig/(7363:7368): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:33:19:169 Kernel-Oblig/(7363:7367): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:33:19:169 Kernel-Oblig/(7363:7367): Cola ready: 1, 2
+[INFO] 03:33:19:170 Kernel-Oblig/(7363:7367): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:33:19:170 Kernel-Oblig/(7363:7367): Cola ready: 1, 2, 3
+[INFO] 03:33:19:170 Kernel-Oblig/(7363:7367): PID: 3 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:33:19:247 Kernel-Oblig/(7363:7368): PID: 0 - Bloqueado por: RA
+[INFO] 03:33:19:248 Kernel-Oblig/(7363:7368): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:33:19:272 Kernel-Oblig/(7363:7368): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:33:19:329 Kernel-Oblig/(7363:7368): PID: 1 - Bloqueado por: RA
+[INFO] 03:33:19:330 Kernel-Oblig/(7363:7368): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:33:19:330 Kernel-Oblig/(7363:7368): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:33:19:422 Kernel-Oblig/(7363:7368): PID: 2 - Bloqueado por: RA
+[INFO] 03:33:19:422 Kernel-Oblig/(7363:7368): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:33:19:423 Kernel-Oblig/(7363:7368): PID: 3 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:33:19:498 Kernel-Oblig/(7363:7368): PID: 3 - Bloqueado por: RA
+[INFO] 03:33:19:498 Kernel-Oblig/(7363:7368): PID: 3 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:33:37:723 Kernel-Oblig/(7363:7377): Finaliza el proceso 3 - Motivo: INTERRUPTED BY USER
+[INFO] 03:33:37:724 Kernel-Oblig/(7363:7377): PID: 3 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:33:37:725 Kernel-Oblig/(7363:7368): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:33:37:780 Kernel-Oblig/(7363:7368): Finaliza el proceso 0 - Motivo: SUCCESS
+[INFO] 03:33:37:781 Kernel-Oblig/(7363:7368): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 03:33:37:781 Kernel-Oblig/(7363:7368): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:33:37:806 Kernel-Oblig/(7363:7368): PID: 1 - Bloqueado por: RA
+[INFO] 03:33:37:807 Kernel-Oblig/(7363:7368): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:33:37:807 Kernel-Oblig/(7363:7368): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:33:37:884 Kernel-Oblig/(7363:7368): PID: 2 - Bloqueado por: RA
+[INFO] 03:33:37:884 Kernel-Oblig/(7363:7368): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:33:48:018 Kernel-Oblig/(7363:7385): Finaliza el proceso 1 - Motivo: INTERRUPTED BY USER
+[INFO] 03:33:48:018 Kernel-Oblig/(7363:7385): PID: 1 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 03:33:48:019 Kernel-Oblig/(7363:7368): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:33:48:066 Kernel-Oblig/(7363:7368): Finaliza el proceso 2 - Motivo: SUCCESS
+[INFO] 03:33:48:067 Kernel-Oblig/(7363:7368): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 19:44:22:684 Kernel-Oblig/(4643:4650): Se crea el proceso 0 en NEW
+[INFO] 19:44:23:494 Kernel-Oblig/(4643:4650): Se crea el proceso 1 en NEW
+[INFO] 19:44:23:971 Kernel-Oblig/(4643:4650): Se crea el proceso 2 en NEW
+[INFO] 19:44:27:886 Kernel-Oblig/(4643:4647): Cola ready: 0
+[INFO] 19:44:27:886 Kernel-Oblig/(4643:4647): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 19:44:27:886 Kernel-Oblig/(4643:4648): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:44:27:886 Kernel-Oblig/(4643:4647): Cola ready: 1
+[INFO] 19:44:27:886 Kernel-Oblig/(4643:4647): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 19:44:27:886 Kernel-Oblig/(4643:4647): Cola ready: 1, 2
+[INFO] 19:44:27:886 Kernel-Oblig/(4643:4647): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 19:44:27:941 Kernel-Oblig/(4643:4648): PID: 0 - Bloqueado por: RA
+[INFO] 19:44:27:941 Kernel-Oblig/(4643:4648): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 19:44:27:941 Kernel-Oblig/(4643:4648): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:44:28:017 Kernel-Oblig/(4643:4648): PID: 1 - Bloqueado por: RA
+[INFO] 19:44:28:017 Kernel-Oblig/(4643:4648): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 19:44:28:017 Kernel-Oblig/(4643:4648): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:44:28:081 Kernel-Oblig/(4643:4648): PID: 2 - Bloqueado por: RA
+[INFO] 19:44:28:081 Kernel-Oblig/(4643:4648): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 19:45:47:838 Kernel-Oblig/(4643:4683): Finaliza el proceso 2 - Motivo: INTERRUPTED BY USER
+[INFO] 19:45:47:838 Kernel-Oblig/(4643:4683): PID: 2 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 19:45:47:838 Kernel-Oblig/(4643:4648): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:45:47:880 Kernel-Oblig/(4643:4648): Finaliza el proceso 0 - Motivo: SUCCESS
+[INFO] 19:45:47:880 Kernel-Oblig/(4643:4648): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 19:45:47:880 Kernel-Oblig/(4643:4648): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:45:47:908 Kernel-Oblig/(4643:4648): PID: 1 - Bloqueado por: RA
+[INFO] 19:45:47:908 Kernel-Oblig/(4643:4648): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 19:54:41:547 Kernel-Oblig/(4643:4831): Finaliza el proceso 1 - Motivo: INTERRUPTED BY USER
+[INFO] 19:54:41:547 Kernel-Oblig/(4643:4831): PID: 1 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 19:59:39:080 Kernel-Oblig/(5007:5014): Se crea el proceso 0 en NEW
+[INFO] 19:59:41:266 Kernel-Oblig/(5007:5014): Se crea el proceso 1 en NEW
+[INFO] 19:59:41:608 Kernel-Oblig/(5007:5014): Se crea el proceso 2 en NEW
+[INFO] 19:59:43:044 Kernel-Oblig/(5007:5011): Cola ready: 0
+[INFO] 19:59:43:044 Kernel-Oblig/(5007:5011): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 19:59:43:044 Kernel-Oblig/(5007:5011): Cola ready: 0, 1
+[INFO] 19:59:43:044 Kernel-Oblig/(5007:5011): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 19:59:43:044 Kernel-Oblig/(5007:5012): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:59:43:044 Kernel-Oblig/(5007:5011): Cola ready: 1, 2
+[INFO] 19:59:43:044 Kernel-Oblig/(5007:5011): PID: 2 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 19:59:43:104 Kernel-Oblig/(5007:5012): PID: 0 - Bloqueado por: RA
+[INFO] 19:59:43:105 Kernel-Oblig/(5007:5012): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 19:59:43:105 Kernel-Oblig/(5007:5012): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:59:43:186 Kernel-Oblig/(5007:5012): PID: 1 - Bloqueado por: RA
+[INFO] 19:59:43:186 Kernel-Oblig/(5007:5012): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 19:59:43:186 Kernel-Oblig/(5007:5012): PID: 2 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:59:43:252 Kernel-Oblig/(5007:5012): PID: 2 - Bloqueado por: RA
+[INFO] 19:59:43:252 Kernel-Oblig/(5007:5012): PID: 2 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 19:59:59:181 Kernel-Oblig/(5007:5018): Finaliza el proceso 2 - Motivo: INTERRUPTED BY USER
+[INFO] 19:59:59:181 Kernel-Oblig/(5007:5018): PID: 2 - Estado Anterior: BLOCKED - Estado Actual: EXIT
+[INFO] 19:59:59:181 Kernel-Oblig/(5007:5012): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:59:59:226 Kernel-Oblig/(5007:5012): Finaliza el proceso 0 - Motivo: SUCCESS
+[INFO] 19:59:59:226 Kernel-Oblig/(5007:5012): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 19:59:59:226 Kernel-Oblig/(5007:5012): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 19:59:59:249 Kernel-Oblig/(5007:5012): PID: 1 - Bloqueado por: RA
+[INFO] 19:59:59:249 Kernel-Oblig/(5007:5012): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED

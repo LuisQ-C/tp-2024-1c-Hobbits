@@ -159,6 +159,21 @@ bool verificar_pid_de_solicitud(void* solicitud_io,int tipo_interfaz, int pid_bu
         }
         es_el_pid_buscado = false;
     } //FALTA IO_FS
+    else if(tipo_interfaz == IO_FS){
+        t_elemento_io_fs *solicitud_generica = (t_elemento_io_fs*) solicitud_io;
+        if(solicitud_generica->pcb->pid == pid_buscado){
+            es_el_pid_buscado = true;
+            if(indice == 0){
+                solicitud_generica->cola_destino = COLA_EXIT_USUARIO;
+            }
+            else{
+                list_iterator_remove(bloqueados_interfaz);
+                manejar_fin_con_motivo(INTERRUPTED_BY_USER_BLOCKED, solicitud_generica->pcb);
+                free(solicitud_generica);
+            }
+        }
+        es_el_pid_buscado = false;
+    }
     return es_el_pid_buscado;
 }
 

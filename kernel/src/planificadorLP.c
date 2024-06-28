@@ -109,10 +109,11 @@ char* listar_pids(t_squeue* squeue){
 
 void mostrar_cola_ready(){
 
+    char* pids = string_new();
     char* lista_pids = listar_pids(lista_procesos_ready);
-
-    log_info(logger_obligatorio, "Cola ready: %s", lista_pids);
-
+    string_n_append(&pids, lista_pids, string_length(lista_pids)-2);
+    log_info(logger_obligatorio, "Cola ready: %s", pids);
+    free(pids);
     free(lista_pids);
 
 }
@@ -126,7 +127,10 @@ void cambiar_a_ready_plus(t_pcb* pcb){
 }
 
 void mostrar_cola_ready_plus(){
+    char* pids = string_new();
     char* lista_pids = listar_pids(lista_procesos_ready_plus);
-    log_info(logger_obligatorio, "Cola ready prioridad: %s", lista_pids);
+    string_n_append(&pids, lista_pids, string_length(lista_pids)-2);
+    log_info(logger_obligatorio, "Cola ready prioridad: %s", pids);
+    free(pids);
     free(lista_pids);
 }

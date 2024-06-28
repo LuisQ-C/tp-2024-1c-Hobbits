@@ -1,6 +1,7 @@
 #include "../include/conexiones.h"
 
 extern t_log* logger;
+extern t_log* logger_obligatorio;
 extern sem_t planificacion_blocked_iniciada;
 extern sem_t proceso_en_cola_ready;
 
@@ -123,7 +124,25 @@ void procesarConexionesIO(void* datosServerInterfaces){
             atender_interfaz_stdin_stdout(interfaz_agregada,IO_STDOUT_WRITE);
             break;
         case IO_FS:
+            atender_interfaz_dial_fs(interfaz_agregada, IO_FS);
             break;
+        /*
+       case IO_FS_CREATE:
+            atender_interfaz_dial_fs(interfaz_agregada,IO_FS_CREATE);// fs-write truncate y esas cosas
+            break;
+        case IO_FS_DELETE:
+            atender_interfaz_dial_fs(interfaz_agregada,IO_FS_DELETE);// fs-write truncate y esas cosas
+            break;
+        case IO_FS_TRUNCATE:
+            atender_interfaz_dial_fs(interfaz_agregada,IO_FS_TRUNCATE);// fs-write truncate y esas cosas
+            break;
+        case IO_FS_WRITE:
+            atender_interfaz_dial_fs(interfaz_agregada,IO_FS_WRITE);// fs-write truncate y esas cosas
+            break;
+        case IO_FS_READ:
+            atender_interfaz_dial_fs(interfaz_agregada,IO_FS_READ);// fs-write truncate y esas cosas
+            break;
+        */
     }
 
     
@@ -144,14 +163,37 @@ int string_to_type(char* tipo)
     {
         return IO_STDOUT_WRITE;
     }
-    else if(!strcmp("DIALFS",tipo))
-    {
+    else if(!strcmp("IO_FS", tipo)){
         return IO_FS;
+    }
+    else{
+        return -1;
+    }
+    /*
+    else if(!strcmp("IO_FS_CREATE",tipo))//CAmbiar al tipo q corresponda
+    {
+        return IO_FS_CREATE;
+    }
+     else if(!strcmp("IO_FS_DELETE",tipo))
+    {
+        return IO_FS_DELETE;
+    }
+     else if(!strcmp("IO_FS_TRUNCATE",tipo))
+    {
+        return IO_FS_TRUNCATE;
+    }
+     else if(!strcmp("IO_FS_WRITE",tipo))
+    {
+        return IO_FS_WRITE;
+    }
+     else if(!strcmp("IO_FS_READ",tipo))
+    {
+        return IO_FS_READ;
     }
     else
     {
         return -1;
-    }
+    }*/
 }
 
 void atender_interfaz_generica(t_list_io* interfaz)
@@ -257,24 +299,83 @@ void atender_interfaz_stdin_stdout(t_list_io* interfaz, int tipo_interfaz)
     
 }
 
+void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
+{
+    int respuesta, err_recv, err_send;
+    t_elemento_io_fs* solicitud_dial_fs;
+
+    while(1)
+    {
+
+        sem_wait(interfaz->hay_proceso_cola);
+        
+        if(!cola_io_is_empty(interfaz))
+        {   
+
+            solicitud_dial_fs = peek_elemento_cola_io(interfaz);
+            int cant_direcciones = list_is_empty(solicitud_dial_fs->direcciones_fisicas) ? 0 : list_size(solicitud_dial_fs->direcciones_fisicas);
+
+            err_send = enviar_solicitud_dial_fs(solicitud_dial_fs->pcb->pid, solicitud_dial_fs->nombre_archivo, solicitud_dial_fs->tamanio, solicitud_dial_fs->direcciones_fisicas, cant_direcciones, interfaz->fd_interfaz, solicitud_dial_fs->puntero, solicitud_dial_fs->codOp);
+
+            if(err_send == -1){
+                log_info(logger, "SE DESCONECTA LA INTERFAZ %s", interfaz->nombre_interfaz);    
+                break;
+            }
+
+            err_recv = recv(interfaz->fd_interfaz,&respuesta,sizeof(int),MSG_WAITALL);
+            
+            if(err_recv == 0)
+            {
+                log_info(logger, "SE DESCONECTA LA INTERFAZ %s", interfaz->nombre_interfaz);    
+
+            break;
+            }
+
+            if(respuesta==INTERFAZ_LISTA)
+            {
+            //printf("\nTERMINO LA SOLICITUD CORRECTAMENTE\n");
+            }
+        }
+
+        sem_wait(&planificacion_blocked_iniciada);
+
+        if(!cola_io_is_empty(interfaz))
+        {
+            pop_elemento_cola_io(interfaz);
+            free(solicitud_dial_fs->nombre_archivo);
+            mandar_pcb_cola_correspondiente(solicitud_dial_fs->pcb,solicitud_dial_fs->cola_destino);
+            if(!list_is_empty(solicitud_dial_fs->direcciones_fisicas))
+                list_destroy_and_destroy_elements(solicitud_dial_fs->direcciones_fisicas,(void*) liberar_elemento);
+            
+            free(solicitud_dial_fs);
+        }
+
+        sem_post(&planificacion_blocked_iniciada);
+        
+    }
+    
+}
+//###########################
+
+
 void mandar_pcb_cola_correspondiente(t_pcb* pcb, int cola_destino)
 {
     if(cola_destino == READY)
     {
-        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", pcb->pid);
+        log_info(logger_obligatorio, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", pcb->pid);
         cambiar_a_ready(pcb);
         sem_post(&proceso_en_cola_ready);
     }
     else if(cola_destino == READYPLUS)
     {
-        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY+", pcb->pid);
+        log_info(logger_obligatorio, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY+", pcb->pid);
         cambiar_a_ready_plus(pcb);
         sem_post(&proceso_en_cola_ready);
     }
     else if(cola_destino == COLA_EXIT)
     {
         squeue_push(lista_procesos_exit,pcb);
-        log_info(logger, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: EXIT", pcb->pid);
+        log_info(logger_obligatorio, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: EXIT", pcb->pid);
     }
     else if(cola_destino == COLA_EXIT_USUARIO)
     {

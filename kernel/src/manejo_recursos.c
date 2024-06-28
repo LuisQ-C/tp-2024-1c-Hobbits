@@ -71,6 +71,7 @@ void liberar_recursos(int pid){
             for (int i = 0; i < iu->cantInstanciasUtil; i++)
             {
                 recurso_a_liberar->instancias_recurso++;
+                log_trace(logger, "%d CANT INSTNACIAS REC", recurso_a_liberar->instancias_recurso);
                 if(!squeue_is_empty(recurso_a_liberar->cola_blocked)){
                     t_pcb* pcb_aux = squeue_pop(recurso_a_liberar->cola_blocked); //como se esta liberando una instancia tengo que sacar un pcb de bloqueado
                     pcb_aux->estado = READY;
