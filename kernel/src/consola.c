@@ -1,6 +1,7 @@
 #include "../include/consola.h"
 
 extern t_log *logger;
+extern t_log* logger_obligatorio;
 extern t_config *config;
 
 extern t_squeue *lista_procesos_new;
@@ -243,7 +244,7 @@ void iniciar_proceso(char *path)
     }
 
     squeue_push(lista_procesos_new, nuevo_pcb);
-    log_info(logger, "Se crea el proceso %d en NEW", nuevo_pcb->pid);
+    log_info(logger_obligatorio, "Se crea el proceso %d en NEW", nuevo_pcb->pid);
 
     sem_post(&proceso_en_cola_new);
 }
@@ -304,7 +305,6 @@ void hilo_elimina_proceso(int *arg)
         sem_wait(&planificacion_detenida);
         sem_wait(&planificacion_detenida);
         sem_wait(&planificacion_detenida);
-        log_trace(logger, "PASE TODOS LOS WAIT");
         buscar_proceso_finalizar(pid);
         iniciar_planificacion();
     }
@@ -602,6 +602,8 @@ void proceso_estado()
         log_info(logger, "No hay recursos para usar");
     // FALTA IMPRIMIR BLOCKED, TODAS SUS COLAS
 }
+
+
 
 char *pids_blocked(t_list_io *interfaz)
 {

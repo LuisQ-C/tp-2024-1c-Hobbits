@@ -2,6 +2,8 @@
 
 extern t_config* config;
 extern t_log* logger;
+extern t_log* logger_obligatorio;
+
 
 extern t_squeue *lista_procesos_new;
 extern t_squeue *lista_procesos_ready;
@@ -31,8 +33,9 @@ void planificacion_rr(){
     
     while (1)
     {
-        sem_wait(&planificacion_ready_iniciada);
         sem_wait(&proceso_en_cola_ready);
+        sem_wait(&planificacion_ready_iniciada);
+        
         if(squeue_is_empty(lista_procesos_ready)){
             sem_post(&planificacion_ready_iniciada);
             continue;
@@ -40,7 +43,7 @@ void planificacion_rr(){
         t_pcb* pcb_auxiliar = squeue_pop(lista_procesos_ready);
         pcb_auxiliar->estado = EXEC;
         squeue_push(lista_procesos_exec, pcb_auxiliar);
-        log_info(logger, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
+        log_info(logger_obligatorio, "PID: %d - Estado Anterior: READY - Estado Actual: EXEC", pcb_auxiliar->pid);
         
         enviar_pcb(pcb_auxiliar, fd_dispatch);
 

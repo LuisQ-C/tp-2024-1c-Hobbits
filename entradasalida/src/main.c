@@ -4,10 +4,11 @@ t_log* logger;
 
 /*
 int main(int argc, char** argv) {
-     char* nombreDeInterfaz;
+
+    char* nombreDeInterfaz;
     int fd_conexion_kernel = 0;
     int fd_conexion_memoria = 0;
-   // t_log* logger;
+    //t_log* logger;
     t_config* config;
     logger = iniciar_logger("entrada_salida.log","MODULO INTERFAZ",1,LOG_LEVEL_DEBUG);
     //config = iniciar_config("entrada_salida.config",logger);

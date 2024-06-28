@@ -1,0 +1,15 @@
+[INFO] 03:46:37:471 Kernel_Obligatorio/(6678:6685): Se crea el proceso 0 en NEW
+[INFO] 03:46:41:385 Kernel_Obligatorio/(6678:6682): Cola ready: 0, 
+[INFO] 03:46:41:385 Kernel_Obligatorio/(6678:6682): PID: 0 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:46:41:385 Kernel_Obligatorio/(6678:6683): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:46:41:433 Kernel_Obligatorio/(6678:6683): PID: 0 - Bloqueado por: RA
+[INFO] 03:46:41:433 Kernel_Obligatorio/(6678:6683): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: BLOCKED
+[INFO] 03:46:49:622 Kernel_Obligatorio/(6678:6685): Se crea el proceso 1 en NEW
+[INFO] 03:46:49:622 Kernel_Obligatorio/(6678:6682): Cola ready: 1, 
+[INFO] 03:46:49:622 Kernel_Obligatorio/(6678:6682): PID: 1 - Estado Anterior: NEW - Estado Actual: READY
+[INFO] 03:46:49:622 Kernel_Obligatorio/(6678:6683): PID: 1 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:46:49:715 Kernel_Obligatorio/(6678:6683): Finaliza el proceso 1 - Motivo: SUCCESS
+[INFO] 03:46:49:715 Kernel_Obligatorio/(6678:6683): PID: 1 - Estado Anterior: EXECUTE - Estado Actual: EXIT
+[INFO] 03:46:49:715 Kernel_Obligatorio/(6678:6683): PID: 0 - Estado Anterior: READY - Estado Actual: EXEC
+[INFO] 03:46:49:758 Kernel_Obligatorio/(6678:6683): Finaliza el proceso 0 - Motivo: SUCCESS
+[INFO] 03:46:49:758 Kernel_Obligatorio/(6678:6683): PID: 0 - Estado Anterior: EXECUTE - Estado Actual: EXIT
