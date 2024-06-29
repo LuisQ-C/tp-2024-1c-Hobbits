@@ -241,6 +241,14 @@ void atender_interfaz_generica(t_list_io* interfaz)
         sem_post(&planificacion_blocked_iniciada);
         
     }
+
+    while(!cola_io_is_empty(interfaz)){
+        solicitud_io = pop_elemento_cola_io(interfaz);
+        manejar_fin_con_motivo(INVALID_INTERFACE, solicitud_io->pcb);
+        free(solicitud_io);
+    }
+    
+    quitar_interfaz_lista(interfaz);
     //DESTRUIRSE A SI MISMO, SACARSE DE LA LISTA, ENVIAR TODOS A WAIT
 }
 
@@ -295,6 +303,16 @@ void atender_interfaz_stdin_stdout(t_list_io* interfaz, int tipo_interfaz)
         sem_post(&planificacion_blocked_iniciada);
         
     }
+
+    while(!cola_io_is_empty(interfaz)){
+        solicitud_io = pop_elemento_cola_io(interfaz);
+        manejar_fin_con_motivo(INVALID_INTERFACE, solicitud_io->pcb);
+        list_destroy_and_destroy_elements(solicitud_io->direcciones_fisicas, (void*) liberar_elemento);
+        free(solicitud_io);
+    }
+    
+    quitar_interfaz_lista(interfaz);
+
     //DESTRUIRSE A SI MISMO, SACARSE DE LA LISTA, ENVIAR TODOS A EXIT
     
 }
@@ -356,6 +374,17 @@ void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
         sem_post(&planificacion_blocked_iniciada);
         
     }
+
+    while(!cola_io_is_empty(interfaz)){
+        solicitud_dial_fs = pop_elemento_cola_io(interfaz);
+        manejar_fin_con_motivo(INVALID_INTERFACE, solicitud_dial_fs->pcb);
+        if(solicitud_dial_fs->direcciones_fisicas != NULL)
+            list_destroy_and_destroy_elements(solicitud_dial_fs->direcciones_fisicas, (void*) liberar_elemento);
+        free(solicitud_dial_fs->nombre_archivo);
+        free(solicitud_dial_fs);
+    }
+    
+    quitar_interfaz_lista(interfaz);
     
 }
 //###########################

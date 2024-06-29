@@ -32,8 +32,8 @@ int main(int argc, char** argv) {
     int fd_cpu_interrupt = 0;
     int fd_escucha_interfaces = 0;
 
-    logger = iniciar_logger("kernel.log","Kernel",1,LOG_LEVEL_TRACE);
-    logger_obligatorio = iniciar_logger("kernel_obligatorio", "Kernel-Oblig", 1, LOG_LEVEL_TRACE);
+    logger = iniciar_logger("kernel.log","Kernel",0,LOG_LEVEL_TRACE);
+    logger_obligatorio = iniciar_logger("kernel_obligatorio.log", "Kernel-Oblig", 0, LOG_LEVEL_TRACE);
     config = iniciar_config(argv[1],logger);
 
     if(!iniciar_conexiones(config,logger,&fd_memoria,&fd_cpu_dispatch,&fd_cpu_interrupt,&fd_escucha_interfaces))

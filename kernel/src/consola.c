@@ -1,7 +1,7 @@
 #include "../include/consola.h"
 
 extern t_log *logger;
-extern t_log* logger_obligatorio;
+extern t_log *logger_obligatorio;
 extern t_config *config;
 
 extern t_squeue *lista_procesos_new;
@@ -32,7 +32,7 @@ t_squeue *squeue_path;
 
 char *opciones[] = {
     "EJECUTAR_SCRIPT",
-    "INICIAR_PROCESO pseudos/",
+    "INICIAR_PROCESO /scripts_memoria/",
     "FINALIZAR_PROCESO",
     "DETENER_PLANIFICACION",
     "INICIAR_PLANIFICACION",

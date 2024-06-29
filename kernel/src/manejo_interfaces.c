@@ -42,11 +42,13 @@ void quitar_interfaz_lista(t_list_io* interfaz)
 }
 void liberar_recursos_interfaz(t_list_io* interfaz)
 {
+    queue_destroy(interfaz->cola_procesos_blocked);
     free(interfaz->nombre_interfaz);
     pthread_mutex_destroy(interfaz->mutex_cola);
     free(interfaz->mutex_cola);
     sem_destroy(interfaz->hay_proceso_cola);
     free(interfaz->hay_proceso_cola);
+    free(interfaz);
 }
 
 
