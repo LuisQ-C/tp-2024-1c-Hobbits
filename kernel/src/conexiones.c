@@ -30,7 +30,7 @@ int iniciar_conexiones(t_config* config,t_log* logger,int* fd_memoria,int* fd_cp
     //LEVANTAR SERVER PARA I/O CON UN HILO
     ip = config_get_string_value(config,"IP_KERNEL");
     puerto = config_get_string_value(config,"PUERTO_ESCUCHA");
-    *fd_escucha_interfaces = iniciar_servidor(logger,ip,puerto);
+    *fd_escucha_interfaces = iniciar_servidor(logger,NULL,puerto);
     return *fd_memoria != 0 && *fd_cpu_dispatch != 0 && *fd_cpu_interrupt != 0 && *fd_escucha_interfaces != 0;
 }
 
