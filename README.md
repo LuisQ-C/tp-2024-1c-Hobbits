@@ -65,7 +65,7 @@ git clone https://github.com/sisoputnfrba/so-deploy.git
 cd so-deploy
 ./deploy.sh -r=release -p=utils -p=kernel -p=cpu -p=memoria -p=entradasalida "tp-{año}-{cuatri}-{grupo}"
 ```
-TOKEN -> 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
+TOKEN -> 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
 El mismo se encargará de instalar las Commons, clonar el repositorio del grupo
 y compilar el proyecto en la máquina remota.
 
