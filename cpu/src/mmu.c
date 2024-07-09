@@ -200,7 +200,7 @@ t_list* bases_arranque(int num_pagina,int desplazamiento, int tam_dato)
 int paginas_necesarias(int desplazamiento, int tamanio_dato)
 {
     int paginas_necesarias = 0;
-    int tamanio_pagina = 4; //HARCODEADO, VIENE DEL CONFIG
+    int tamanio_pagina = config_mem.tam_pagina; //VIENE DEL CONFIG
     int espacio_disponible_pagina = tamanio_pagina - desplazamiento;
     //TAMANIO PAGINA - DESPLAZAMIENTO, LO SOBRANTE ME CUBRE EL TAMANIO DE MI DATO? 0 o positivo
     int alcanza_pagina = alcanza_una_pagina(espacio_disponible_pagina,tamanio_dato);

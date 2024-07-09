@@ -1,6 +1,7 @@
 #include "../include/consola.h"
 
 extern t_log *logger;
+extern t_log *logger_obligatorio;
 extern t_config *config;
 
 extern t_squeue *lista_procesos_new;
@@ -31,7 +32,7 @@ t_squeue *squeue_path;
 
 char *opciones[] = {
     "EJECUTAR_SCRIPT",
-    "INICIAR_PROCESO pseudos/",
+    "INICIAR_PROCESO /scripts_memoria/",
     "FINALIZAR_PROCESO",
     "DETENER_PLANIFICACION",
     "INICIAR_PLANIFICACION",
@@ -194,12 +195,17 @@ void instrucciones_consola(char *leido)
 
 void ejecutar_script(char *path)
 {
+    char *path_archivo_scripts = string_new();
+    char *path_scripts = config_get_string_value(config, "PATH_SCRIPTS"); 
+    //string_append_with_format(&pathv2, ".%s" ,path);
+    string_append(&path_archivo_scripts, path_scripts);
+    string_append(&path_archivo_scripts, path);
     FILE *arch_instrucciones;
     char *linea_almacenada = NULL;
     size_t tam_almacenamiento = 0;
     int linea_leida;
 
-    arch_instrucciones = fopen(path, "rt");
+    arch_instrucciones = fopen(path_archivo_scripts, "rt");
     if (arch_instrucciones == NULL)
     {
         log_error(logger, "No se pudo abrir el archivo de instrucciones");
@@ -218,7 +224,9 @@ void ejecutar_script(char *path)
             instrucciones_consola(linea_almacenada);
         }
     }
+    free(path_archivo_scripts);
     free(linea_almacenada);
+    free(path_scripts);
     fclose(arch_instrucciones);
 }
 
@@ -243,7 +251,7 @@ void iniciar_proceso(char *path)
     }
 
     squeue_push(lista_procesos_new, nuevo_pcb);
-    log_info(logger, "Se crea el proceso %d en NEW", nuevo_pcb->pid);
+    log_info(logger_obligatorio, "Se crea el proceso %d en NEW", nuevo_pcb->pid);
 
     sem_post(&proceso_en_cola_new);
 }
@@ -304,7 +312,6 @@ void hilo_elimina_proceso(int *arg)
         sem_wait(&planificacion_detenida);
         sem_wait(&planificacion_detenida);
         sem_wait(&planificacion_detenida);
-        log_trace(logger, "PASE TODOS LOS WAIT");
         buscar_proceso_finalizar(pid);
         iniciar_planificacion();
     }
@@ -351,7 +358,7 @@ void buscar_proceso_finalizar(int pid)
     else if (squeue_any_satisfy(lista_procesos_ready_plus, (void *)_elemento_encontrado))
     {
         pcb_auxiliar = squeue_remove_by_condition(lista_procesos_ready_plus, (void *)_elemento_encontrado);
-        manejar_fin_con_motivo(INTERRUPTED_BY_USER_READY, pcb_auxiliar);
+        manejar_fin_con_motivo(INTERRUPTED_BY_USER_READY_PLUS, pcb_auxiliar);
     }
     else if (squeue_any_satisfy(lista_procesos_exec, (void *)_elemento_encontrado))
     {
@@ -499,45 +506,60 @@ void proceso_estado()
     // printf("proceso_estado \n");
     if (!squeue_is_empty(lista_procesos_new))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_new);
-        log_info(logger, "Procesos cola new: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola new: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else
         log_info(logger, "La cola new esta vacia");
 
     if (!squeue_is_empty(lista_procesos_ready))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_ready);
-        log_info(logger, "Procesos cola ready: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola ready: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else
         log_info(logger, "La cola ready esta vacia");
 
     if (strcmp(algoritmo, "VRR") == 0 && !squeue_is_empty(lista_procesos_ready_plus))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_ready_plus);
-        log_info(logger, "Procesos cola ready: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola ready plus: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else if (strcmp(algoritmo, "VRR") == 0)
         log_info(logger, "La cola ready plus esta vacia");
 
     if (!squeue_is_empty(lista_procesos_exec))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_exec);
-        log_info(logger, "Procesos cola exec: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola exec: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else
         log_info(logger, "La cola exec esta vacia");
 
     if (!squeue_is_empty(lista_procesos_exit))
     {
+        char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_exit);
-        log_info(logger, "Procesos cola exit: %s", pids_listar);
+        string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
+        log_info(logger, "Procesos cola exit: %s", lista_pids);
         free(pids_listar);
+        free(lista_pids);
     }
     else
         log_info(logger, "La cola exit esta vacia");
@@ -561,7 +583,10 @@ void proceso_estado()
 
         if (!string_is_empty(pids))
         {
-            log_info(logger, "Procesos cola blocked: %s", pids);
+            char* lista_pids = string_new();
+            string_n_append(&lista_pids, pids, string_length(pids)-2);
+            log_info(logger, "Procesos cola blocked: %s", lista_pids);
+            free(lista_pids);    
         }
         else
             log_info(logger, "La cola blocked (interfaces) esta vacia");
@@ -591,7 +616,10 @@ void proceso_estado()
 
         if (!string_is_empty(pids))
         {
-            log_info(logger, "Procesos cola blocked (recursos): %s", pids);
+            char* lista_pids = string_new();
+            string_n_append(&lista_pids, pids, string_length(pids)-2);
+            log_info(logger, "Procesos cola blocked (recursos): %s", lista_pids);
+            free(lista_pids);    
         }
         else
             log_info(logger, "La cola blocked (recursos) esta vacia");
@@ -600,8 +628,10 @@ void proceso_estado()
     }
     else
         log_info(logger, "No hay recursos para usar");
-    // FALTA IMPRIMIR BLOCKED, TODAS SUS COLAS
+
 }
+
+
 
 char *pids_blocked(t_list_io *interfaz)
 {
@@ -613,7 +643,6 @@ char *pids_blocked(t_list_io *interfaz)
             if (!(strcmp(pid, " ") == 0))
             {
                 string_append_with_format(&pids, "%s, ", pid);
-                //log_warning(logger, "%s", pid);
             }
             free(pid);
         }
@@ -623,17 +652,27 @@ char *pids_blocked(t_list_io *interfaz)
             if (!(strcmp(pid, " ") == 0))
             {
                 string_append_with_format(&pids, "%s, ", pid);
-                //log_warning(logger, "%s", pid);
+            }
+            free(pid);
+        }
+
+        void obtener_pids_blocked_dialfs(t_elemento_io_fs * elemento_fs){
+            char *pid = string_itoa(elemento_fs->pcb->pid);
+            if (!(strcmp(pid, " ") == 0))
+            {
+                string_append_with_format(&pids, "%s, ", pid);
             }
             free(pid);
         }
     
-    if(interfaz->tipo_interfaz == 16){
+    if(interfaz->tipo_interfaz == IO_GEN_SLEEP){
         cola_io_iterate(interfaz, (void *) obtener_pids_blocked_gen);
     }
-    else if(interfaz->tipo_interfaz == 17 || interfaz->tipo_interfaz == 18){
-        cola_io_iterate(interfaz, (void *)obtener_pids_blocked_in_out);
-
+    else if(interfaz->tipo_interfaz == IO_STDIN_READ || interfaz->tipo_interfaz == IO_STDOUT_WRITE){
+        cola_io_iterate(interfaz, (void *) obtener_pids_blocked_in_out);
+    }
+    else if(interfaz->tipo_interfaz == IO_FS){
+        cola_io_iterate(interfaz, (void *) obtener_pids_blocked_dialfs);
     }
     return pids;
 }

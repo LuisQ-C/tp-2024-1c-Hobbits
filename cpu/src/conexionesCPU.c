@@ -33,7 +33,7 @@ int iniciar_conexiones(int* fd_conexion_memoria,int* server_fd_escucha_dispatch,
     *fd_conexion_memoria = crear_conexion(ip,puerto,logger,"MEMORIA");
     //LUEGO EMPIEZA A ESCUCHAR CONEXIONES ENTRANTES
     puerto=config_get_string_value(config,"PUERTO_ESCUCHA_DISPATCH");
-    *server_fd_escucha_dispatch = iniciar_servidor(logger,"0.0.0.0",puerto);
+    *server_fd_escucha_dispatch = iniciar_servidor(logger,NULL,puerto);
     log_info(logger,"Servidor escuchando en puerto dispatch");
     puerto=config_get_string_value(config,"PUERTO_ESCUCHA_INTERRUPT");
     *server_fd_escucha_interrupt = iniciar_servidor(logger,"0.0.0.0",puerto);

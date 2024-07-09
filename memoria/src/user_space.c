@@ -34,7 +34,7 @@ int modificar_espacio_proceso(int pid,int tam,int tam_pagina)
     int pag_necesarias = calcular_pag_necesarias(espacio_necesario,tam_pagina);//CALCULA PAGINAS A QUITAR O AGREGAR
     int valor_abs_mod = fabs(espacio_necesario);
 
-    if(tam <= tam_proceso && tam >= tam_proceso-4)
+    if(tam <= tam_proceso && tam >= tam_proceso-tam_pagina)
     {
         printf("\n YA CONTAS CON ESA CANTIDAD DE ESPACIO \n");
         return MODIFICACION_NULA;

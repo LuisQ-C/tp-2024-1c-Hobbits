@@ -18,7 +18,7 @@ int iniciar_conexiones(int* server_fd,int* fd_cpu,int* fd_kernel)
     char* puerto;
     //INICIA SERVIDOR
     puerto = string_duplicate(datos_memoria.puerto_escucha);
-    *server_fd = iniciar_servidor(logger,"0.0.0.0",puerto);
+    *server_fd = iniciar_servidor(logger,NULL,puerto);
     free(puerto);
     log_info(logger,"Servidor listo para recibir cliente!");
     //ESPERAR CPU

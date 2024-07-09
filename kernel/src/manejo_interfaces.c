@@ -42,11 +42,13 @@ void quitar_interfaz_lista(t_list_io* interfaz)
 }
 void liberar_recursos_interfaz(t_list_io* interfaz)
 {
+    queue_destroy(interfaz->cola_procesos_blocked);
     free(interfaz->nombre_interfaz);
     pthread_mutex_destroy(interfaz->mutex_cola);
     free(interfaz->mutex_cola);
     sem_destroy(interfaz->hay_proceso_cola);
     free(interfaz->hay_proceso_cola);
+    free(interfaz);
 }
 
 
@@ -159,6 +161,21 @@ bool verificar_pid_de_solicitud(void* solicitud_io,int tipo_interfaz, int pid_bu
         }
         es_el_pid_buscado = false;
     } //FALTA IO_FS
+    else if(tipo_interfaz == IO_FS){
+        t_elemento_io_fs *solicitud_generica = (t_elemento_io_fs*) solicitud_io;
+        if(solicitud_generica->pcb->pid == pid_buscado){
+            es_el_pid_buscado = true;
+            if(indice == 0){
+                solicitud_generica->cola_destino = COLA_EXIT_USUARIO;
+            }
+            else{
+                list_iterator_remove(bloqueados_interfaz);
+                manejar_fin_con_motivo(INTERRUPTED_BY_USER_BLOCKED, solicitud_generica->pcb);
+                free(solicitud_generica);
+            }
+        }
+        es_el_pid_buscado = false;
+    }
     return es_el_pid_buscado;
 }
 
@@ -254,12 +271,12 @@ bool slist_comprobate_io(char* nombreInterfaz,int operacion_solicitada)
         pthread_mutex_unlock(lista_procesos_blocked->mutex);
         if(admiteTipo)
         {
-            printf("\ntipo admitido\n");
+            //printf("\ntipo admitido\n");
             return true;
         }
         else
         {
-            printf("\ntipo inadmitido\n");
+            //printf("\ntipo inadmitido\n");
             return false;
         }
     }
@@ -280,8 +297,8 @@ t_list_io* slist_buscar_interfaz(char* nombre)
 bool admite_tipo(int operacion_solicitada,int tipo_interfaz)
 {
     //HACER QUE SI ES IO GEN SLEEP el operacion_solicitad, SE COMPARE el tipo IO_GEN CON tipo_interfaz
-    printf("OPERACION SOLICITDA: %d",operacion_solicitada);
-    printf("TIPO INTERFAZ: %d",tipo_interfaz);
+    //printf("OPERACION SOLICITDA: %d",operacion_solicitada);
+    //printf("TIPO INTERFAZ: %d",tipo_interfaz);
     return operacion_solicitada == tipo_interfaz; //PARA EL FS TIPO_INTERFAZ DEBE SER UNA LISTA
 }
 

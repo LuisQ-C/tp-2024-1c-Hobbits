@@ -39,7 +39,16 @@ typedef struct
     t_pcb* pcb;
 } t_elemento_io_in_out;
 
-
+typedef struct
+{
+    int cola_destino;
+    int codOp;
+    char* nombre_archivo;
+    int tamanio;
+    int puntero;
+    t_list* direcciones_fisicas;
+    t_pcb* pcb;
+} t_elemento_io_fs;
 
 
 t_list_io* agregar_interfaz_lista(char* nombre,int tipo, int fd_interfaz);

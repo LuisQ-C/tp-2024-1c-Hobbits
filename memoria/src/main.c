@@ -13,7 +13,7 @@ t_datos_memoria datos_memoria;
 
 
 
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv) {
     
     //ESTO ANDA NO BORRARLO
     int server_fd = 0;
@@ -21,9 +21,9 @@ int main(int argc, char* argv[]) {
     int fd_kernel = 0;
 
 
-    logger = iniciar_logger("memoria.log", "MODULO MEMORIA", 1, LOG_LEVEL_DEBUG);
+    logger = iniciar_logger("memoria.log", "MODULO MEMORIA", 0, LOG_LEVEL_DEBUG);
     logger_obligatorio = iniciar_logger("memoria_oblig.log","MODULO MEMORIA-OBL",1,LOG_LEVEL_DEBUG);
-    config = iniciar_config("memoria.config",logger);
+    config = iniciar_config(argv[1],logger);
     tomar_datos_config_y_destruir();
     ////////////////////////////////////////////////////////////////
     user_space = inicializar_user_space();

@@ -62,6 +62,26 @@ int string_to_opcode(char* instruccion)
     {
         return IO_STDOUT_WRITE;
     }
+    else if(string_equals_ignore_case("IO_FS_CREATE",instruccion))
+    {
+        return IO_FS_CREATE;
+    }
+    else if(string_equals_ignore_case("IO_FS_DELETE",instruccion))
+    {
+        return IO_FS_DELETE;
+    }
+    else if(string_equals_ignore_case("IO_FS_TRUNCATE",instruccion))
+    {
+        return IO_FS_TRUNCATE;
+    }
+    else if(string_equals_ignore_case("IO_FS_READ",instruccion))
+    {
+        return IO_FS_READ;
+    }
+    else if(string_equals_ignore_case("IO_FS_WRITE",instruccion))
+    {
+        return IO_FS_WRITE;
+    }
     else
     {
         return -1;

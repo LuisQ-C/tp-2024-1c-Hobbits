@@ -2,6 +2,7 @@
 #include "../include/main.h"
 
 extern t_log* logger;
+extern t_log* logger_obligatorio;
 extern t_config* config;
 
 extern t_squeue *lista_procesos_new;
@@ -64,7 +65,7 @@ void atender_estados_new(){
             sem_post(&proceso_en_cola_ready);
             sem_post(&planificacion_new_iniciada);
             //Una vez que pasa los estados de new a ready
-            log_info(logger, "PID: %d - Estado Anterior: NEW - Estado Actual: READY", pcb_auxiliar->pid);
+            log_info(logger_obligatorio, "PID: %d - Estado Anterior: NEW - Estado Actual: READY", pcb_auxiliar->pid);
         }
         else{
             sem_post(&grado_de_multiprogramacion);
@@ -108,10 +109,11 @@ char* listar_pids(t_squeue* squeue){
 
 void mostrar_cola_ready(){
 
+    char* pids = string_new();
     char* lista_pids = listar_pids(lista_procesos_ready);
-
-    log_info(logger, "Cola ready: %s", lista_pids);
-
+    string_n_append(&pids, lista_pids, string_length(lista_pids)-2);
+    log_info(logger_obligatorio, "Cola ready: %s", pids);
+    free(pids);
     free(lista_pids);
 
 }
@@ -125,7 +127,10 @@ void cambiar_a_ready_plus(t_pcb* pcb){
 }
 
 void mostrar_cola_ready_plus(){
+    char* pids = string_new();
     char* lista_pids = listar_pids(lista_procesos_ready_plus);
-    log_info(logger, "Cola ready prioridad: %s", lista_pids);
+    string_n_append(&pids, lista_pids, string_length(lista_pids)-2);
+    log_info(logger_obligatorio, "Cola ready prioridad: %s", pids);
+    free(pids);
     free(lista_pids);
 }

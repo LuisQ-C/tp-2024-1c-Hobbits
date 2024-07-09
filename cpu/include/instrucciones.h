@@ -57,6 +57,10 @@ void io_fs_delete(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_archi
 
 void io_fs_truncate(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_archivo, int tamanio_archivo,int fd_dispatch);
 
+void io_fs_write_read(t_pcb* pcb_a_enviar,char* nombre_interfaz,char* nombre_archivo, int direccion_logica,int tamanio_dato,int puntero_archivo,int fd_dispatch, int fd_memoria,int motivo);
+
+void aniadir_porciones_dato (t_paquete* paquete,int pid ,int direccion_logica, int tamanio_dato, int fd_memoria);
+
 
 enum{
     PC_MODIFICADO,

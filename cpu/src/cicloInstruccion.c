@@ -62,7 +62,7 @@ void realizarCicloInstruccion(int fd_conexion_memoria, t_pcb* pcb_recibido,int c
 void resetear_interrupcion()
 {
     pthread_mutex_lock(&mutex_interrupcion);
-    PID_ACTUAL = -1;
+    PID_INTERRUMPIR = -1; //ANTES ESTABA ACA PID ACTUAL, SI ROMPE ALGO PUEDE SER A CAUSA DE ESO
     MOTIVO_INTERRUPCION = -1;
     pthread_mutex_unlock(&mutex_interrupcion);
 }
@@ -193,7 +193,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             MOTIVO_DESALOJO = IO_GEN_SLEEP;
             pcb_a_enviar->pc = registro.PC+1;
             pcb_a_enviar->quantum-=config_mem.retardo_memoria;
-            log_trace(logger, "%d SOY EL QUANTUM QUE VA A ACTUALIZAR", pcb_a_enviar->quantum);
+            //log_trace(logger, "%d SOY EL QUANTUM QUE VA A ACTUALIZAR", pcb_a_enviar->quantum);
             io_gen_sleep(pcb_a_enviar,instruccionDesarmada,fd_dispatch);
             break;
         }
@@ -267,6 +267,8 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             
             if(respuesta == OUT_OF_MEMORY)
             {
+                pcb_a_enviar->pc = registro.PC+1;
+                pcb_a_enviar->quantum-=config_mem.retardo_memoria;
                 desalojar_proceso(pcb_a_enviar,OUT_OF_MEMORY,fd_dispatch);
                 break;
             }
@@ -380,7 +382,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             char* nombre_archivo = string_duplicate(instruccionDesarmada[2]);
 
             pcb_a_enviar->pc = registro.PC+1;
-
+            pcb_a_enviar->quantum-=config_mem.retardo_memoria;
             io_fs_create(pcb_a_enviar,nombre_interfaz,nombre_archivo,fd_dispatch);
             free(nombre_archivo);
             free(nombre_interfaz);
@@ -393,7 +395,7 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             char* nombre_archivo = string_duplicate(instruccionDesarmada[2]);
 
             pcb_a_enviar->pc = registro.PC+1;
-
+            pcb_a_enviar->quantum-=config_mem.retardo_memoria;
             io_fs_delete(pcb_a_enviar,nombre_interfaz,nombre_archivo,fd_dispatch);
             free(nombre_archivo);
             free(nombre_interfaz);
@@ -407,10 +409,54 @@ void decode_and_execute(t_instruccion instruccion,t_pcb* pcb_a_enviar,int fd_dis
             int tamanio_archivo = obtener_valor_registro(instruccionDesarmada[3]);
 
             pcb_a_enviar->pc = registro.PC+1;
-
+            pcb_a_enviar->quantum-=config_mem.retardo_memoria;
             io_fs_truncate(pcb_a_enviar,nombre_interfaz,nombre_archivo,tamanio_archivo,fd_dispatch);
             free(nombre_archivo);
             free(nombre_interfaz);
+            break;
+        }
+        case IO_FS_READ:
+        {
+            MOTIVO_DESALOJO = IO_FS_READ;
+
+            char* nombre_interfaz = string_duplicate(instruccionDesarmada[1]);
+            char* nombre_archivo = string_duplicate(instruccionDesarmada[2]);
+            char* puntero_archivo = string_duplicate(instruccionDesarmada[5]);
+            //NECESARIO PARA EL CALCULO DE MMU
+            int direccion_logica = obtener_valor_registro(instruccionDesarmada[3]);
+            int tamanio = obtener_valor_registro(instruccionDesarmada[4]);
+            int puntero = obtener_valor_registro(puntero_archivo);
+
+            pcb_a_enviar->pc = registro.PC+1;
+            pcb_a_enviar->quantum-=config_mem.retardo_memoria;
+
+            io_fs_write_read(pcb_a_enviar,nombre_interfaz,nombre_archivo,direccion_logica,tamanio,puntero,fd_dispatch,fd_memoria,IO_FS_READ);
+            free(nombre_interfaz);
+            free(nombre_archivo);
+            free(puntero_archivo);
+            break;
+        }
+        case IO_FS_WRITE:
+        {
+            MOTIVO_DESALOJO = IO_FS_WRITE;
+
+            char* nombre_interfaz = string_duplicate(instruccionDesarmada[1]);
+            char* nombre_archivo = string_duplicate(instruccionDesarmada[2]);
+            char* puntero_archivo = string_duplicate(instruccionDesarmada[5]);
+            //NECESARIO PARA EL CALCULO DE MMU
+            int direccion_logica = obtener_valor_registro(instruccionDesarmada[3]);
+            int tamanio = obtener_valor_registro(instruccionDesarmada[4]);
+            int puntero = obtener_valor_registro(puntero_archivo);
+
+            pcb_a_enviar->pc = registro.PC+1;
+            pcb_a_enviar->quantum-=config_mem.retardo_memoria;
+            
+            io_fs_write_read(pcb_a_enviar,nombre_interfaz,nombre_archivo,direccion_logica,tamanio,puntero,fd_dispatch,fd_memoria,IO_FS_WRITE);
+
+            free(nombre_interfaz);
+            free(nombre_archivo);
+            free(puntero_archivo);
+
             break;
         }
         case EXIT:

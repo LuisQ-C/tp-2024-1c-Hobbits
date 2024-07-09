@@ -286,6 +286,75 @@ void io_stdin_stdout(t_pcb* pcb_a_enviar,char* nombre_interfaz,int direccion_log
 }
 
 //IO FILESYSTEM
+void io_fs_write_read(t_pcb* pcb_a_enviar,char* nombre_interfaz,char* nombre_archivo, int direccion_logica,int tamanio_dato,int puntero_archivo,int fd_dispatch, int fd_memoria,int motivo)
+{
+    int motivo_desalojo = motivo;
+    
+    //EMPAQUETO PCB PRIMERO
+    t_paquete* paquete = armar_paquete_pcb(pcb_a_enviar);
+    //LUEGO EL MOTIVO
+    agregar_a_paquete(paquete,&motivo_desalojo,sizeof(int));
+    //LUEGO EL NOMBRE DE LA INTERFAZ
+    agregar_a_paquete(paquete,nombre_interfaz,strlen(nombre_interfaz)+1);
+    agregar_a_paquete(paquete,nombre_archivo,strlen(nombre_archivo)+1);
+    agregar_a_paquete(paquete,&tamanio_dato,sizeof(int));
+    agregar_a_paquete(paquete,&puntero_archivo,sizeof(int));
+    //SOLICITO LOS MARCOS
+    aniadir_porciones_dato(paquete,pcb_a_enviar->pid,direccion_logica,tamanio_dato,fd_memoria);
+
+    enviar_paquete(paquete,fd_dispatch);
+    
+    eliminar_paquete(paquete);
+}
+
+void aniadir_porciones_dato (t_paquete* paquete,int pid ,int direccion_logica, int tamanio_dato, int fd_memoria)
+{
+    int tam_pagina = config_mem.tam_pagina;
+    int tamanio_enviar;
+    //
+    int pagina_inicial = traducir_direccion_pagina(direccion_logica);
+    int offset = traducir_direccion_desplazamiento(direccion_logica,pagina_inicial);
+    int pag_necesarias = paginas_necesarias(offset,tamanio_dato);
+    //BASE, DIR FISICA Y TAMANIO
+    int base = 0;
+    int dir_fisica;
+    int restante = tamanio_dato;
+    int espacio_restante = tam_pagina - offset;
+    //PORCION EMPAQUETAR
+    t_porcion_dato porcion_empaquetar;
+    //EMPIEZO A CALCULAR Y EMPAQUETAR LOS T_PORCION_DATO
+    t_list* marcos = solicitar_macros(pagina_inicial,pag_necesarias,pid,fd_memoria);
+
+    int* ptro_nro_frame = list_get(marcos,0);
+    dir_fisica = calcular_direccion_fisica(*ptro_nro_frame,offset);
+    
+    tamanio_enviar = (espacio_restante > tamanio_dato) ? tamanio_dato : espacio_restante;
+
+   
+    asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
+
+    agregar_a_paquete(paquete,&porcion_empaquetar,sizeof(t_porcion_dato));
+
+    avanzar_base_restante(&base,&restante,espacio_restante);
+
+    for(int i =1;i<pag_necesarias;i++)
+    {
+        ptro_nro_frame = list_get(marcos,i);
+        dir_fisica = calcular_direccion_fisica(*ptro_nro_frame,0);
+
+        tamanio_enviar = (restante<tam_pagina) ? restante : tam_pagina;
+
+        
+        asignar_porcion_dato(&porcion_empaquetar,base,dir_fisica,tamanio_enviar);
+
+        agregar_a_paquete(paquete,&porcion_empaquetar,sizeof(t_porcion_dato));
+
+        avanzar_base_restante(&base,&restante,tam_pagina);
+
+    }
+
+    list_destroy_and_destroy_elements(marcos,(void*) liberar_elemento);
+}
 
 void io_fs_create(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_archivo, int fd_dispatch)
 {
@@ -331,12 +400,9 @@ void io_fs_truncate(t_pcb* pcb_a_enviar, char* nombre_interfaz, char* nombre_arc
 
 void asignar_porcion_dato(t_porcion_dato* porcion, int base, int dir_fisica, int tamanio)
 {
-    /**(porcion->base) = base;
-    *(porcion->tamanio) = tamanio;
-    *(porcion->direccion_fisica) = dir_fisica;*/
-    /*porcion->base = base;
+    porcion->base = base;
     porcion->direccion_fisica = dir_fisica;
-    porcion->tamanio = tamanio;*/
+    porcion->tamanio = tamanio;
 }
 
 int resize(int pid,int new_size,int fd_memoria)
