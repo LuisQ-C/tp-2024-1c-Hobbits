@@ -28,14 +28,14 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
     string_append(&ruta_archivo_madre,"/archivo_madr3.txt");
 
     bitmap_fs = (access(ruta_bitmap,F_OK) == -1)
-        ? cargar_bitmap_nuevo(arch_bitmap,cant_bloques)
-        : cargar_bitmap_existente(arch_bitmap,cant_bloques);
+        ? cargar_bitmap_nuevo(arch_bitmap,cant_bloques,ruta_bitmap)
+        : cargar_bitmap_existente(arch_bitmap,cant_bloques,ruta_bitmap);
 
     //imprimir_bitmap(bitmap_fs);
     
     block_fs = (access(ruta_bloques,F_OK) == -1)
-        ? cargar_block_fs_nuevo(arch_bloques,tam_block_fs)
-        : cargar_block_fs_existente(arch_bloques,tam_block_fs);
+        ? cargar_block_fs_nuevo(arch_bloques,tam_block_fs,ruta_bloques)
+        : cargar_block_fs_existente(arch_bloques,tam_block_fs,ruta_bloques);
 
     if(access(ruta_archivo_madre,F_OK) == -1)
         crear_archivo_metadatas(ruta_archivo_madre);
@@ -383,11 +383,11 @@ void dialFS(t_config* config,int fd_kernel,int fd_memoria)
     
 }
 
-t_bitarray* cargar_bitmap_nuevo(FILE* arch_bitmap,int cant_bloques)
+t_bitarray* cargar_bitmap_nuevo(FILE* arch_bitmap,int cant_bloques,char* ruta_bitmap)
 {
     //log_info(logger,"ENTRE AL IF");
     int tam_bitmap = ceil(cant_bloques/8.00);
-    arch_bitmap = fopen("file_system/bitmap.dat","wb+"); //NO EXISTE ENTONCES LO CREO
+    arch_bitmap = fopen(ruta_bitmap,"wb+"); //NO EXISTE ENTONCES LO CREO
     fflush(arch_bitmap);
     ftruncate(fileno(arch_bitmap),tam_bitmap);
 
@@ -402,10 +402,10 @@ t_bitarray* cargar_bitmap_nuevo(FILE* arch_bitmap,int cant_bloques)
     return bitmap_fs_aux;
 }
 
-t_bitarray* cargar_bitmap_existente(FILE* arch_bitmap,int cant_bloques)
+t_bitarray* cargar_bitmap_existente(FILE* arch_bitmap,int cant_bloques, char* ruta_bitmap)
 {
     //log_info(logger,"ENTRE AL ELSE");
-    arch_bitmap = fopen("file_system/bitmap.dat","rb+"); 
+    arch_bitmap = fopen(ruta_bitmap,"rb+"); 
     int tam_bitmap = ceil(cant_bloques/8.00);
 
     data_bitmap = mmap(NULL,tam_bitmap,PROT_READ|PROT_WRITE,MAP_SHARED,fileno(arch_bitmap),0);
@@ -434,10 +434,10 @@ void imprimir_bitmap()
     return;
 }
 
-void* cargar_block_fs_nuevo(FILE* arch_bloques,int tam_block_fs)
+void* cargar_block_fs_nuevo(FILE* arch_bloques,int tam_block_fs, char* ruta_bloques)
 {
     //log_info(logger,"ENTRE AL IF");
-    arch_bloques = fopen("file_system/bloques.dat","wb+"); //NO EXISTE ENTONCES LO CREO
+    arch_bloques = fopen(ruta_bloques,"wb+"); //NO EXISTE ENTONCES LO CREO
     fflush(arch_bloques);
     ftruncate(fileno(arch_bloques),tam_block_fs);
 
@@ -455,10 +455,10 @@ void* cargar_block_fs_nuevo(FILE* arch_bloques,int tam_block_fs)
     return data_bloques;
 }
 
-void* cargar_block_fs_existente(FILE* arch_bloques,int tam_block_fs)
+void* cargar_block_fs_existente(FILE* arch_bloques,int tam_block_fs, char* ruta_bloques)
 {
     //log_info(logger,"ENTRE AL ELSE");
-    arch_bloques = fopen("file_system/bloques.dat","rb+"); 
+    arch_bloques = fopen(ruta_bloques,"rb+"); 
 
     void* data_bloques = mmap(NULL,tam_block_fs,PROT_READ|PROT_WRITE,MAP_SHARED,fileno(arch_bloques),0);
     

@@ -16,12 +16,12 @@
 
 
 void dialFS(t_config* config,int fd_kernel,int fd_memoria);
-t_bitarray* cargar_bitmap_nuevo(FILE* arch_bitmap,int cant_bloques);
-t_bitarray* cargar_bitmap_existente(FILE* arch_bitmap,int cant_bloques);
+t_bitarray* cargar_bitmap_nuevo(FILE* arch_bitmap,int cant_bloques,char* ruta_bitmap);
+t_bitarray* cargar_bitmap_existente(FILE* arch_bitmap,int cant_bloques, char* ruta_bitmap);
 void imprimir_bitmap();
 
-void* cargar_block_fs_existente(FILE* arch_bloques,int tam_block_fs);
-void* cargar_block_fs_nuevo(FILE* arch_bloques,int tam_block_fs);
+void* cargar_block_fs_existente(FILE* arch_bloques,int tam_block_fs, char* ruta_bloques);
+void* cargar_block_fs_nuevo(FILE* arch_bloques,int tam_block_fs, char* ruta_bloques);
 
 
 // Manejo bitmap
