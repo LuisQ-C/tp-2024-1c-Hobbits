@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
     int cliente_fd_conexion_interrupt = 0;
     int cliente_fd_conexion_dispatch = 0;
-    logger = iniciar_logger("cpu.log", "MODULO CPU", 1, LOG_LEVEL_TRACE); //QUEDA PARA SIEMPRE
+    logger = iniciar_logger("cpu.log", "MODULO CPU", 0, LOG_LEVEL_TRACE); //QUEDA PARA SIEMPRE
     logger_obligatorio = iniciar_logger("cpu_oblig.log","MODULO CPU-OBL",1,LOG_LEVEL_DEBUG);
     config = iniciar_config(argv[1],logger); //DESTRUIRLO CUANDO TERMINEMOS DE LEER LOS DATOS
     iniciar_tlb();

@@ -63,14 +63,14 @@ void conexionKernel(void* info_fd)
             char* path_kernel;
             
             recibir_creacion_proceso(&pid,&path_kernel,fd_kernel);
-            log_debug(logger,"ruta archivo: %s",path_kernel);
+            //log_debug(logger,"ruta archivo: %s",path_kernel);
 
             char* path_archivo = string_new();
             string_append(&path_archivo,path_config);
             string_append(&path_archivo,path_kernel);
 
             //ver
-            log_debug(logger,"ruta archivo: %s",path_archivo);
+            //log_debug(logger,"ruta archivo: %s",path_archivo);
             FILE* archivo_pseudocodigo = fopen(path_archivo,"r");
 
             //FALLA CUANDO SE ESPECIFICA EL DIRECTORIO SIN NADA, EJ PSEUDOS/ O PSEUDOS
