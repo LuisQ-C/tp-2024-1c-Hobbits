@@ -195,14 +195,17 @@ void instrucciones_consola(char *leido)
 
 void ejecutar_script(char *path)
 {
-    char *pathv2 = string_new();
-    string_append_with_format(&pathv2, ".%s" ,path);
+    char *path_archivo_scripts = string_new();
+    char *path_scripts = config_get_string_value(config, "PATH_SCRIPTS"); 
+    //string_append_with_format(&pathv2, ".%s" ,path);
+    string_append(&path_archivo_scripts, path_scripts);
+    string_append(&path_archivo_scripts, path);
     FILE *arch_instrucciones;
     char *linea_almacenada = NULL;
     size_t tam_almacenamiento = 0;
     int linea_leida;
 
-    arch_instrucciones = fopen(pathv2, "rt");
+    arch_instrucciones = fopen(path_archivo_scripts, "rt");
     if (arch_instrucciones == NULL)
     {
         log_error(logger, "No se pudo abrir el archivo de instrucciones");
@@ -221,8 +224,9 @@ void ejecutar_script(char *path)
             instrucciones_consola(linea_almacenada);
         }
     }
-    free(pathv2);
+    free(path_archivo_scripts);
     free(linea_almacenada);
+    free(path_scripts);
     fclose(arch_instrucciones);
 }
 
@@ -354,7 +358,7 @@ void buscar_proceso_finalizar(int pid)
     else if (squeue_any_satisfy(lista_procesos_ready_plus, (void *)_elemento_encontrado))
     {
         pcb_auxiliar = squeue_remove_by_condition(lista_procesos_ready_plus, (void *)_elemento_encontrado);
-        manejar_fin_con_motivo(INTERRUPTED_BY_USER_READY, pcb_auxiliar);
+        manejar_fin_con_motivo(INTERRUPTED_BY_USER_READY_PLUS, pcb_auxiliar);
     }
     else if (squeue_any_satisfy(lista_procesos_exec, (void *)_elemento_encontrado))
     {
@@ -529,7 +533,7 @@ void proceso_estado()
         char* lista_pids = string_new();
         char *pids_listar = listar_pids(lista_procesos_ready_plus);
         string_n_append(&lista_pids, pids_listar, string_length(pids_listar)-2);
-        log_info(logger, "Procesos cola ready: %s", lista_pids);
+        log_info(logger, "Procesos cola ready plus: %s", lista_pids);
         free(pids_listar);
         free(lista_pids);
     }

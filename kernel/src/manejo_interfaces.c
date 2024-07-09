@@ -271,12 +271,12 @@ bool slist_comprobate_io(char* nombreInterfaz,int operacion_solicitada)
         pthread_mutex_unlock(lista_procesos_blocked->mutex);
         if(admiteTipo)
         {
-            printf("\ntipo admitido\n");
+            //printf("\ntipo admitido\n");
             return true;
         }
         else
         {
-            printf("\ntipo inadmitido\n");
+            //printf("\ntipo inadmitido\n");
             return false;
         }
     }
@@ -297,8 +297,8 @@ t_list_io* slist_buscar_interfaz(char* nombre)
 bool admite_tipo(int operacion_solicitada,int tipo_interfaz)
 {
     //HACER QUE SI ES IO GEN SLEEP el operacion_solicitad, SE COMPARE el tipo IO_GEN CON tipo_interfaz
-    printf("OPERACION SOLICITDA: %d",operacion_solicitada);
-    printf("TIPO INTERFAZ: %d",tipo_interfaz);
+    //printf("OPERACION SOLICITDA: %d",operacion_solicitada);
+    //printf("TIPO INTERFAZ: %d",tipo_interfaz);
     return operacion_solicitada == tipo_interfaz; //PARA EL FS TIPO_INTERFAZ DEBE SER UNA LISTA
 }
 

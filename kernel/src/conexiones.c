@@ -394,12 +394,14 @@ void mandar_pcb_cola_correspondiente(t_pcb* pcb, int cola_destino)
 {
     if(cola_destino == READY)
     {
+        mostrar_cola_ready();
         log_info(logger_obligatorio, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", pcb->pid);
         cambiar_a_ready(pcb);
         sem_post(&proceso_en_cola_ready);
     }
     else if(cola_destino == READYPLUS)
     {
+        mostrar_cola_ready_plus();
         log_info(logger_obligatorio, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY+", pcb->pid);
         cambiar_a_ready_plus(pcb);
         sem_post(&proceso_en_cola_ready);

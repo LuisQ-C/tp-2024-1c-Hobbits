@@ -544,8 +544,8 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
             pcb_a_actualizar->estado = READY;
             pcb_a_actualizar->quantum = quantum; //PARA VRR
             squeue_push(lista_procesos_ready, pcb_a_actualizar);
-            log_info(logger_obligatorio, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: READY", pcb_a_actualizar->pid);
             mostrar_cola_ready();
+            log_info(logger_obligatorio, "PID: %d - Estado Anterior: EXECUTE - Estado Actual: READY", pcb_a_actualizar->pid);
             sem_post(&proceso_en_cola_ready);
             return false;
 
@@ -691,6 +691,8 @@ bool manejar_motivo_interrupcion(t_pcb* pcb_a_actualizar,t_list* pcb_con_motivo)
                     t_pcb* pcb_en_cola_blocked = squeue_pop(recurso_usado->cola_blocked);
                     pcb_en_cola_blocked->estado = READY;
                     squeue_push(lista_procesos_ready, pcb_en_cola_blocked);
+                    mostrar_cola_ready();
+                    log_info(logger_obligatorio, "PID: %d - Estado Anterior: BLOCKED - Estado Actual: READY", pcb_en_cola_blocked->pid);
                     sem_post(&proceso_en_cola_ready);
                 }
 
