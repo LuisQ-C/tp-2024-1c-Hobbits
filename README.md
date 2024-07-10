@@ -60,17 +60,20 @@ antes de subir el tag.
 Para desplegar el proyecto en una máquina Ubuntu Server, podemos utilizar el
 script [so-deploy] de la cátedra:
 
-```
 bash
+```
+
 git clone https://github.com/sisoputnfrba/so-deploy.git
 cd so-deploy
 ./deploy.sh -r=release -p=utils -p=kernel -p=cpu -p=memoria -p=entradasalida "tp-{año}-{cuatri}-{grupo}"
 ```
 
 ```
-./deploy.sh -r=release -p=utils -p=kernel -p=cpu -p=memoria -p=entradasalida tp-2024-1c-Hobbits
+1 - git clone https://github.com/sisoputnfrba/so-deploy.git
+2 - cd so-deploy
+3 - ./deploy.sh -r=release -p=utils -p=kernel -p=cpu -p=memoria -p=entradasalida tp-2024-1c-Hobbits
 repo de pruebas: git clone https://github.com/sisoputnfrba/c-comenta-pruebas.git
-TOKEN -> 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
+TOKEN -> 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
 
 mkdir file_system  para crear directorio
 touch
