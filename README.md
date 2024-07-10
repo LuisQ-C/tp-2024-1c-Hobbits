@@ -60,12 +60,27 @@ antes de subir el tag.
 Para desplegar el proyecto en una máquina Ubuntu Server, podemos utilizar el
 script [so-deploy] de la cátedra:
 
-```bash
+```
+bash
 git clone https://github.com/sisoputnfrba/so-deploy.git
 cd so-deploy
 ./deploy.sh -r=release -p=utils -p=kernel -p=cpu -p=memoria -p=entradasalida "tp-{año}-{cuatri}-{grupo}"
 ```
+
+```
+./deploy.sh -r=release -p=utils -p=kernel -p=cpu -p=memoria -p=entradasalida tp-2024-1c-Hobbits
+repo de pruebas: git clone https://github.com/sisoputnfrba/c-comenta-pruebas.git
 TOKEN -> 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
+
+mkdir file_system  para crear directorio
+touch
+
+para reiniciar ip :
+sudo rm -f /etc/machine-id
+sudo dbus-uuidgen --ensure=/etc/machine-id
+sudo reboot
+
+```
 El mismo se encargará de instalar las Commons, clonar el repositorio del grupo
 y compilar el proyecto en la máquina remota.
 
