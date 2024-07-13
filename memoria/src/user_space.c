@@ -36,7 +36,7 @@ int modificar_espacio_proceso(int pid,int tam,int tam_pagina)
 
     if(tam <= tam_proceso && tam >= tam_proceso-tam_pagina)
     {
-        printf("\n YA CONTAS CON ESA CANTIDAD DE ESPACIO \n");
+        //printf("\n YA CONTAS CON ESA CANTIDAD DE ESPACIO \n");
         return MODIFICACION_NULA;
     }
     else

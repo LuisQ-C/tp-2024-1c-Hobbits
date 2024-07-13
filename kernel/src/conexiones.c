@@ -199,7 +199,7 @@ int string_to_type(char* tipo)
 void atender_interfaz_generica(t_list_io* interfaz)
 {
     int respuesta, err_recv, err_send;
-    t_elemento_iogenerica* solicitud_io;
+    t_elemento_iogenerica* solicitud_io=NULL;
     while(1)
     {
         sem_wait(interfaz->hay_proceso_cola);
@@ -255,7 +255,7 @@ void atender_interfaz_generica(t_list_io* interfaz)
 void atender_interfaz_stdin_stdout(t_list_io* interfaz, int tipo_interfaz)
 {
     int respuesta, err_recv, err_send;
-    t_elemento_io_in_out* solicitud_io;
+    t_elemento_io_in_out* solicitud_io=NULL;
     while(1)
     {
         sem_wait(interfaz->hay_proceso_cola);
@@ -320,7 +320,7 @@ void atender_interfaz_stdin_stdout(t_list_io* interfaz, int tipo_interfaz)
 void atender_interfaz_dial_fs(t_list_io* interfaz, int tipo_interfaz)
 {
     int respuesta, err_recv, err_send;
-    t_elemento_io_fs* solicitud_dial_fs;
+    t_elemento_io_fs* solicitud_dial_fs=NULL;
 
     while(1)
     {

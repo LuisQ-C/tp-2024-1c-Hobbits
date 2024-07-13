@@ -40,9 +40,9 @@ while(1){
     cadenaDeCaracteres = readline(">");
 
     
-    while(tamanio_total > string_length(cadenaDeCaracteres))
+    while(tamanio_total != string_length(cadenaDeCaracteres))
     {
-        printf("\nLA CADENA INGRESADA DEBE SER DE UNA LONGITUD >= %d\n",tamanio_total);
+        printf("\nLA CADENA INGRESADA DEBE SER DE UNA LONGITUD == %d\n",tamanio_total);
         free(cadenaDeCaracteres);
         cadenaDeCaracteres = readline(">");
     }
@@ -57,7 +57,7 @@ while(1){
         direccionFisica= datoAenviar->direccion_fisica;
         tamanio= datoAenviar-> tamanio;
         agregar_a_paquete(infoAenviar,&pid,sizeof(int));
-        agregar_a_paquete(infoAenviar,cadenaAenviar,strlen(cadenaDeCaracteres));
+        agregar_a_paquete(infoAenviar,cadenaAenviar,strlen(cadenaDeCaracteres)+1);
         agregar_a_paquete(infoAenviar,&base,sizeof(int));
         agregar_a_paquete(infoAenviar,&tamanio,sizeof(int));
         agregar_a_paquete(infoAenviar,&direccionFisica,sizeof(int));

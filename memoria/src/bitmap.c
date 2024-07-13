@@ -55,7 +55,7 @@ MARCO LIBRE
 int marco_libre()
 {
     int valor;
-    int marco_libre;
+    int marco_libre=-1;
     //pthread_mutex_lock(&mutex_bitmap);
     for(int i=0;i<datos_memoria.cantidad_marcos;i++)
     {

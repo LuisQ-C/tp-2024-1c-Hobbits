@@ -27,22 +27,22 @@ void iniciarInterfaz(char* nombreDeInterfaz,  t_config* config, int fd_conexion_
 
     if (!(strcmp(tipoDeInterfaz, "GENERICA")))
     {
-        log_info(logger,"La interfaz recibida es: GENERICA");
+        //log_info(logger,"La interfaz recibida es: GENERICA");
         interfazGenerica(config,fd_conexion_kernel);
     }
     else if (!(strcmp(tipoDeInterfaz, "STDIN")))
     {
-        log_info(logger,"La interfaz recibida es: STDIN");
+        //log_info(logger,"La interfaz recibida es: STDIN");
         stDin(config, fd_conexion_kernel,fd_conexion_memoria);
     }
     else  if (!(strcmp(tipoDeInterfaz, "STDOUT")))
     {
-        log_info(logger,"La interfaz recibida es: STDOUT");
+        //log_info(logger,"La interfaz recibida es: STDOUT");
         stdOut(config, fd_conexion_kernel, fd_conexion_memoria);
     }
     else  if (!(strcmp(tipoDeInterfaz, "DIALFS")))
     {
-        log_info(logger,"La interfaz recibida es: DIALFS");
+        //log_info(logger,"La interfaz recibida es: DIALFS");
         dialFS(config, fd_conexion_kernel, fd_conexion_memoria);
     }
 
