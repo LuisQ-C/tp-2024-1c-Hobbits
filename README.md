@@ -73,7 +73,7 @@ cd so-deploy
 2 - cd so-deploy
 3 - ./deploy.sh -r=release -p=utils -p=kernel -p=cpu -p=memoria -p=entradasalida tp-2024-1c-Hobbits
 repo de pruebas: git clone https://github.com/sisoputnfrba/c-comenta-pruebas.git
-TOKEN -> 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
+
 
 mkdir file_system  para crear directorio
 touch
